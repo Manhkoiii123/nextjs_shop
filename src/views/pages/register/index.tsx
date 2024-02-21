@@ -224,7 +224,7 @@ const RegisterPage: NextPage<TProps> = () => {
             </Box>
 
             <Button type='submit' fullWidth variant='contained' sx={{ mt: 3, mb: 2 }}>
-              Sign In
+              Sign Up
             </Button>
             <Box
               sx={{
@@ -236,7 +236,14 @@ const RegisterPage: NextPage<TProps> = () => {
             >
               <Typography>Do you have already account?</Typography>
 
-              <Link href='/login'>{'Sign In'}</Link>
+              <Link
+                href='/login'
+                style={{
+                  color: theme.palette.mode === 'light' ? theme.palette.common.black : theme.palette.common.white
+                }}
+              >
+                {'Sign In'}
+              </Link>
             </Box>
             <Divider>
               <Typography sx={{ textAlign: 'center', mb: 2, mt: 2 }}> Or </Typography>
