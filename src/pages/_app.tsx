@@ -49,6 +49,7 @@ type GuardProps = {
 }
 
 // ** Pace Loader
+//khi di chuyển trang thì có thanh tiến trình chạy ở trên
 if (themeConfig.routingLoader) {
   Router.events.on('routeChangeStart', () => {
     NProgress.start()
