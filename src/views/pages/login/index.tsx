@@ -209,7 +209,14 @@ const LoginPage: NextPage<TProps> = () => {
             >
               <Typography>Don't have an account?</Typography>
 
-              <Link href='/register'>{'Sign Up'}</Link>
+              <Link
+                href='/register'
+                style={{
+                  color: theme.palette.mode === 'light' ? theme.palette.common.black : theme.palette.common.white
+                }}
+              >
+                {'Sign Up'}
+              </Link>
             </Box>
             <Divider>
               <Typography sx={{ textAlign: 'center', mb: 2, mt: 2 }}> Or </Typography>
