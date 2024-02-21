@@ -23,6 +23,7 @@ import Image from 'next/image'
 import LoginDark from '/public/images/login-dark.png'
 import LoginLight from '/public/images/login-light.png'
 import Link from 'next/link'
+import { useAuth } from 'src/hooks/useAuth'
 
 type TProps = {}
 type TDefaultValue = {
@@ -58,9 +59,16 @@ const LoginPage: NextPage<TProps> = () => {
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
-  // console.log(errors)
+
+  //** context */
+  const { login } = useAuth()
+
   const onsubmit = (data: { email: string; password: string }) => {
     // console.log({ data })
+    if (!Object.keys(errors).length) {
+      console.log('sub')
+      login({ ...data, rememberMe: isRemember })
+    }
   }
 
   return (
