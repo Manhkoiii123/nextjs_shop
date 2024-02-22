@@ -5,19 +5,6 @@ import CustomTextField from 'src/components/text-field'
 import { useSettings } from 'src/hooks/useSettings'
 
 export default function Home() {
-  // const fetchApiUser = async () => {
-  //   await axios.get('http://localhost:3001/api/users?limit=10&page=1&order=created%20asc').then(res => {
-  //     console.log(res)
-  //   })
-  // }
-  // useEffect(() => {
-  //   fetchApiUser()
-  // }, [])
-  // const theme = useTheme()
-  // console.log('theme: ', theme)
-  const { settings } = useSettings()
-  // console.log(settings)
-
   return (
     <>
       <Head>
@@ -26,9 +13,6 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Box sx={{ margin: 6, width: '200px' }}>
-        <CustomTextField id='abc' label='Mul'></CustomTextField>
-      </Box>
     </>
   )
 }
