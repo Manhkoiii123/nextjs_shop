@@ -60,7 +60,7 @@ const TextFieldStyle = styled(TextField)<TextFieldProps>(({ theme }) => {
       }
     },
     '& .MuiFormHelperText-root': {
-      marginLeft: '0 !important'
+      margin: theme.spacing(1, 0, 0)
       // lineHeight: 1.154,
       // margin: theme.spacing(1, 0, 0),
       // color: theme.palette.text.secondary,
