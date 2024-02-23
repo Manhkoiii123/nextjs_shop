@@ -9,6 +9,7 @@ import Badge from '@mui/material/Badge'
 
 import { NextPage } from 'next'
 import IconifyIcon from 'src/components/Icon'
+import UserDropdown from 'src/components/user-dropdown'
 
 const drawerWidth: number = 240
 
@@ -68,7 +69,7 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
         <Typography component='h1' variant='h6' color='inherit' noWrap sx={{ flexGrow: 1 }}>
           Dashboard
         </Typography>
-
+        <UserDropdown />
         <IconButton color='inherit'>
           <Badge badgeContent={4} color='primary'>
             <IconifyIcon icon='iconamoon:notification-bold' />
