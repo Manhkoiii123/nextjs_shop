@@ -12,7 +12,7 @@ import authConfig from 'src/configs/auth'
 
 // ** Types
 import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
-import { loginAuth } from 'src/services/auth'
+import { loginAuth, logoutAuth } from 'src/services/auth'
 import { CONFIG_API } from 'src/configs/api'
 import { clearLocalUserData, setLocalUserData } from 'src/helpers/storage'
 
@@ -39,7 +39,7 @@ const AuthProvider = ({ children }: Props) => {
 
   // ** Hooks
   const router = useRouter()
-
+  ///khi f5 se chya cai nay để call get auth me
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
@@ -93,9 +93,11 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleLogout = () => {
-    setUser(null)
-    clearLocalUserData()
-    router.push('/login')
+    logoutAuth().then(res => {
+      setUser(null)
+      clearLocalUserData()
+      router.push('/login')
+    })
   }
 
   const values = {
