@@ -47,7 +47,7 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
             await axios
               .post(
                 `${CONFIG_API.AUTH.INDEX}/refresh-token`,
-                {},
+                {}, //data
                 {
                   headers: {
                     Authorization: `Bearer ${refreshToken}`
@@ -71,7 +71,7 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
             handleRedirectLogin(router, setUser)
           }
         } else {
-          //ko có refTOken
+          //ko có refToken
           handleRedirectLogin(router, setUser)
         }
       }
