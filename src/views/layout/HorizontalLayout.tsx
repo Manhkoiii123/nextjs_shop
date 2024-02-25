@@ -23,8 +23,8 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: prop => prop !== 'open'
 })<AppBarProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  //
-  color: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.primary.contrastText,
+  color: theme.palette.text.primary,
+  // color: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.primary.contrastText,
   backgroundColor:
     theme.palette.mode === 'light' ? theme.palette.customColors.lightPaperBg : theme.palette.customColors.darkPaperBg,
   transition: theme.transitions.create(['width', 'margin'], {
