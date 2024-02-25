@@ -1,29 +1,14 @@
-import { NextPage } from 'next'
 import IconifyIcon from 'src/components/Icon'
-import Typography from '@mui/material/Typography'
+
 import IconButton from '@mui/material/IconButton'
 import { useState } from 'react'
-import { Box, BoxProps, styled } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { LAGUAGE_OPTIONS } from 'src/configs/i18n'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
+import { Menu, MenuItem } from '@mui/material'
 
 type TProps = {}
-interface TStyledItemLanguage extends BoxProps {
-  selected: boolean
-}
-const StyleItemLanguage = styled(Box)<TStyledItemLanguage>(({ theme, selected }) => ({
-  cursor: 'pointer',
-  '.MuiTypography-root': {
-    padding: '8px 12px'
-  },
-  '&:hover': {
-    backgroundColor: theme.palette.mode === 'light' ? theme.palette.primary.light : theme.palette.primary.dark
-  }
-}))
 
-const LanguageDropdown: NextPage = (props: TProps) => {
+const LanguageDropdown = (props: TProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const { i18n } = useTranslation()
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,12 +25,12 @@ const LanguageDropdown: NextPage = (props: TProps) => {
 
   return (
     <>
-      <IconButton color='inherit' id={'language-dropdown'} onClick={handleOpen}>
+      <IconButton color='inherit' id='language-dropdown' onClick={handleOpen}>
         <IconifyIcon icon='material-symbols-light:translate' />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
-        id='account-menu'
+        id='language-dropdown'
         open={open}
         onClose={handleClose}
         onClick={handleClose}
@@ -86,7 +71,7 @@ const LanguageDropdown: NextPage = (props: TProps) => {
               handleChangeLang(lang.value)
             }}
           >
-            <Typography>{lang.lang}</Typography>
+            {lang.lang}
           </MenuItem>
         ))}
       </Menu>
