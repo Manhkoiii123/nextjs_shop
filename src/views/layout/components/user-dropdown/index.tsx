@@ -11,9 +11,12 @@ import IconifyIcon from '../../../../components/Icon'
 import Image from 'next/image'
 import { useAuth } from 'src/hooks/useAuth'
 import { NextPage } from 'next'
+import { useTranslation } from 'react-i18next'
 
 type TProps = {}
 const UserDropdown: NextPage = (props: TProps) => {
+  const { t } = useTranslation()
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -28,7 +31,7 @@ const UserDropdown: NextPage = (props: TProps) => {
   return (
     <Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <Tooltip title='Account'>
+        <Tooltip title={t('Account')}>
           <IconButton
             onClick={handleClick}
             size='small'
