@@ -1,3 +1,20 @@
 {
-  "Account": "Tài khoản"
+  "Account": "Tài khoản",
+  "my_profile": "Tài khoản của tôi",
+  "Sign_In": "Đăng nhập",
+  "Upload_Image": "Cập nhật ảnh đại diện",
+  "Update_user": "Cập nhật thông tin",
+  "Enter_email": "Vui lòng nhập email",
+  "Enter_role": "Vui lòng nhập nhóm vai trò",
+  "Role": "Nhóm vai trò",
+  "address": "Địa chỉ",
+  "address_enter": "Vui lòng nhập địa chỉ của bạn",
+  "city": "Thành phố",
+  "city_enter": "Vui lòng nhập thành phố bạn đang sống",
+  "phone_number": "Số điện thoại",
+  "enter_phone": "Vui lòng nhập số điện thoại của bạn",
+  "fullName": "Họ Và Tên",
+  "enter_fullname": "Vui lòng nhập họ và tên của bạn",
+  "required": "Thông tin này không được để trống",
+  "email_type": "Vui lòng nhập đúng định dạng email"
 }

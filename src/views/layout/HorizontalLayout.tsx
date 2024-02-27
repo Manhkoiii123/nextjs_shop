@@ -12,6 +12,11 @@ import IconifyIcon from 'src/components/Icon'
 import UserDropdown from 'src/views/layout/components/user-dropdown'
 import ModeToggle from './components/mode-toggle'
 import LanguageDropdown from './components/language-dropdown'
+import { useAuth } from 'src/hooks/useAuth'
+import { Button } from '@mui/material'
+import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/router'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 const drawerWidth: number = 240
 
@@ -47,6 +52,10 @@ type TProps = {
   isHideMenu?: boolean
 }
 const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) => {
+  const { user } = useAuth()
+  const { t } = useTranslation()
+  const router = useRouter()
+
   return (
     <AppBar position='absolute' open={open}>
       <Toolbar
@@ -74,7 +83,21 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
         </Typography>
         <LanguageDropdown></LanguageDropdown>
         <ModeToggle />
-        <UserDropdown />
+        {user ? (
+          <UserDropdown />
+        ) : (
+          <Button
+            onClick={() => {
+              router.push(`/${ROUTE_CONFIG.LOGIN}`)
+            }}
+            type='submit'
+            variant='contained'
+            sx={{ width: 'auto', ml: 2 }}
+          >
+            {t('Sign_In')}
+          </Button>
+        )}
+
         {/* <IconButton color='inherit'>
           <Badge badgeContent={4} color='primary'>
             <IconifyIcon icon='iconamoon:notification-bold' />
