@@ -1,3 +1,20 @@
 {
-  "Account": "Account"
+  "Account": "Account",
+  "my_profile": "My profile",
+  "Sign_In": "Sign In",
+  "Upload_Image": "Upload Avatar",
+  "Update_user": "Update User",
+  "Enter_email": "Please enter your email address.",
+  "Enter_role": "Please enter your role",
+  "Role": "Role",
+  "address": "Address",
+  "address_enter": "Please enter your address.",
+  "city": "City",
+  "city_enter": "Please enter your city",
+  "phone_number": "Phone Number",
+  "enter_phone": "Please enter your phone number",
+  "fullName": "Fullname",
+  "enter_fullname": "Please enter your fullname",
+  "required": "The field is required",
+  "email_type": "The field is must email type"
 }

@@ -32,7 +32,7 @@ const AuthGuard = (props: AuthGuardProps) => {
     ) {
       //nếu đang ở /profile mà f5 lại actoken hết hạn đá sang login
       //login lại thì phải quay lại /profile
-      if (router.asPath !== '/') {
+      if (router.asPath !== '/' && router.asPath !== '/login') {
         router.replace({
           pathname: '/login',
           //cái query này để xử lí bên cái authCOntext có cái returnUrl khi login => đã setup chứ ko phỉa nó tự chạy sang

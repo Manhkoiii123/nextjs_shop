@@ -26,7 +26,7 @@ const GuestGuard = (props: GuestGuardProps) => {
     }
   }, [router.route])
 
-  if (authContext.loading) return fallback
+  if (authContext.loading || (!authContext.loading && authContext.user !== null)) return fallback
 
   return <>{children}</>
 }

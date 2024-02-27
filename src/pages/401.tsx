@@ -1,4 +1,6 @@
 import Typography from '@mui/material/Typography'
+import React, { ReactNode } from 'react'
+import BlankLayout from 'src/views/layout/BlankLayout'
 
 const Error401 = () => {
   return (
@@ -9,3 +11,4 @@ const Error401 = () => {
 }
 
 export default Error401
+Error401.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>

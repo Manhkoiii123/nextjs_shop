@@ -12,11 +12,13 @@ import Image from 'next/image'
 import { useAuth } from 'src/hooks/useAuth'
 import { NextPage } from 'next'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/router'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 type TProps = {}
 const UserDropdown: NextPage = (props: TProps) => {
   const { t } = useTranslation()
-
+  const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -24,6 +26,10 @@ const UserDropdown: NextPage = (props: TProps) => {
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+  const handleNavigateProfile = () => {
+    handleClose()
+    router.push(`/${ROUTE_CONFIG.MY_PROFILE}`)
   }
 
   const { user, logout } = useAuth()
@@ -96,21 +102,10 @@ const UserDropdown: NextPage = (props: TProps) => {
           {user?.email}
           {/* {user?.firstName} {user?.middleName} {user?.lastName} */}
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> My account
+        <MenuItem onClick={handleNavigateProfile}>
+          <Avatar /> {t('my_profile')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>{/* <PersonAdd fontSize='small' /> */}</ListItemIcon>
-          Add another account
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>{/* <Settings fontSize='small' /> */}</ListItemIcon>
-          Settings
-        </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>{/* <Logout fontSize='small' /> */}</ListItemIcon>
           Logout

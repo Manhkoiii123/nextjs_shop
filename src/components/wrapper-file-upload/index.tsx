@@ -1,0 +1,26 @@
+import React, { ReactNode } from 'react'
+import { useDropzone } from 'react-dropzone'
+
+interface TProps {
+  children: ReactNode
+  uploadFunc: (file: File) => void
+  objectAcceptFile?: Record<string, string[]>
+}
+// lên doc https://react-dropzone.js.org/#section-basic-example
+function WrapperFileUpload(props: TProps) {
+  const { children, uploadFunc, objectAcceptFile } = props
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: objectAcceptFile ? objectAcceptFile : {},
+    onDrop: acceptedFiles => {
+      uploadFunc(acceptedFiles[0])
+    }
+  })
+
+  return (
+    <div {...getRootProps({ className: 'dropzone' })}>
+      <input {...getInputProps()} />
+      {children}
+    </div>
+  )
+}
+export default WrapperFileUpload
