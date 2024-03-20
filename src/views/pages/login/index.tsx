@@ -24,6 +24,7 @@ import LoginDark from '/public/images/login-dark.png'
 import LoginLight from '/public/images/login-light.png'
 import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
+import { useTranslation } from 'react-i18next'
 
 type TProps = {}
 type TDefaultValue = {
@@ -43,6 +44,7 @@ const schema = yup
   .required()
 
 const LoginPage: NextPage<TProps> = () => {
+  const { t } = useTranslation()
   const defaultValues: TDefaultValue = {
     email: '',
     password: ''
@@ -64,7 +66,6 @@ const LoginPage: NextPage<TProps> = () => {
   const { login } = useAuth()
 
   const onsubmit = (data: { email: string; password: string }) => {
-    // console.log({ data })
     if (!Object.keys(errors).length) {
       login({ ...data, rememberMe: isRemember })
     }
@@ -121,7 +122,7 @@ const LoginPage: NextPage<TProps> = () => {
           }}
         >
           <Typography component='h1' variant='h5'>
-            Sign in
+            {t('Sign_in')}
           </Typography>
           <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
             <Box sx={{ mt: 2, width: '300px' }}>

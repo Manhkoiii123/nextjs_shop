@@ -108,7 +108,7 @@ const UserDropdown: NextPage = (props: TProps) => {
         <Divider />
         <MenuItem onClick={logout}>
           <ListItemIcon>{/* <Logout fontSize='small' /> */}</ListItemIcon>
-          Logout
+          {t('logout')}
         </MenuItem>
       </Menu>
     </Fragment>
