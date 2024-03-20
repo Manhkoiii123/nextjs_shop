@@ -16,5 +16,7 @@
   "fullName": "Fullname",
   "enter_fullname": "Please enter your fullname",
   "required": "The field is required",
-  "email_type": "The field is must email type"
+  "email_type": "The field is must email type",
+  "logout": "Logout",
+  "Sign_in": "Sign in"
 }

@@ -1,11 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Box, Button, Card, Grid, useTheme } from '@mui/material'
 import { NextPage } from 'next'
 import CustomTextField from 'src/components/text-field'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
-import { useEffect, useState } from 'react'
+import { EMAIL_REG } from 'src/configs/regex'
+import { useEffect } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import { useTranslation } from 'react-i18next'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
@@ -40,7 +41,6 @@ const ProfilePage: NextPage<TProps> = () => {
     role: yup.string()
   })
   const { user } = useAuth()
-  console.log('🚀 ~ user:', user)
   const theme = useTheme()
   const {
     control,
@@ -53,7 +53,7 @@ const ProfilePage: NextPage<TProps> = () => {
     resolver: yupResolver(schema)
   })
   const onsubmit = (data: any) => {
-    // console.log({ data })
+    console.log(data)
   }
   const handleUploadAvatar = (file: File) => {}
 
@@ -72,7 +72,6 @@ const ProfilePage: NextPage<TProps> = () => {
 
   return (
     <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
-      {/* <Card sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', p: 4 }}> */}
       <Grid container>
         <Grid
           container
@@ -101,18 +100,7 @@ const ProfilePage: NextPage<TProps> = () => {
                   }}
                 >
                   <Avatar sx={{ width: 100, height: 100 }}>
-                    {/* {user?.avatar ? (
-                  <Image
-                    src={user?.avatar || ''}
-                    alt='avatar'
-                    style={{
-                      height: 'auto',
-                      width: 'auto'
-                    }}
-                  ></Image>
-                ) : ( */}
                     <IconifyIcon fontSize={50} icon='mdi:user-outline'></IconifyIcon>
-                    {/* )} */}
                   </Avatar>
                   <WrapperFileUpload
                     uploadFunc={handleUploadAvatar}
@@ -291,7 +279,6 @@ const ProfilePage: NextPage<TProps> = () => {
           </Box>
         </Grid>
       </Grid>
-      {/* </Card> */}
 
       <Box sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'end' }}>
         <Button type='submit' variant='outlined' sx={{ mt: 3, mb: 2 }}>

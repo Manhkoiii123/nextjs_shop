@@ -16,5 +16,7 @@
   "fullName": "Họ Và Tên",
   "enter_fullname": "Vui lòng nhập họ và tên của bạn",
   "required": "Thông tin này không được để trống",
-  "email_type": "Vui lòng nhập đúng định dạng email"
+  "email_type": "Vui lòng nhập đúng định dạng email",
+  "logout": "Đăng xuất",
+  "Sign_in": "Đăng nhập"
 }

@@ -97,12 +97,6 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
             {t('Sign_In')}
           </Button>
         )}
-
-        {/* <IconButton color='inherit'>
-          <Badge badgeContent={4} color='primary'>
-            <IconifyIcon icon='iconamoon:notification-bold' />
-          </Badge>
-        </IconButton> */}
       </Toolbar>
     </AppBar>
   )
