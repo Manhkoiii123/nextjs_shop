@@ -59,7 +59,7 @@ const RegisterPage: NextPage<TProps> = () => {
   }
   const [isShowPassword, setIsShowPassword] = useState(false)
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
-  const [isRemember, setIsRemenber] = useState(true)
+  const [isRemember, setIsRemember] = useState(true)
   const theme = useTheme()
   const {
     control,
