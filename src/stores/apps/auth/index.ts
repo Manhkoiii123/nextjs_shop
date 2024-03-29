@@ -35,16 +35,16 @@ export const authSlice = createSlice({
     builder.addCase(registerAuthAsync.fulfilled, (state, action) => {
       // console.log('🚀 ~ builder.addCase ~ action:', action
       state.isLoading = false
-      state.isErrorUpdate = !action.payload.data?.email
-      state.isSuccessUpdate = !!action.payload.data?.email //có emial là thành công
-      state.messageUpdate = action.payload.message
+      state.isError = !action.payload.data?.email
+      state.isSuccess = !!action.payload.data?.email //có emial là thành công
+      state.message = action.payload.message
       state.typeError = action.payload.typeError
     })
     builder.addCase(registerAuthAsync.rejected, (state, action) => {
       state.isLoading = false
-      state.isErrorUpdate = false
-      state.isSuccessUpdate = false
-      state.messageUpdate = ''
+      state.isError = false
+      state.isSuccess = false
+      state.message = ''
       state.typeError = ''
     })
     //update
@@ -54,16 +54,16 @@ export const authSlice = createSlice({
     builder.addCase(updateAuthMeAsync.fulfilled, (state, action) => {
       // console.log('🚀 ~ builder.addCase ~ action:', action
       state.isLoading = false
-      state.isError = !action.payload.data?.email
-      state.isSuccess = !!action.payload.data?.email //có emial là thành công
+      state.isErrorUpdate = !action.payload.data?.email
+      state.isSuccessUpdate = !!action.payload.data?.email //có emial là thành công
       state.messageUpdate = action.payload.message
       state.typeError = action.payload.typeError
     })
     builder.addCase(updateAuthMeAsync.rejected, (state, action) => {
-      state.isError = true
-      state.isSuccess = false
+      state.isErrorUpdate = true
+      state.isSuccessUpdate = false
       state.isLoading = false
-      state.message = ''
+      state.messageUpdate = ''
       state.typeError = ''
     })
   }
