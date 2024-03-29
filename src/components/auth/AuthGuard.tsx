@@ -50,7 +50,7 @@ const AuthGuard = (props: AuthGuardProps) => {
 
   //nếu mỗi xử lí như trên thì khi mà chưa login mà vào trang /aaa => vẫn hiện ra cái ui của /aaa trong 1 thời gian
   //dưới đây sẽ xử lí
-  //do cái initAuth bên authContext => bắt if else 
+  //do cái initAuth bên authContext => bắt if else
   if (authContext.loading || authContext.user === null) return fallback
 
   return <>{children}</>
