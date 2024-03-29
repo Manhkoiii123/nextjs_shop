@@ -53,8 +53,11 @@ const UserDropdown: NextPage = (props: TProps) => {
                   alt='avatar'
                   style={{
                     height: 'auto',
-                    width: 'auto'
+                    width: 'auto',
+                    objectFit: 'cover'
                   }}
+                  width={100}
+                  height={100}
                 ></Image>
               ) : (
                 <IconifyIcon icon='mdi:user-outline'></IconifyIcon>
