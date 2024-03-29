@@ -14,9 +14,44 @@ import { NextPage } from 'next'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import { Typography } from '@mui/material'
+import { toFullName } from 'src/utils'
+import { styled } from '@mui/material/styles'
+import Badge from '@mui/material/Badge'
 
 type TProps = {}
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    backgroundColor: '#44b700',
+    color: '#44b700',
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    '&::after': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      animation: 'ripple 1.2s infinite ease-in-out',
+      border: '1px solid currentColor',
+      content: '""'
+    }
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1
+    },
+    '100%': {
+      transform: 'scale(2.4)',
+      opacity: 0
+    }
+  }
+}))
+
 const UserDropdown: NextPage = (props: TProps) => {
+  const { i18n } = useTranslation()
   const { t } = useTranslation()
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -29,7 +64,7 @@ const UserDropdown: NextPage = (props: TProps) => {
   }
   const handleNavigateProfile = () => {
     handleClose()
-    router.push(`/${ROUTE_CONFIG.MY_PROFILE}`)
+    router.push(`${ROUTE_CONFIG.MY_PROFILE}`)
   }
 
   const { user, logout } = useAuth()
@@ -46,23 +81,25 @@ const UserDropdown: NextPage = (props: TProps) => {
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>
-              {user?.avatar ? (
-                <Image
-                  src={user?.avatar || ''}
-                  alt='avatar'
-                  style={{
-                    height: 'auto',
-                    width: 'auto',
-                    objectFit: 'cover'
-                  }}
-                  width={100}
-                  height={100}
-                ></Image>
-              ) : (
-                <IconifyIcon icon='mdi:user-outline'></IconifyIcon>
-              )}
-            </Avatar>
+            <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
+              <Avatar sx={{ width: 32, height: 32 }}>
+                {user?.avatar ? (
+                  <Image
+                    src={user?.avatar || ''}
+                    alt='avatar'
+                    style={{
+                      height: '32px',
+                      width: '32px',
+                      objectFit: 'cover'
+                    }}
+                    width={0}
+                    height={0}
+                  ></Image>
+                ) : (
+                  <IconifyIcon icon='mdi:user-outline'></IconifyIcon>
+                )}
+              </Avatar>
+            </StyledBadge>
           </IconButton>
         </Tooltip>
       </Box>
@@ -101,10 +138,50 @@ const UserDropdown: NextPage = (props: TProps) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
-          {user?.email}
-          {/* {user?.firstName} {user?.middleName} {user?.lastName} */}
-        </MenuItem>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            mx: 2,
+            pb: 2,
+            px: 2
+          }}
+        >
+          <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
+            <Avatar sx={{ width: 32, height: 32 }}>
+              {user?.avatar ? (
+                <Image
+                  src={user?.avatar || ''}
+                  alt='avatar'
+                  style={{
+                    height: '32px',
+                    width: '32px',
+                    objectFit: 'cover'
+                  }}
+                  width={0}
+                  height={0}
+                ></Image>
+              ) : (
+                <IconifyIcon icon='mdi:user-outline'></IconifyIcon>
+              )}
+            </Avatar>
+          </StyledBadge>
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1
+            }}
+          >
+            <Typography component='span'>
+              {toFullName(user?.lastName || '', user?.middleName || '', user?.firstName || '', i18n.language)}
+            </Typography>
+            <Typography>{user?.role.name}</Typography>
+          </Box>
+        </Box>
+        <Divider />
         <MenuItem onClick={handleNavigateProfile}>
           <Avatar /> {t('my_profile')}
         </MenuItem>

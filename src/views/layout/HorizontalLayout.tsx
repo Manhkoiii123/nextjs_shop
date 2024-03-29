@@ -88,7 +88,7 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
         ) : (
           <Button
             onClick={() => {
-              router.push(`/${ROUTE_CONFIG.LOGIN}`)
+              router.push(`${ROUTE_CONFIG.LOGIN}`)
             }}
             type='submit'
             variant='contained'
