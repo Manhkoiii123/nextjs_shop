@@ -39,6 +39,7 @@ import { useSettings } from 'src/hooks/useSettings'
 import ThemeComponent from 'src/theme/ThemeComponent'
 import UserLayout from 'src/views/layout/UserLayout'
 import { AxiosInterceptor } from 'src/helpers/axios'
+import NoGrard from 'src/components/auth/NoGuard'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -68,7 +69,7 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   if (guestGuard) {
     return <GuestGuard fallback={<FallbackSpinner />}>{children}</GuestGuard>
   } else if (!guestGuard && !authGuard) {
-    return <>{children}</>
+    return <NoGrard fallback={<FallbackSpinner />}>{children}</NoGrard>
   } else {
     return <AuthGuard fallback={<FallbackSpinner />}>{children}</AuthGuard>
   }
