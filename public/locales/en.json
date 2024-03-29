@@ -18,5 +18,7 @@
   "required": "The field is required",
   "email_type": "The field is must email type",
   "logout": "Logout",
-  "Sign_in": "Sign in"
+  "Sign_in": "Sign in",
+  "min_8": "The phone number must be at least 8 number",
+  "Change_Image": "Update your avatar"
 }
