@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
 import { getAuthMe } from 'src/services/auth'
 import { UserDataType } from 'src/contexts/types'
-import { convertBase64, toFullName } from 'src/utils'
+import { convertBase64, seporationFullname, toFullName } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
@@ -66,6 +66,7 @@ const ProfilePage: NextPage<TProps> = () => {
   const { i18n } = useTranslation()
   const language = i18n.language
   const fetchGetAuthMe = async () => {
+    setLoading(true)
     await getAuthMe()
       .then(async response => {
         setLoading(false)
@@ -92,10 +93,13 @@ const ProfilePage: NextPage<TProps> = () => {
   const dispatch: AppDispatch = useDispatch()
   const { isLoading, isErrorUpdate, messageUpdate, isSuccessUpdate } = useSelector((state: RootState) => state.auth)
   const onsubmit = (data: any) => {
+    const { firstName, middleName, lastName } = seporationFullname(data?.fullName, language)
     dispatch(
       updateAuthMeAsync({
         email: data.email,
-        firstName: '',
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName,
         role: roleId,
         phoneNumber: data.phoneNumber,
         address: data.address,
@@ -122,7 +126,7 @@ const ProfilePage: NextPage<TProps> = () => {
 
   useEffect(() => {
     fetchGetAuthMe()
-  }, [])
+  }, [language])
 
   return (
     <>
