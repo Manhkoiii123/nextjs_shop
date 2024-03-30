@@ -30,5 +30,6 @@
   "enter_new_pass": "Please enter your new password",
   "confirm_pass": "Confirm password",
   "input_confirm_pass": "Please enter your confirm password",
-  "update_pasword": "Update password"
+  "update_pasword": "Update password",
+  "no_data": "No data"
 }

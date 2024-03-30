@@ -75,9 +75,6 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
                   config.headers['Authorization'] = `Bearer ${newAccessToken}`
                   if (accessToken) {
                     setLocalUserData(JSON.stringify(user), newAccessToken, refreshToken)
-                  } else {
-                    setLocalUserData(JSON.stringify(user), '', refreshToken)
-                    setTemporaryToken(newAccessToken)
                   }
                 } else {
                   //ko trả về acc mới

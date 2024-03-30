@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Box, Button, Card, Grid, IconButton, useTheme } from '@mui/material'
+import { Avatar, Box, Button, Card, FormHelperText, Grid, IconButton, InputLabel, useTheme } from '@mui/material'
 import { NextPage } from 'next'
 import CustomTextField from 'src/components/text-field'
 import { Controller, useForm } from 'react-hook-form'
@@ -20,6 +20,7 @@ import { resetInitialState } from 'src/stores/apps/auth'
 import { updateAuthMeAsync } from 'src/stores/apps/auth/actions'
 import FallbackSpinner from 'src/components/fall-back'
 import Spinner from 'src/components/spinner'
+import CustomSelect from 'src/components/custom-select'
 
 type TProps = {}
 type TDefaultValue = {
@@ -226,21 +227,45 @@ const ProfilePage: NextPage<TProps> = () => {
                 <Grid item md={6} xs={12}>
                   <Controller
                     control={control}
+                    rules={{
+                      required: true
+                    }}
                     render={({ field: { onChange, onBlur, value } }) => (
-                      <CustomTextField
-                        error={Boolean(errors.role)}
-                        margin='normal'
-                        required
-                        disabled
-                        fullWidth
-                        label={t('Role')}
-                        name='role'
-                        placeholder={t('Enter_role')}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        value={value}
-                        helperText={errors?.role?.message}
-                      />
+                      <div style={{ paddingTop: '12px' }}>
+                        <label
+                          style={{
+                            fontSize: '13px',
+                            marginBottom: '4px',
+                            display: 'block',
+                            color: errors?.role
+                              ? theme.palette.error.main
+                              : `rgba(${theme.palette.customColors.main}, 0.42)`
+                          }}
+                        >
+                          {t('Role')} <span style={{ color: theme.palette.error.main }}>*</span>
+                        </label>
+                        <CustomSelect
+                          fullWidth
+                          onChange={onChange}
+                          options={[]}
+                          // options={optionRoles}
+                          error={Boolean(errors?.role)}
+                          onBlur={onBlur}
+                          value={value}
+                          placeholder={t('Enter_your_role')}
+                        />
+                        {errors?.role?.message && (
+                          <FormHelperText
+                            sx={{
+                              color: errors?.role
+                                ? theme.palette.error.main
+                                : `rgba(${theme.palette.customColors.main}, 0.42)`
+                            }}
+                          >
+                            {errors?.role?.message}
+                          </FormHelperText>
+                        )}
+                      </div>
                     )}
                     name='role'
                   />
@@ -297,7 +322,7 @@ const ProfilePage: NextPage<TProps> = () => {
                     name='address'
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <Controller
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
@@ -313,6 +338,52 @@ const ProfilePage: NextPage<TProps> = () => {
                       />
                     )}
                     name='city'
+                  />
+                </Grid> */}
+                <Grid item md={6} xs={12}>
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true
+                    }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <div style={{ paddingTop: '12px' }}>
+                        <label
+                          style={{
+                            fontSize: '13px',
+                            marginBottom: '4px',
+                            display: 'block',
+                            color: errors?.city
+                              ? theme.palette.error.main
+                              : `rgba(${theme.palette.customColors.main}, 0.42)`
+                          }}
+                        >
+                          {t('city')} <span style={{ color: theme.palette.error.main }}>*</span>
+                        </label>
+                        <CustomSelect
+                          fullWidth
+                          onChange={onChange}
+                          options={[]}
+                          // options={optionRoles}
+                          error={Boolean(errors?.city)}
+                          onBlur={onBlur}
+                          value={value}
+                          placeholder={t('city_enter')}
+                        />
+                        {errors?.city?.message && (
+                          <FormHelperText
+                            sx={{
+                              color: errors?.city
+                                ? theme.palette.error.main
+                                : `rgba(${theme.palette.customColors.main}, 0.42)`
+                            }}
+                          >
+                            {errors?.city?.message}
+                          </FormHelperText>
+                        )}
+                      </div>
+                    )}
+                    name='role'
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>

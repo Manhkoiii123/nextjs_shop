@@ -30,5 +30,6 @@
   "enter_new_pass": "Vui lòng nhập mật khẩu mới",
   "confirm_pass": "Nhập lại mât khẩu mới",
   "input_confirm_pass": "Vui lòng nhập lại mật khẩu mới",
-  "update_pasword": "Cập nhật mật khẩu"
+  "update_pasword": "Cập nhật mật khẩu",
+  "no_data": "Không có dữ liệu"
 }
