@@ -1,6 +1,6 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { updateAuthMeAsync, registerAuthAsync } from 'src/stores/apps/auth/actions'
+import { updateAuthMeAsync, registerAuthAsync, chagePasswordMeAsync } from 'src/stores/apps/auth/actions'
 
 const initialState = {
   isLoading: false,
@@ -10,7 +10,10 @@ const initialState = {
   typeError: '',
   isSuccessUpdate: true,
   isErrorUpdate: false,
-  messageUpdate: ''
+  messageUpdate: '',
+  isSuccessChangePassword: true,
+  isErrorChangePassword: false,
+  messageChangePassword: ''
 }
 
 export const authSlice = createSlice({
@@ -23,9 +26,12 @@ export const authSlice = createSlice({
       state.isLoading = false
       state.message = ''
       state.typeError = ''
-      state.isErrorUpdate = false
+      state.isErrorChangePassword = false
       state.isSuccessUpdate = true
       state.messageUpdate = ''
+      state.isErrorChangePassword = false
+      state.isSuccessChangePassword = true
+      state.messageChangePassword = ''
     }
   },
   extraReducers: builder => {
@@ -64,6 +70,24 @@ export const authSlice = createSlice({
       state.isSuccessUpdate = false
       state.isLoading = false
       state.messageUpdate = ''
+      state.typeError = ''
+    })
+    //change password me
+    builder.addCase(chagePasswordMeAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(chagePasswordMeAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isErrorChangePassword = !action.payload.data
+      state.isSuccessChangePassword = !!action.payload.data //có emial là thành công
+      state.messageChangePassword = action.payload.message
+      state.typeError = action.payload.typeError
+    })
+    builder.addCase(chagePasswordMeAsync.rejected, (state, action) => {
+      state.isErrorChangePassword = true
+      state.isSuccessChangePassword = false
+      state.isLoading = false
+      state.messageChangePassword = ''
       state.typeError = ''
     })
   }

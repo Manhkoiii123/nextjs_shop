@@ -25,6 +25,7 @@ import LoginLight from '/public/images/login-light.png'
 import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 type TProps = {}
 type TDefaultValue = {
@@ -55,7 +56,8 @@ const LoginPage: NextPage<TProps> = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    setError
   } = useForm({
     defaultValues: defaultValues,
     mode: 'onBlur',
@@ -67,7 +69,11 @@ const LoginPage: NextPage<TProps> = () => {
 
   const onsubmit = (data: { email: string; password: string }) => {
     if (!Object.keys(errors).length) {
-      login({ ...data, rememberMe: isRemember })
+      login({ ...data, rememberMe: isRemember }, err => {
+        if (err?.response?.data?.typeError === 'INVALID')
+          // console.log('🚀 ~ onsubmit ~ err:', err)
+          toast.error(t('the_emmail_or_pass_wrong'))
+      })
     }
   }
 

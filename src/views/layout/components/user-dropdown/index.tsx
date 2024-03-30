@@ -66,6 +66,10 @@ const UserDropdown: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.MY_PROFILE)
     handleClose()
   }
+  const handleNavigateChangePassword = () => {
+    router.push(ROUTE_CONFIG.CHANGE_PASSWORD)
+    handleClose()
+  }
 
   const { user, logout } = useAuth()
 
@@ -176,7 +180,8 @@ const UserDropdown: NextPage = (props: TProps) => {
             }}
           >
             <Typography component='span'>
-              {toFullName(user?.lastName || '', user?.middleName || '', user?.firstName || '', i18n.language)}
+              {toFullName(user?.lastName || '', user?.middleName || '', user?.firstName || '', i18n.language) ||
+                user?.email}
             </Typography>
             <Typography>{user?.role?.name}</Typography>
           </Box>
@@ -188,7 +193,13 @@ const UserDropdown: NextPage = (props: TProps) => {
           </Avatar>{' '}
           {t('my_profile')}
         </MenuItem>
-        <Divider />
+        <MenuItem onClick={handleNavigateChangePassword}>
+          <Avatar sx={{ backgroundColor: 'transparent' }}>
+            <IconifyIcon icon={'solar:lock-password-linear'}></IconifyIcon>
+          </Avatar>
+          <ListItemIcon></ListItemIcon>
+          {t('change_pass')}
+        </MenuItem>
         <MenuItem onClick={logout}>
           <Avatar sx={{ backgroundColor: 'transparent' }}>
             <IconifyIcon icon={'material-symbols-light:logout-sharp'}></IconifyIcon>

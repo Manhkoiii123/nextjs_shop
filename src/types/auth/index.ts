@@ -6,3 +6,7 @@ export type TRegisterAuth = {
   email: string
   password: string
 }
+export type TypeChangePassword = {
+  currentPassword: string
+  newPassword: string
+}

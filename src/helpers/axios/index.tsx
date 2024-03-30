@@ -29,9 +29,10 @@ const instanceAxios = axios.create({ baseURL: BASE_URL })
 const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
   const router = useRouter()
   const { setUser } = useAuth()
-  const { accessToken, refreshToken } = getLocalUserData()
 
   instanceAxios.interceptors.request.use(async config => {
+    const { accessToken, refreshToken } = getLocalUserData() //để luôn lấy cái mới nhất token
+
     if (accessToken) {
       const decodeAccessToken: any = jwtDecode(accessToken)
       //check xem còn accToken thời hạn ko

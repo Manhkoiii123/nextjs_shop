@@ -20,5 +20,15 @@
   "logout": "Logout",
   "Sign_in": "Sign in",
   "min_8": "The phone number must be at least 8 number",
-  "Change_Image": "Update your avatar"
+  "Change_Image": "Update your avatar",
+  "change_pass": "Change password",
+  "the_emmail_or_pass_wrong": "The email or password is wrong",
+  "login_successfull": "Login successfully",
+  "current_pass": "Current password",
+  "input_currentPass": "Please enter your current password",
+  "new_pass": "New password",
+  "enter_new_pass": "Please enter your new password",
+  "confirm_pass": "Confirm password",
+  "input_confirm_pass": "Please enter your confirm password",
+  "update_pasword": "Update password"
 }

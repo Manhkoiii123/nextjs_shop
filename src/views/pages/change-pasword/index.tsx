@@ -1,66 +1,61 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  CssBaseline,
-  Divider,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  Typography,
-  useTheme
-} from '@mui/material'
+import { Box, Button, CssBaseline, IconButton, InputAdornment, Typography, useTheme } from '@mui/material'
 import { NextPage } from 'next'
 import CustomTextField from 'src/components/text-field'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
+import { PASSWORD_REG } from 'src/configs/regex'
 import { useEffect, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import Image from 'next/image'
 import RegisterDark from '/public/images/register-dark.png'
 import RegisterLight from '/public/images/register-light.png'
-import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerAuthAsync } from 'src/stores/apps/auth/actions'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
 import FallbackSpinner from 'src/components/fall-back'
 import { resetInitialState } from 'src/stores/apps/auth'
 import { useRouter } from 'next/navigation'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import { useTranslation } from 'react-i18next'
+import { chagePasswordMeAsync } from 'src/stores/apps/auth/actions'
+import { useAuth } from 'src/hooks/useAuth'
 
 type TProps = {}
 type TDefaultValue = {
-  email: string
-  password: string
-  confirmPassword: string
+  currentPassword: string
+  newPassword: string
+  confirmNewPassword: string
 }
 
 const schema = yup.object().shape({
-  email: yup.string().required('The field is required').matches(EMAIL_REG, 'The field is must email type'),
-  password: yup
+  currentPassword: yup
     .string()
     .required('The field is required')
     .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
-  confirmPassword: yup
+  newPassword: yup
+    .string()
+    .required('The field is required')
+    .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
+  confirmNewPassword: yup
     .string()
     .required('The field is required')
     .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number')
-    .oneOf([yup.ref('password')], 'The confirm password is must match with password')
+    .oneOf([yup.ref('newPassword')], 'The confirm password is must match with password')
 })
 
-const RegisterPage: NextPage<TProps> = () => {
+const ChangePasswordPage: NextPage<TProps> = () => {
   const defaultValues: TDefaultValue = {
-    email: '',
-    password: '',
-    confirmPassword: ''
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: ''
   }
-  const [isShowPassword, setIsShowPassword] = useState(false)
-  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
-  const [isRemember, setIsRemember] = useState(true)
+  const [isShowCurrentPassword, setIsShowCurrentPassword] = useState(false)
+  const [isShowConfirmNewPassword, setIsShowConfirmNewPassword] = useState(false)
+  const [isShowNewPassword, setIsShowNewPassword] = useState(false)
+  const { t } = useTranslation()
   const theme = useTheme()
+  const { logout } = useAuth()
   const {
     control,
     handleSubmit,
@@ -73,33 +68,35 @@ const RegisterPage: NextPage<TProps> = () => {
 
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
-  const { isLoading, isError, isSuccess, message } = useSelector((state: RootState) => state.auth)
+  const { isLoading, isErrorChangePassword, isSuccessChangePassword, messageChangePassword } = useSelector(
+    (state: RootState) => state.auth
+  )
   const router = useRouter()
-  const onsubmit = (data: { email: string; password: string }) => {
+  const onsubmit = (data: { currentPassword: string; newPassword: string }) => {
     if (!Object.keys(errors).length) {
-      dispatch(registerAuthAsync({ email: data.email, password: data.password }))
+      dispatch(chagePasswordMeAsync({ currentPassword: data.currentPassword, newPassword: data.newPassword }))
     }
   }
 
   useEffect(() => {
-    if (message) {
-      if (isError) {
-        toast.error(message)
-      } else if (isSuccess) {
-        toast.success(message)
-        router.push(ROUTE_CONFIG.LOGIN)
+    if (messageChangePassword) {
+      if (isErrorChangePassword) {
+        toast.error(messageChangePassword)
+      } else if (isSuccessChangePassword) {
+        toast.success(messageChangePassword)
+        setTimeout(() => {
+          logout() //logout ra để đưa token vào blacklist
+        }, 500)
       }
       dispatch(resetInitialState())
     }
-  }, [isSuccess, isError, message])
+  }, [isSuccessChangePassword, isErrorChangePassword, messageChangePassword, dispatch, router, logout])
 
   return (
     <>
       {isLoading && <FallbackSpinner />}
       <Box
         sx={{
-          height: '100vh',
-          width: '100vw',
           backgroundColor: theme.palette.background.paper,
           display: 'flex',
           alignItems: 'center',
@@ -146,7 +143,7 @@ const RegisterPage: NextPage<TProps> = () => {
             }}
           >
             <Typography component='h1' variant='h5'>
-              Sign Up
+              {t('change_pass')}
             </Typography>
             <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
               <Box sx={{ mt: 2, width: '300px' }}>
@@ -157,49 +154,24 @@ const RegisterPage: NextPage<TProps> = () => {
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <CustomTextField
-                      error={Boolean(errors.email)}
+                      error={Boolean(errors?.currentPassword)}
                       margin='normal'
                       required
                       fullWidth
-                      id='email'
-                      label='Email'
-                      name='email'
-                      placeholder='Input email'
+                      name='currentPassword'
+                      label={t('current_pass')}
+                      type={isShowCurrentPassword ? 'text' : 'password'}
+                      id='currentPassword'
+                      placeholder={t('input_currentPass')}
                       onChange={onChange}
                       onBlur={onBlur}
-                      value={value}
-                      helperText={errors?.email?.message}
-                    />
-                  )}
-                  name='email'
-                />
-              </Box>
-              <Box sx={{ mt: 2, width: '300px' }}>
-                <Controller
-                  control={control}
-                  rules={{
-                    required: true
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <CustomTextField
-                      error={Boolean(errors.password)}
-                      margin='normal'
-                      required
-                      fullWidth
-                      name='password'
-                      label='Password'
-                      type={isShowPassword ? 'text' : 'password'}
-                      id='password'
-                      placeholder='Input password'
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      helperText={errors?.password?.message}
+                      helperText={errors?.currentPassword?.message}
                       value={value}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position='end'>
-                            <IconButton edge='end' onClick={() => setIsShowPassword(!isShowPassword)}>
-                              {isShowPassword ? (
+                            <IconButton edge='end' onClick={() => setIsShowCurrentPassword(!isShowCurrentPassword)}>
+                              {isShowCurrentPassword ? (
                                 <IconifyIcon icon={'material-symbols:visibility-outline'} />
                               ) : (
                                 <IconifyIcon icon={'material-symbols:visibility-off'} />
@@ -210,7 +182,7 @@ const RegisterPage: NextPage<TProps> = () => {
                       }}
                     />
                   )}
-                  name='password'
+                  name='currentPassword'
                 />
               </Box>
               <Box sx={{ mt: 2, width: '300px' }}>
@@ -221,23 +193,24 @@ const RegisterPage: NextPage<TProps> = () => {
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <CustomTextField
-                      error={Boolean(errors.confirmPassword)}
+                      error={Boolean(errors.newPassword)}
                       margin='normal'
                       required
                       fullWidth
-                      name='confirmPassword'
-                      label='Confirm Password'
-                      type={isShowConfirmPassword ? 'text' : 'password'}
-                      placeholder='Enter confirm password'
+                      name='newPassword'
+                      label={t('new_pass')}
+                      type={isShowNewPassword ? 'text' : 'password'}
+                      id='newPassword'
+                      placeholder={t('enter_new_pass')}
                       onChange={onChange}
                       onBlur={onBlur}
-                      helperText={errors?.confirmPassword?.message}
+                      helperText={errors?.newPassword?.message}
                       value={value}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position='end'>
-                            <IconButton edge='end' onClick={() => setIsShowConfirmPassword(!isShowConfirmPassword)}>
-                              {isShowConfirmPassword ? (
+                            <IconButton edge='end' onClick={() => setIsShowNewPassword(!isShowNewPassword)}>
+                              {isShowNewPassword ? (
                                 <IconifyIcon icon={'material-symbols:visibility-outline'} />
                               ) : (
                                 <IconifyIcon icon={'material-symbols:visibility-off'} />
@@ -248,76 +221,54 @@ const RegisterPage: NextPage<TProps> = () => {
                       }}
                     />
                   )}
-                  name='confirmPassword'
+                  name='newPassword'
+                />
+              </Box>
+              <Box sx={{ mt: 2, width: '300px' }}>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: true
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <CustomTextField
+                      error={Boolean(errors.confirmNewPassword)}
+                      margin='normal'
+                      required
+                      fullWidth
+                      name='confirmNewPassword'
+                      label={t('confirm_pass')}
+                      type={isShowConfirmNewPassword ? 'text' : 'password'}
+                      placeholder={t('input_confirm_pass')}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      helperText={errors?.confirmNewPassword?.message}
+                      value={value}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              edge='end'
+                              onClick={() => setIsShowConfirmNewPassword(!isShowConfirmNewPassword)}
+                            >
+                              {isShowConfirmNewPassword ? (
+                                <IconifyIcon icon={'material-symbols:visibility-outline'} />
+                              ) : (
+                                <IconifyIcon icon={'material-symbols:visibility-off'} />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  )}
+                  name='confirmNewPassword'
                 />
               </Box>
 
               <Button type='submit' fullWidth variant='contained' sx={{ mt: 3, mb: 2 }}>
-                Sign Up
+                {t('update_pasword')}
               </Button>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4
-                }}
-              >
-                <Typography>Do you have already account?</Typography>
-
-                <Link
-                  href='/login'
-                  style={{
-                    color: theme.palette.mode === 'light' ? theme.palette.common.black : theme.palette.common.white
-                  }}
-                >
-                  {'Sign In'}
-                </Link>
-              </Box>
-              <Divider>
-                <Typography sx={{ textAlign: 'center', mb: 2, mt: 2 }}> Or </Typography>
-              </Divider>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 5
-                }}
-              >
-                <IconButton sx={{ color: theme.palette.error.main }}>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    role='img'
-                    fontSize='1.375rem'
-                    className='iconify iconify--mdi'
-                    width='1em'
-                    height='1em'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      fill='currentColor'
-                      d='M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z'
-                    ></path>
-                  </svg>
-                </IconButton>
-                <IconButton sx={{ color: '#497ce2' }}>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    role='img'
-                    fontSize='1.375rem'
-                    className='iconify iconify--mdi'
-                    width='1em'
-                    height='1em'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      fill='currentColor'
-                      d='M12 2.04c-5.5 0-10 4.49-10 10.02c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89c1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02Z'
-                    ></path>
-                  </svg>
-                </IconButton>
-              </Box>
             </form>
           </Box>
         </Box>
@@ -325,4 +276,4 @@ const RegisterPage: NextPage<TProps> = () => {
     </>
   )
 }
-export default RegisterPage
+export default ChangePasswordPage
