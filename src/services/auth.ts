@@ -11,6 +11,8 @@ export const loginAuth = async (data: TLoginAuth) => {
 export const logoutAuth = async () => {
   try {
     const res = await instanceAxios.post(`${CONFIG_API.AUTH.INDEX}/logout`)
+
+    return res.data
   } catch (error) {
     return null
   }

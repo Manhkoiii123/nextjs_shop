@@ -19,6 +19,7 @@ import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/apps/auth'
 import { updateAuthMeAsync } from 'src/stores/apps/auth/actions'
 import FallbackSpinner from 'src/components/fall-back'
+import Spinner from 'src/components/spinner'
 
 type TProps = {}
 type TDefaultValue = {
@@ -130,7 +131,8 @@ const ProfilePage: NextPage<TProps> = () => {
 
   return (
     <>
-      {loading || (isLoading && <FallbackSpinner />)}
+      {/* <Spinner></Spinner> */}
+      {loading || (isLoading && <Spinner />)}
       <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
         <Grid container>
           <Grid

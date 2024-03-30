@@ -63,8 +63,8 @@ const UserDropdown: NextPage = (props: TProps) => {
     setAnchorEl(null)
   }
   const handleNavigateProfile = () => {
+    router.push(ROUTE_CONFIG.MY_PROFILE)
     handleClose()
-    router.push(`${ROUTE_CONFIG.MY_PROFILE}`)
   }
 
   const { user, logout } = useAuth()
@@ -178,16 +178,22 @@ const UserDropdown: NextPage = (props: TProps) => {
             <Typography component='span'>
               {toFullName(user?.lastName || '', user?.middleName || '', user?.firstName || '', i18n.language)}
             </Typography>
-            <Typography>{user?.role.name}</Typography>
+            <Typography>{user?.role?.name}</Typography>
           </Box>
         </Box>
         <Divider />
         <MenuItem onClick={handleNavigateProfile}>
-          <Avatar /> {t('my_profile')}
+          <Avatar>
+            <IconifyIcon icon='ph:user-thin' />
+          </Avatar>{' '}
+          {t('my_profile')}
         </MenuItem>
         <Divider />
         <MenuItem onClick={logout}>
-          <ListItemIcon>{/* <Logout fontSize='small' /> */}</ListItemIcon>
+          <Avatar sx={{ backgroundColor: 'transparent' }}>
+            <IconifyIcon icon={'material-symbols-light:logout-sharp'}></IconifyIcon>
+          </Avatar>
+          <ListItemIcon></ListItemIcon>
           {t('logout')}
         </MenuItem>
       </Menu>
