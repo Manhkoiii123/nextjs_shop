@@ -4,7 +4,7 @@
 import { useRouter } from 'next/router'
 import { ReactNode, ReactElement, useEffect } from 'react'
 import { ACCESS_TOKEN, USERDATA } from 'src/configs/auth'
-import { clearLocalUserData } from 'src/helpers/storage'
+import { clearLocalUserData, clearTemporaryToken, getTemporaryToken } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
 
 interface AuthGuardProps {
@@ -18,6 +18,7 @@ const AuthGuard = (props: AuthGuardProps) => {
   const authContext = useAuth()
   const router = useRouter()
   useEffect(() => {
+    const { temporaryToken } = getTemporaryToken()
     if (!router.isReady) {
       // khi chuyển trang mà cái trang nó first render rồi => thì cái isRE = true
       return
@@ -28,7 +29,8 @@ const AuthGuard = (props: AuthGuardProps) => {
       //vì vậy cần check thêm 2 cái điều kiện sau nữa cho chắc
       authContext.user === null &&
       !window.localStorage.getItem(ACCESS_TOKEN) &&
-      !window.localStorage.getItem(USERDATA)
+      !window.localStorage.getItem(USERDATA) &&
+      !temporaryToken
     ) {
       //nếu đang ở /profile mà f5 lại actoken hết hạn đá sang login
       //login lại thì phải quay lại /profile
@@ -47,7 +49,16 @@ const AuthGuard = (props: AuthGuardProps) => {
       clearLocalUserData()
     }
   }, [router.route])
+  useEffect(() => {
+    const handleUnload = () => {
+      clearTemporaryToken()
+    }
+    window.addEventListener('beforeunload', handleUnload)
 
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload)
+    }
+  }, [])
   //nếu mỗi xử lí như trên thì khi mà chưa login mà vào trang /aaa => vẫn hiện ra cái ui của /aaa trong 1 thời gian
   //dưới đây sẽ xử lí
   //do cái initAuth bên authContext => bắt if else

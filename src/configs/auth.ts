@@ -5,3 +5,5 @@ export default {
 export const ACCESS_TOKEN = 'accessToken'
 export const REFRESH_TOKEN = 'refreshToken'
 export const USERDATA = 'userdata'
+export const TEMPORARY_TOKEN = 'temporaryToken'
+
