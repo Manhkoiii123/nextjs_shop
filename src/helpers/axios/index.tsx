@@ -1,6 +1,13 @@
 import axios from 'axios'
 import { BASE_URL, CONFIG_API } from 'src/configs/api'
-import { clearLocalUserData, getLocalUserData } from '../storage'
+import {
+  clearLocalUserData,
+  clearTemporaryToken,
+  getLocalUserData,
+  getTemporaryToken,
+  setLocalUserData,
+  setTemporaryToken
+} from '../storage'
 import { jwtDecode } from 'jwt-decode'
 import { FC } from 'react'
 import { NextRouter, useRouter } from 'next/router'
@@ -22,22 +29,29 @@ const handleRedirectLogin = (router: NextRouter, setUser: (data: UserDataType | 
   }
   setUser(null)
   clearLocalUserData()
+  clearTemporaryToken()
 }
 
 const instanceAxios = axios.create({ baseURL: BASE_URL })
 // đưa vào 1 cái hàm để dùng được các cái hook như useRouter
 const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
   const router = useRouter()
-  const { setUser } = useAuth()
+  const { setUser, user } = useAuth()
 
   instanceAxios.interceptors.request.use(async config => {
     const { accessToken, refreshToken } = getLocalUserData() //để luôn lấy cái mới nhất token
-
-    if (accessToken) {
-      const decodeAccessToken: any = jwtDecode(accessToken)
+    const { temporaryToken } = getTemporaryToken()
+    if (accessToken || temporaryToken) {
+      let decodeAccessToken: any = {}
+      if (accessToken) {
+        decodeAccessToken = jwtDecode(accessToken)
+      } else if (temporaryToken) {
+        //isMem = fase
+        decodeAccessToken = jwtDecode(temporaryToken)
+      }
       //check xem còn accToken thời hạn ko
       if (decodeAccessToken.exp > Date.now() / 1000) {
-        config.headers['Authorization'] = `Bearer ${accessToken}`
+        config.headers['Authorization'] = `Bearer ${accessToken ? accessToken : temporaryToken}`
       } else {
         // hết hạn acc => gọi api ref để lấy lại acc token mới
         if (refreshToken) {
@@ -59,6 +73,12 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
                 const newAccessToken = res?.data?.data?.access_token
                 if (newAccessToken) {
                   config.headers['Authorization'] = `Bearer ${newAccessToken}`
+                  if (accessToken) {
+                    setLocalUserData(JSON.stringify(user), newAccessToken, refreshToken)
+                  } else {
+                    setLocalUserData(JSON.stringify(user), '', refreshToken)
+                    setTemporaryToken(newAccessToken)
+                  }
                 } else {
                   //ko trả về acc mới
                   handleRedirectLogin(router, setUser)
