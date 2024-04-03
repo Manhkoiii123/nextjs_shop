@@ -14,11 +14,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
 import FallbackSpinner from 'src/components/fall-back'
-import { resetInitialState } from 'src/stores/apps/auth'
+import { resetInitialState } from 'src/stores/auth'
 import { useRouter } from 'next/navigation'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import { useTranslation } from 'react-i18next'
-import { chagePasswordMeAsync } from 'src/stores/apps/auth/actions'
+import { chagePasswordMeAsync } from 'src/stores/auth/actions'
 import { useAuth } from 'src/hooks/useAuth'
 
 type TProps = {}

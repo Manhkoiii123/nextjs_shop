@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BASE_URL, CONFIG_API } from 'src/configs/api'
+import { BASE_URL, API_ENDPOINT } from 'src/configs/api'
 import {
   clearLocalUserData,
   clearTemporaryToken,
@@ -61,7 +61,7 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
             //call api ở đây để lấy
             await axios
               .post(
-                `${CONFIG_API.AUTH.INDEX}/refresh-token`,
+                `${API_ENDPOINT.AUTH.INDEX}/refresh-token`,
                 {}, //data
                 {
                   headers: {

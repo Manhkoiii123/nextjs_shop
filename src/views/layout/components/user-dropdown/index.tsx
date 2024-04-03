@@ -70,6 +70,10 @@ const UserDropdown: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.CHANGE_PASSWORD)
     handleClose()
   }
+  const handleNavigateManageSystem = () => {
+    router.push(ROUTE_CONFIG.DASHBOARD)
+    handleClose()
+  }
 
   const { user, logout } = useAuth()
 
@@ -187,6 +191,12 @@ const UserDropdown: NextPage = (props: TProps) => {
           </Box>
         </Box>
         <Divider />
+        <MenuItem onClick={handleNavigateManageSystem}>
+          <Avatar>
+            <IconifyIcon icon='arcticons:phone-manager' />
+          </Avatar>{' '}
+          {t('manager_system')}
+        </MenuItem>
         <MenuItem onClick={handleNavigateProfile}>
           <Avatar>
             <IconifyIcon icon='ph:user-thin' />

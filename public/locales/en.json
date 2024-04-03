@@ -43,5 +43,6 @@
   "Setting": "Setting",
   "Delivery_method": "Delivery Method",
   "Payment_method": "Payment Method",
-  "Manage_order": "Manage Order"
+  "Manage_order": "Manage Order",
+  "manager_system": "Manager system"
 }
