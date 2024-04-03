@@ -1,6 +1,6 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { updateAuthMeAsync, registerAuthAsync, chagePasswordMeAsync } from 'src/stores/apps/auth/actions'
+import { updateAuthMeAsync, registerAuthAsync, chagePasswordMeAsync } from 'src/stores/auth/actions'
 
 const initialState = {
   isLoading: false,
