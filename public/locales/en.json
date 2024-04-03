@@ -31,5 +31,17 @@
   "confirm_pass": "Confirm password",
   "input_confirm_pass": "Please enter your confirm password",
   "update_pasword": "Update password",
-  "no_data": "No data"
+  "no_data": "No data",
+  "Enter_your_role": "Please enter your role",
+  "System": "System",
+  "User": "User",
+  "Manage_product": "Manage Product",
+  "List_product": "List Product",
+  "Type_product": "Type Product",
+  "List_order": "List Order",
+  "List_review": "List Review",
+  "Setting": "Setting",
+  "Delivery_method": "Delivery Method",
+  "Payment_method": "Payment Method",
+  "Manage_order": "Manage Order"
 }

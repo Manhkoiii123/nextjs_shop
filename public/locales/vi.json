@@ -31,5 +31,17 @@
   "confirm_pass": "Nhập lại mât khẩu mới",
   "input_confirm_pass": "Vui lòng nhập lại mật khẩu mới",
   "update_pasword": "Cập nhật mật khẩu",
-  "no_data": "Không có dữ liệu"
+  "no_data": "Không có dữ liệu",
+  "Enter_your_role": "Mời lựa chọn quyền của bạn",
+  "System": "Hệ thống",
+  "User": "Người dùng",
+  "Manage_product": "Quản trị sản phẩm",
+  "List_product": "Danh sách sản phẩm",
+  "Type_product": "Danh mục sản phẩm",
+  "List_order": "Danh sách đơn hàng",
+  "List_review": "Danh sách đánh giá",
+  "Setting": "Cài đặt",
+  "Delivery_method": "Phương thức giao hàng",
+  "Payment_method": "Phương thức thanh toán",
+  "Manage_order": "Quản lí đơn hàng"
 }
