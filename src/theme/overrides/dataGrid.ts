@@ -6,7 +6,7 @@ const DataGrid = () => {
     MuiDataGrid: {
       styleOverrides: {
         root: ({ theme }: OwnerStateThemeType) => ({
-          border: 0,
+          border: 1,
           color: theme.palette.text.primary,
           '& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within': {
             outline: 'none'
