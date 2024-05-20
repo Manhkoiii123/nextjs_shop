@@ -44,5 +44,10 @@
   "Delivery_method": "Phương thức giao hàng",
   "Payment_method": "Phương thức thanh toán",
   "Manage_order": "Quản lí đơn hàng",
-  "manager_system": "Quản trị hệ thống"
+  "manager_system": "Quản trị hệ thống",
+  "name": "Tên",
+  "actions": "Hành động",
+  "edit": "Chỉnh sửa",
+  "delete": "Xóa",
+  "create": "Tạo"
 }

@@ -44,5 +44,10 @@
   "Delivery_method": "Delivery Method",
   "Payment_method": "Payment Method",
   "Manage_order": "Manage Order",
-  "manager_system": "Manager system"
+  "manager_system": "Manager system",
+  "name": "Name",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "create": "Create"
 }

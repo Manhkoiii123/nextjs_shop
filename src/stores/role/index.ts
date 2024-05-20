@@ -1,6 +1,6 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { getAllRoleAsync } from 'src/stores/role/actions'
+import { getAllRolesAsync } from 'src/stores/role/actions'
 
 const initialState = {
   isLoading: false,
@@ -14,11 +14,14 @@ const initialState = {
   isSuccessChangePassword: true,
   isErrorChangePassword: false,
   messageChangePassword: '',
-  roles: []
+  roles: {
+    data: [],
+    total: 0
+  }
 }
 
 export const roleSlice = createSlice({
-  name: 'auth', //tên này là type của action,
+  name: 'role', //tên này là type của action,
   initialState,
   reducers: {
     resetInitialState: state => {
@@ -33,21 +36,26 @@ export const roleSlice = createSlice({
       state.isErrorChangePassword = false
       state.isSuccessChangePassword = true
       state.messageChangePassword = ''
-      state.roles = []
+      state.roles = {
+        data: [],
+        total: 0
+      }
     }
   },
   extraReducers: builder => {
     //get all
-    builder.addCase(getAllRoleAsync.pending, (state, action) => {
+    builder.addCase(getAllRolesAsync.pending, (state, action) => {
       state.isLoading = true
     })
-    builder.addCase(getAllRoleAsync.fulfilled, (state, action) => {
-      console.log('🚀 ~ builder.addCase ~ action:', action)
+    builder.addCase(getAllRolesAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.roles = []
+      state.roles.data = action.payload.data.roles
+      state.roles.total = action.payload.data.totalCount
     })
-    builder.addCase(getAllRoleAsync.rejected, (state, action) => {
+    builder.addCase(getAllRolesAsync.rejected, (state, action) => {
       state.isLoading = false
+      state.roles.data = []
+      state.roles.total = 0
     })
   }
 })

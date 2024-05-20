@@ -3,7 +3,7 @@ import { styled } from '@mui/material'
 import { Box } from '@mui/material'
 
 interface TCustomModal extends ModalProps {
-  handleClose: () => void
+  onClose: () => void
 }
 
 const StyleModal = styled(Modal)<ModalProps>(({ theme }) => ({
@@ -14,12 +14,12 @@ const StyleModal = styled(Modal)<ModalProps>(({ theme }) => ({
 }))
 
 const CustomModal = (props: TCustomModal) => {
-  const { children, handleClose, open } = props
+  const { children, onClose, open } = props
 
   return (
     <StyleModal
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       aria-labelledby='modal-modal-title'
       aria-describedby='modal-modal-description'
     >
