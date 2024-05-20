@@ -62,7 +62,6 @@ const RecursiveListItem: NextPage<TListItems> = ({
     }
   }
   const handleSelectItem = (path: string) => {
-    console.log('🚀 ~ handleSelectItem ~ path:', path)
     setActivePath(path)
     if (path) {
       router.push(path) //khi chọn thì sẽ re render lại từ đầu cả menu của mình luôn =>
