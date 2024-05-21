@@ -18,7 +18,7 @@ interface TConfirmationDialog {
   handleClose: () => void
   title: string
   description: string
-  handleConfirm: () => {}
+  handleConfirm: () => void
   handleCancel: () => void
 }
 const CustomStyleContent = styled(DialogContentText)(() => ({
