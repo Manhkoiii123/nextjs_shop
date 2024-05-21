@@ -49,5 +49,12 @@
   "actions": "Hành động",
   "edit": "Chỉnh sửa",
   "delete": "Xóa",
-  "create": "Tạo"
+  "create": "Tạo",
+  "Name_role": "Tên quyền",
+  "enter_name": "Mời nhập tên quyền",
+  "edit_role": "Chỉnh sửa nhóm vai trò",
+  "create_role": "Tạo nhóm vai trò",
+  "create-role-success": "Tạo nhóm vai trò thành công ",
+  "update-role-success": "Cập nhật nhóm vai trò thành công",
+  "delete-role-success": "Xóa nhóm vai trò thành công"
 }

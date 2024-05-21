@@ -1,6 +1,7 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { getAllRolesAsync } from 'src/stores/role/actions'
+import { updateAuthMeAsync } from 'src/stores/auth/actions'
+import { createRolesAsync, deleteRolesAsync, getAllRolesAsync, updateRolesAsync } from 'src/stores/role/actions'
 
 const initialState = {
   isLoading: false,
@@ -8,12 +9,12 @@ const initialState = {
   isError: false,
   message: '',
   typeError: '',
-  isSuccessUpdate: true,
-  isErrorUpdate: false,
-  messageUpdate: '',
-  isSuccessChangePassword: true,
-  isErrorChangePassword: false,
-  messageChangePassword: '',
+  isSuccessCreateEdit: false,
+  isErrorCreateEdit: false,
+  messageErrorCreateEdit: '',
+  isSuccessDelete: false,
+  isErrorDelete: false,
+  messageErrorDelete: '',
   roles: {
     data: [],
     total: 0
@@ -30,12 +31,12 @@ export const roleSlice = createSlice({
       state.isLoading = false
       state.message = ''
       state.typeError = ''
-      state.isErrorChangePassword = false
-      state.isSuccessUpdate = true
-      state.messageUpdate = ''
-      state.isErrorChangePassword = false
-      state.isSuccessChangePassword = true
-      state.messageChangePassword = ''
+      state.isSuccessCreateEdit = false
+      state.isErrorCreateEdit = true
+      state.messageErrorCreateEdit = ''
+      state.isSuccessDelete = false
+      state.isErrorDelete = true
+      state.messageErrorDelete = ''
       state.roles = {
         data: [],
         total: 0
@@ -56,6 +57,40 @@ export const roleSlice = createSlice({
       state.isLoading = false
       state.roles.data = []
       state.roles.total = 0
+    })
+
+    //creat Role
+    builder.addCase(createRolesAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(createRolesAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessCreateEdit = !!action.payload?.data?._id
+      state.isErrorCreateEdit = !action.payload?.data?._id
+      state.messageErrorCreateEdit = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    //edit Role
+    builder.addCase(updateRolesAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(updateRolesAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessCreateEdit = !!action.payload?.data?._id
+      state.isErrorCreateEdit = !action.payload?.data?._id
+      state.messageErrorCreateEdit = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    //delete Role
+    builder.addCase(deleteRolesAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(deleteRolesAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessDelete = !!action.payload?.data?._id
+      state.isErrorDelete = !action.payload?.data?._id
+      state.messageErrorDelete = action.payload?.message
+      state.typeError = action.payload?.typeError
     })
   }
 })
