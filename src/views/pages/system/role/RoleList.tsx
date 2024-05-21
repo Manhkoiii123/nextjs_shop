@@ -142,13 +142,13 @@ const RoleListPage: NextPage<TProps> = () => {
 
   return (
     <>
-      <ConfirmationDialog
-      title={t("")}
+      {/* <ConfirmationDialog
+        title={t('')}
         handleConfirm={() => {}}
         handleCancel={() => setOpenDeleteRole({ open: false, id: '' })}
         open={openDeleteRole.open}
         handleClose={() => setOpenDeleteRole({ open: false, id: '' })}
-      />
+      /> */}
       <CreateEditRole idRole={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} />
       {isLoading && <Spinner />}
       <Box
