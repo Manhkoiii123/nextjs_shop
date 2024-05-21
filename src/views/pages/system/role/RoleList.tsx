@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Grid, IconButton, Tooltip, useTheme } from '@mui/material'
+import { Box, Card, Grid, IconButton, Tooltip, useTheme } from '@mui/material'
 import { NextPage } from 'next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { getAllRolesAsync } from 'src/stores/role/actions'
+import { deleteRolesAsync, getAllRolesAsync } from 'src/stores/role/actions'
 import { useEffect, useState } from 'react'
 import { GridColDef } from '@mui/x-data-grid'
 import CustomDataGrid from 'src/components/custom-data-grid'
@@ -18,10 +18,23 @@ import GridCreate from 'src/components/grid-create'
 import InputSearch from 'src/components/input-search'
 import CreateEditRole from 'src/views/pages/system/role/components/CreateEditRole'
 
+import toast from 'react-hot-toast'
+import { resetInitialState } from 'src/stores/role'
+import Spinner from 'src/components/spinner'
+
 type TProps = {}
 
 const RoleListPage: NextPage<TProps> = () => {
-  const { roles } = useSelector((state: RootState) => state.role)
+  const {
+    roles,
+    isSuccessCreateEdit,
+    isErrorCreateEdit,
+    isLoading,
+    messageErrorCreateEdit,
+    isErrorDelete,
+    isSuccessDelete,
+    messageErrorDelete
+  } = useSelector((state: RootState) => state.role)
   const [openCreateEdit, setOpeCreateEdit] = useState({
     open: false,
     id: ''
@@ -37,9 +50,7 @@ const RoleListPage: NextPage<TProps> = () => {
   const handleGetListRoles = () => {
     dispatch(getAllRolesAsync({ params: { limit: -1, page: -1 } }))
   }
-  useEffect(() => {
-    handleGetListRoles()
-  }, [])
+
   const handleOnChangePagination = (page: number, pageSize: number) => {}
   const PaginationComponent = () => {
     return (
@@ -65,11 +76,18 @@ const RoleListPage: NextPage<TProps> = () => {
       minWidth: 150,
       sortable: false,
       align: 'left',
-      renderCell: () => {
+      renderCell: row => {
         return (
           <Box>
-            <GridEdit onClick={() => {}}></GridEdit>
-            <GridDelete onClick={() => {}}></GridDelete>
+            <GridEdit
+              onClick={() => {
+                setOpeCreateEdit({
+                  open: true,
+                  id: String(row.id)
+                })
+              }}
+            ></GridEdit>
+            <GridDelete onClick={() => dispatch(deleteRolesAsync(String(row.id)))}></GridDelete>
           </Box>
         )
       }
@@ -81,20 +99,48 @@ const RoleListPage: NextPage<TProps> = () => {
       id: ''
     })
   }
+  useEffect(() => {
+    handleGetListRoles()
+  }, [])
+  useEffect(() => {
+    if (isSuccessCreateEdit) {
+      if (openCreateEdit.id) {
+        toast.success(t('update-role-success'))
+      } else {
+        toast.success(t('create-role-success'))
+      }
+      handleGetListRoles()
+      handleCloseCreateEdit()
+      dispatch(resetInitialState())
+    } else if (isErrorCreateEdit && messageErrorCreateEdit) {
+      toast.error(t(messageErrorCreateEdit))
+      handleCloseCreateEdit()
+    }
+  }, [isErrorCreateEdit, isSuccessCreateEdit, messageErrorCreateEdit])
+  useEffect(() => {
+    if (isSuccessDelete) {
+      toast.success(t('delete-role-success'))
+      handleGetListRoles()
+      dispatch(resetInitialState())
+    } else if (isErrorDelete && messageErrorDelete) {
+      toast.error(t(messageErrorDelete))
+    }
+  }, [isSuccessDelete, isErrorDelete, messageErrorDelete])
 
   return (
     <>
       <CreateEditRole idRole={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} />
-      {/* {isLoading && <FallbackSpinner />} */}
+      {isLoading && <Spinner />}
       <Box
         sx={{
           backgroundColor: theme.palette.background.paper,
           display: 'flex',
           alignItems: 'center',
-          padding: '40px'
+          padding: '20px',
+          height: '100%'
         }}
       >
-        <Grid container>
+        <Grid container sx={{ height: '100%', width: '100%' }}>
           <Grid item md={5} xs={12}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <Box sx={{ width: '300px' }}>
@@ -117,6 +163,7 @@ const RoleListPage: NextPage<TProps> = () => {
               autoHeight
               getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
               disableRowSelectionOnClick
+              hideFooter
               slots={{
                 // cái này để cutom pagination nó là 1 hàm trả về cái comp này
                 // viết hàm PaginationComponent trả về cái customPa của ta

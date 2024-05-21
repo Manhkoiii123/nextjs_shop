@@ -49,5 +49,12 @@
   "actions": "Actions",
   "edit": "Edit",
   "delete": "Delete",
-  "create": "Create"
+  "create": "Create",
+  "enter_name": "Enter name role",
+  "Name_role": "Name Role",
+  "edit_role": "Edit Role",
+  "create_role": "Create Role",
+  "create-role-success": "Create role success",
+  "update-role-success": "Update role success",
+  "delete-role-success": "Delete role success"
 }

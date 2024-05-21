@@ -17,7 +17,6 @@ export const registerAuthAsync = createAsyncThunk('auth/register', async (data: 
 })
 export const updateAuthMeAsync = createAsyncThunk('auth/update-me', async (data: any) => {
   const response = await updateAuthMe(data)
-  //   console.log('🚀 ~ registerAuthAsync ~ response:', response)
   if (response?.data) {
     return response
   }

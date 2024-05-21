@@ -28,22 +28,6 @@ type TDefaultValue = {
   confirmNewPassword: string
 }
 
-const schema = yup.object().shape({
-  currentPassword: yup
-    .string()
-    .required('The field is required')
-    .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
-  newPassword: yup
-    .string()
-    .required('The field is required')
-    .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
-  confirmNewPassword: yup
-    .string()
-    .required('The field is required')
-    .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number')
-    .oneOf([yup.ref('newPassword')], 'The confirm password is must match with password')
-})
-
 const ChangePasswordPage: NextPage<TProps> = () => {
   const defaultValues: TDefaultValue = {
     currentPassword: '',
@@ -56,6 +40,21 @@ const ChangePasswordPage: NextPage<TProps> = () => {
   const { t } = useTranslation()
   const theme = useTheme()
   const { logout } = useAuth()
+  const schema = yup.object().shape({
+    currentPassword: yup
+      .string()
+      .required('The field is required')
+      .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
+    newPassword: yup
+      .string()
+      .required('The field is required')
+      .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number'),
+    confirmNewPassword: yup
+      .string()
+      .required('The field is required')
+      .matches(PASSWORD_REG, 'The password is contain charator,special charactor,number')
+      .oneOf([yup.ref('newPassword')], 'The confirm password is must match with password')
+  })
   const {
     control,
     handleSubmit,
