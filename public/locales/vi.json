@@ -56,5 +56,8 @@
   "create_role": "Tạo nhóm vai trò",
   "create-role-success": "Tạo nhóm vai trò thành công ",
   "update-role-success": "Cập nhật nhóm vai trò thành công",
-  "delete-role-success": "Xóa nhóm vai trò thành công"
+  "delete-role-success": "Xóa nhóm vai trò thành công",
+  "confirm": "Xác nhận",
+  "cancel": "Hủy",
+  "deleteRole": "Xóa nhóm vai trò"
 }
