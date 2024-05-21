@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { deleteRolesAsync, getAllRolesAsync } from 'src/stores/role/actions'
 import { useEffect, useState } from 'react'
-import { GridColDef } from '@mui/x-data-grid'
+import { GridColDef, GridSortModel } from '@mui/x-data-grid'
 import CustomDataGrid from 'src/components/custom-data-grid'
 import CustomPagination from 'src/components/custom-pagination'
 import { PAGE_SIZE_OPTIONS } from 'src/configs/gridConfig'
@@ -35,6 +35,8 @@ const RoleListPage: NextPage<TProps> = () => {
     isSuccessDelete,
     messageErrorDelete
   } = useSelector((state: RootState) => state.role)
+  const [sortBy, setSortBy] = useState('created asc')
+  const [searchBy, setSearchBy] = useState('')
   const [openCreateEdit, setOpeCreateEdit] = useState({
     open: false,
     id: ''
@@ -48,7 +50,7 @@ const RoleListPage: NextPage<TProps> = () => {
 
   const router = useRouter()
   const handleGetListRoles = () => {
-    dispatch(getAllRolesAsync({ params: { limit: -1, page: -1 } }))
+    dispatch(getAllRolesAsync({ params: { limit: -1, page: -1, search: searchBy, order: sortBy } }))
   }
 
   const handleOnChangePagination = (page: number, pageSize: number) => {}
@@ -99,9 +101,15 @@ const RoleListPage: NextPage<TProps> = () => {
       id: ''
     })
   }
+
+  const handleSort = (sort: GridSortModel) => {
+    const sortOption = sort[0]
+    setSortBy(`${sortOption.field} ${sortOption.sort}`)
+  }
+
   useEffect(() => {
     handleGetListRoles()
-  }, [])
+  }, [sortBy, searchBy])
   useEffect(() => {
     if (isSuccessCreateEdit) {
       if (openCreateEdit.id) {
@@ -144,7 +152,7 @@ const RoleListPage: NextPage<TProps> = () => {
           <Grid item md={5} xs={12}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <Box sx={{ width: '300px' }}>
-                <InputSearch></InputSearch>
+                <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
               </Box>
               <GridCreate
                 onClick={() =>
@@ -164,6 +172,10 @@ const RoleListPage: NextPage<TProps> = () => {
               getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
               disableRowSelectionOnClick
               hideFooter
+              //sorting trong MUI
+              sortingOrder={['desc', 'asc']}
+              sortingMode='server'
+              onSortModelChange={handleSort}
               slots={{
                 // cái này để cutom pagination nó là 1 hàm trả về cái comp này
                 // viết hàm PaginationComponent trả về cái customPa của ta

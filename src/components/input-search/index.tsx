@@ -1,10 +1,14 @@
-import { useTheme } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { styled } from '@mui/material/styles'
 import InputBase from '@mui/material/InputBase'
 import IconifyIcon from 'src/components/Icon'
+import { useEffect, useState } from 'react'
+import { useDebounce } from 'src/hooks/useDebounce'
 
-interface TInputSearch {}
+interface TInputSearch {
+  value: string
+  onChange: (value: string) => void
+}
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -45,14 +49,27 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 }))
 
 const InputSearch = (props: TInputSearch) => {
+  const { value, onChange } = props
   const { t } = useTranslation()
+  const [search, setSearch] = useState(value)
+  const debounceSearch = useDebounce(search, 500)
+  useEffect(() => {
+    onChange(debounceSearch)
+  }, [debounceSearch])
 
   return (
     <Search>
       <SearchIconWrapper>
         <IconifyIcon icon={'material-symbols-light:search'} />
       </SearchIconWrapper>
-      <StyledInputBase placeholder='Search…' inputProps={{ 'aria-label': 'search' }} />
+      <StyledInputBase
+        value={search}
+        onChange={e => {
+          setSearch(e.target.value)
+        }}
+        placeholder='Search…'
+        inputProps={{ 'aria-label': 'search' }}
+      />
     </Search>
   )
 }

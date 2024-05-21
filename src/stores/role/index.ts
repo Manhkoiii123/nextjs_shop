@@ -1,6 +1,5 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { updateAuthMeAsync } from 'src/stores/auth/actions'
 import { createRolesAsync, deleteRolesAsync, getAllRolesAsync, updateRolesAsync } from 'src/stores/role/actions'
 
 const initialState = {
