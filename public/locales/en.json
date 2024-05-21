@@ -56,5 +56,8 @@
   "create_role": "Create Role",
   "create-role-success": "Create role success",
   "update-role-success": "Update role success",
-  "delete-role-success": "Delete role success"
+  "delete-role-success": "Delete role success",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "deleteRole": "Delete Role"
 }

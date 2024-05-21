@@ -21,6 +21,7 @@ import CreateEditRole from 'src/views/pages/system/role/components/CreateEditRol
 import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/role'
 import Spinner from 'src/components/spinner'
+import ConfirmationDialog from 'src/components/confirmation-dialog'
 
 type TProps = {}
 
@@ -45,6 +46,10 @@ const RoleListPage: NextPage<TProps> = () => {
   const theme = useTheme()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
+  const [openDeleteRole, setOpenDeleteRole] = useState({
+    open: false,
+    id: ''
+  })
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
 
@@ -89,7 +94,7 @@ const RoleListPage: NextPage<TProps> = () => {
                 })
               }}
             ></GridEdit>
-            <GridDelete onClick={() => dispatch(deleteRolesAsync(String(row.id)))}></GridDelete>
+            <GridDelete onClick={() => setOpenDeleteRole({ open: true, id: String(row.id) })} />
           </Box>
         )
       }
@@ -137,6 +142,13 @@ const RoleListPage: NextPage<TProps> = () => {
 
   return (
     <>
+      {/* <ConfirmationDialog
+        title={t('')}
+        handleConfirm={() => {}}
+        handleCancel={() => setOpenDeleteRole({ open: false, id: '' })}
+        open={openDeleteRole.open}
+        handleClose={() => setOpenDeleteRole({ open: false, id: '' })}
+      /> */}
       <CreateEditRole idRole={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} />
       {isLoading && <Spinner />}
       <Box
