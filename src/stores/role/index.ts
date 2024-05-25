@@ -36,10 +36,6 @@ export const roleSlice = createSlice({
       state.isSuccessDelete = false
       state.isErrorDelete = true
       state.messageErrorDelete = ''
-      state.roles = {
-        data: [],
-        total: 0
-      }
     }
   },
   extraReducers: builder => {

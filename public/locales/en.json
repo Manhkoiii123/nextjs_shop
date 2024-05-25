@@ -61,5 +61,7 @@
   "cancel": "Cancel",
   "deleteRole": "Delete Role",
   "title_delete_role": "Delete Role",
-  "confirm_delete_role": "Are you sure you want to delete this role group? "
+  "confirm_delete_role": "Are you sure you want to delete this role group? ",
+  "Data_exist_in_system": "Data exist in system",
+  "server_is_error": "Server is error"
 }

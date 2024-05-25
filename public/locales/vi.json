@@ -61,5 +61,7 @@
   "cancel": "Hủy",
   "deleteRole": "Xóa nhóm vai trò",
   "title_delete_role": "Xác nhận xóa nhóm vai trò",
-  "confirm_delete_role": "Bạn có chắc chắn muốn xóa nhóm vai trò này ? "
+  "confirm_delete_role": "Bạn có chắc chắn muốn xóa nhóm vai trò này ? ",
+  "Data_exist_in_system": "Data đã tồn tại trong hệ thống",
+  "server_is_error": "Server lỗi"
 }
