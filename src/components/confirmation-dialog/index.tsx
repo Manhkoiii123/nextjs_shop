@@ -36,6 +36,9 @@ const ConfirmationDialog = (props: TConfirmationDialog) => {
       onClose={handleClose}
       aria-labelledby='alert-dialog-title'
       aria-describedby='alert-dialog-description'
+      sx={{
+        padding: '20px'
+      }}
     >
       <DialogTitle sx={{ textAlign: 'center' }}>
         <Typography variant='h4' sx={{ fontWeight: 600 }}>
@@ -49,7 +52,7 @@ const ConfirmationDialog = (props: TConfirmationDialog) => {
           justifyContent: 'center'
         }}
       >
-        <IconifyIcon icon='ep:warning' fontSize={60} color={theme.palette.warning.main} />
+        <IconifyIcon icon='ep:warning' fontSize={40} color={theme.palette.warning.main} />
       </Box>
       <CustomStyleContent>
         <DialogContentText sx={{ textAlign: 'center' }}>{description}</DialogContentText>
