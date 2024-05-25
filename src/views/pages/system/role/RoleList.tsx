@@ -23,6 +23,7 @@ import { resetInitialState } from 'src/stores/role'
 import Spinner from 'src/components/spinner'
 import ConfirmationDialog from 'src/components/confirmation-dialog'
 import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
+import TablePermission from 'src/views/pages/system/role/components/TablePermission'
 
 type TProps = {}
 
@@ -185,8 +186,8 @@ const RoleListPage: NextPage<TProps> = () => {
           height: '100%'
         }}
       >
-        <Grid container sx={{ height: '100%', width: '100%' }}>
-          <Grid item md={5} xs={12}>
+        <Grid spacing={10} container sx={{ height: '100%', width: '100%' }}>
+          <Grid item md={4} xs={12}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <Box sx={{ width: '300px' }}>
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
@@ -200,30 +201,32 @@ const RoleListPage: NextPage<TProps> = () => {
                 }
               />
             </Box>
-            <CustomDataGrid
-              rows={roles.data}
-              columns={columns}
-              pageSizeOptions={[5]}
-              // checkboxSelection
-              autoHeight
-              getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
-              disableRowSelectionOnClick
-              hideFooter
-              //sorting trong MUI
-              sortingOrder={['desc', 'asc']}
-              sortingMode='server'
-              onSortModelChange={handleSort}
-              slots={{
-                // cái này để cutom pagination nó là 1 hàm trả về cái comp này
-                // viết hàm PaginationComponent trả về cái customPa của ta
-                pagination: PaginationComponent
-              }}
-              disableColumnFilter
-              disableColumnMenu
-            />
+            <Box sx={{ maxHeight: '100%' }}>
+              <CustomDataGrid
+                rows={roles.data}
+                columns={columns}
+                pageSizeOptions={[5]}
+                // checkboxSelection
+                autoHeight
+                getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
+                disableRowSelectionOnClick
+                hideFooter
+                //sorting trong MUI
+                sortingOrder={['desc', 'asc']}
+                sortingMode='server'
+                onSortModelChange={handleSort}
+                slots={{
+                  // cái này để cutom pagination nó là 1 hàm trả về cái comp này
+                  // viết hàm PaginationComponent trả về cái customPa của ta
+                  pagination: PaginationComponent
+                }}
+                disableColumnFilter
+                disableColumnMenu
+              />
+            </Box>
           </Grid>
-          <Grid item md={7} xs={12}>
-            List permission
+          <Grid item md={8} xs={12} sx={{ maxHeight: '100%' }}>
+            <TablePermission />
           </Grid>
         </Grid>
       </Box>
