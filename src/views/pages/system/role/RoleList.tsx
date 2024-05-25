@@ -83,18 +83,25 @@ const RoleListPage: NextPage<TProps> = () => {
       minWidth: 150,
       sortable: false,
       align: 'left',
-      renderCell: row => {
+      renderCell: params => {
+        const { row } = params
+
         return (
           <Box>
-            <GridEdit
-              onClick={() => {
-                setOpeCreateEdit({
-                  open: true,
-                  id: String(row.id)
-                })
-              }}
-            ></GridEdit>
-            <GridDelete onClick={() => setOpenDeleteRole({ open: true, id: String(row.id) })} />
+            {!row.permissions.some((per: string) => ['ADMIN.GRANTED', 'BASIC.PUBLIC'].includes(per)) && (
+              <>
+                {' '}
+                <GridEdit
+                  onClick={() => {
+                    setOpeCreateEdit({
+                      open: true,
+                      id: String(params.id)
+                    })
+                  }}
+                ></GridEdit>
+                <GridDelete onClick={() => setOpenDeleteRole({ open: true, id: String(params.id) })} />
+              </>
+            )}
           </Box>
         )
       }
@@ -135,17 +142,21 @@ const RoleListPage: NextPage<TProps> = () => {
       toast.success(t('delete-role-success'))
       handleGetListRoles()
       dispatch(resetInitialState())
+      setOpenDeleteRole({ open: false, id: '' })
     } else if (isErrorDelete && messageErrorDelete) {
       toast.error(t(messageErrorDelete))
     }
   }, [isSuccessDelete, isErrorDelete, messageErrorDelete])
+  const handleDeleteRole = () => {
+    dispatch(deleteRolesAsync(openDeleteRole.id))
+  }
 
   return (
     <>
       <ConfirmationDialog
-        title={t('')}
-        description={t('')}
-        handleConfirm={() => {}}
+        title={t('title_delete_role')}
+        description={t('confirm_delete_role')}
+        handleConfirm={handleDeleteRole}
         handleCancel={() => setOpenDeleteRole({ open: false, id: '' })}
         open={openDeleteRole.open}
         handleClose={() => setOpenDeleteRole({ open: false, id: '' })}
