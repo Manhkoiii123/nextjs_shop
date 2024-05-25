@@ -22,6 +22,7 @@ import FallbackSpinner from 'src/components/fall-back'
 import Spinner from 'src/components/spinner'
 import CustomSelect from 'src/components/custom-select'
 import CustomModal from 'src/components/custom-modal'
+import { getAllRoles } from 'src/services/role'
 
 type TProps = {}
 type TDefaultValue = {
@@ -36,7 +37,6 @@ type TDefaultValue = {
 const ProfilePage: NextPage<TProps> = () => {
   const [user, setUser] = useState<UserDataType | null>(null)
   const [loading, setLoading] = useState(false)
-  const [roleId, setRoleId] = useState('')
   const [avatar, setAvatar] = useState('')
   const { t } = useTranslation()
   const defaultValues: TDefaultValue = {
@@ -77,9 +77,8 @@ const ProfilePage: NextPage<TProps> = () => {
         const data = response?.data
         if (data) {
           setAvatar(data?.avatar)
-          setRoleId(data?.role.id)
           reset({
-            role: data?.role.name,
+            role: data?.role._id,
             fullName: toFullName(data?.lastName, data?.middleName, data?.firstName, language),
             email: data?.email,
             address: data?.address,
@@ -103,7 +102,7 @@ const ProfilePage: NextPage<TProps> = () => {
         firstName: firstName,
         middleName: middleName,
         lastName: lastName,
-        role: roleId,
+        role: data.role,
         phoneNumber: data.phoneNumber,
         address: data.address,
         // city: data.city,
@@ -111,6 +110,23 @@ const ProfilePage: NextPage<TProps> = () => {
       })
     )
   }
+  const [optionsRole, setOptionRole] = useState<{ label: string; value: string }[]>([])
+  const fetchRoles = async () => {
+    setLoading(true)
+    await getAllRoles({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.roles
+        if (data) {
+          setOptionRole(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchRoles()
+  }, [])
   useEffect(() => {
     if (messageUpdate) {
       if (isErrorUpdate) {
@@ -135,11 +151,7 @@ const ProfilePage: NextPage<TProps> = () => {
     <>
       {/* <Spinner></Spinner> */}
       {loading || (isLoading && <Spinner />)}
-      <form
-        onSubmit={handleSubmit(onsubmit)}
-        autoComplete='off'
-        noValidate
-      >
+      <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
         <Grid container>
           <Grid
             container
@@ -252,8 +264,7 @@ const ProfilePage: NextPage<TProps> = () => {
                         <CustomSelect
                           fullWidth
                           onChange={onChange}
-                          options={[]}
-                          // options={optionRoles}
+                          options={optionsRole}
                           error={Boolean(errors?.role)}
                           onBlur={onBlur}
                           value={value}
@@ -371,7 +382,7 @@ const ProfilePage: NextPage<TProps> = () => {
                         )}
                       </div>
                     )}
-                    name='role'
+                    name='city'
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>

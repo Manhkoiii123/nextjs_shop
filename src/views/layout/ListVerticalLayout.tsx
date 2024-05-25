@@ -11,6 +11,16 @@ import { Box, Tooltip, styled, useTheme } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 
+export type TVertical = {
+  title: string
+  path?: string
+  icon: string
+  childrens?: {
+    title: string
+    path?: string
+    icon: string
+  }[]
+}
 type TProps = {
   open: boolean
 }
@@ -67,17 +77,27 @@ const RecursiveListItem: NextPage<TListItems> = ({
       router.push(path) //khi chọn thì sẽ re render lại từ đầu cả menu của mình luôn =>
     }
   }
+  const checkParentHasChildActive = (item: TVertical): boolean => {
+    if (!item.childrens) {
+      return item.path === activePath
+    }
+    // nếu mà có children thì tiếp tục tìm con
+
+    return item.childrens.some((item: TVertical) => checkParentHasChildActive(item))
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {items.map((item: any, index: number) => {
+      {items.map((item: TVertical, index: number) => {
+        const isParentActive = checkParentHasChildActive(item)
+
         return (
           <React.Fragment key={index}>
             <ListItemButton
               sx={{
                 margin: '1px 0',
                 backgroundColor:
-                  (activePath && item.path === activePath) || !!openItems[item.title]
+                  (activePath && item.path === activePath) || !!openItems[item.title] || isParentActive
                     ? `${hexToRGBA(theme.palette.primary.main, 0.16)} !important`
                     : theme.palette.background.paper,
                 padding: `8px 10px 8px ${level * (level === 1 ? 28 : 20)}px`
@@ -86,7 +106,9 @@ const RecursiveListItem: NextPage<TListItems> = ({
                 if (item.childrens) {
                   handleClick(item.title)
                 }
-                handleSelectItem(item.path)
+                if (item.path) {
+                  handleSelectItem(item.path)
+                }
               }}
             >
               <ListItemIcon>
@@ -99,7 +121,7 @@ const RecursiveListItem: NextPage<TListItems> = ({
                     height: '38px',
                     width: '38px',
                     backgroundColor:
-                      (activePath && item.path === activePath) || !!openItems[item.title]
+                      (activePath && item.path === activePath) || !!openItems[item.title] || isParentActive
                         ? `${theme.palette.primary.main} !important`
                         : theme.palette.background.paper
                   }}
@@ -107,7 +129,7 @@ const RecursiveListItem: NextPage<TListItems> = ({
                   <IconifyIcon
                     style={{
                       color:
-                        (activePath && item.path === activePath) || !!openItems[item.title]
+                        (activePath && item.path === activePath) || !!openItems[item.title] || isParentActive
                           ? `${theme.palette.customColors.lightPaperBg} `
                           : `rgba(${theme.palette.customColors.main}, 0.78)`
                     }}
@@ -118,7 +140,9 @@ const RecursiveListItem: NextPage<TListItems> = ({
               {!disabled && (
                 <Tooltip title={item.title}>
                   <StyleListItemText
-                    active={Boolean((activePath && item.path === activePath) || !!openItems[item.title])}
+                    active={Boolean(
+                      (activePath && item.path === activePath) || !!openItems[item.title] || isParentActive
+                    )}
                     primary={item.title}
                   />
                 </Tooltip>
@@ -130,7 +154,7 @@ const RecursiveListItem: NextPage<TListItems> = ({
                     <IconifyIcon
                       style={{
                         color:
-                          (activePath && item.path === activePath) || !!openItems[item.title]
+                          (activePath && item.path === activePath) || !!openItems[item.title] || isParentActive
                             ? `${theme.palette.primary.main}`
                             : `rgba(${theme.palette.customColors.main}, 0.78)`
                       }}
@@ -139,9 +163,10 @@ const RecursiveListItem: NextPage<TListItems> = ({
                   ) : (
                     <IconifyIcon
                       style={{
-                        color: !!openItems[item.title]
-                          ? `${theme.palette.primary.main}`
-                          : `rgba(${theme.palette.customColors.main}, 0.78)`
+                        color:
+                          !!openItems[item.title] || isParentActive
+                            ? `${theme.palette.primary.main}`
+                            : `rgba(${theme.palette.customColors.main}, 0.78)`
                       }}
                       icon='material-symbols-light:expand-more'
                     ></IconifyIcon>

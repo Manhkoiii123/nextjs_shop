@@ -22,6 +22,7 @@ import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/role'
 import Spinner from 'src/components/spinner'
 import ConfirmationDialog from 'src/components/confirmation-dialog'
+import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
 
 type TProps = {}
 
@@ -34,7 +35,8 @@ const RoleListPage: NextPage<TProps> = () => {
     messageErrorCreateEdit,
     isErrorDelete,
     isSuccessDelete,
-    messageErrorDelete
+    messageErrorDelete,
+    typeError
   } = useSelector((state: RootState) => state.role)
   const [sortBy, setSortBy] = useState('created asc')
   const [searchBy, setSearchBy] = useState('')
@@ -96,6 +98,7 @@ const RoleListPage: NextPage<TProps> = () => {
                     setOpeCreateEdit({
                       open: true,
                       id: String(params.id)
+                      // id: 'yyyy'
                     })
                   }}
                 ></GridEdit>
@@ -133,8 +136,18 @@ const RoleListPage: NextPage<TProps> = () => {
       handleCloseCreateEdit()
       dispatch(resetInitialState())
     } else if (isErrorCreateEdit && messageErrorCreateEdit) {
-      toast.error(t(messageErrorCreateEdit))
-      handleCloseCreateEdit()
+      //config show lỗi ko lấy từ mess nữa
+      const errorConfig = OBJECT_TYPE_ERROR_ROLE[typeError]
+      if (errorConfig) {
+        toast.error(t(errorConfig))
+      } else {
+        if (openCreateEdit.id) {
+          toast.error(t('update-role-error'))
+        } else {
+          toast.error(t('create-role-error'))
+        }
+      }
+      dispatch(resetInitialState())
     }
   }, [isErrorCreateEdit, isSuccessCreateEdit, messageErrorCreateEdit])
   useEffect(() => {
