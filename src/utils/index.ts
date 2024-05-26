@@ -52,3 +52,40 @@ export const seporationFullname = (fullname: string, language: string) => {
 
   return res
 }
+
+// viết hàm mà lúc mà ấn vào cái PRODUCT => sẽ chọn hết các cái như create,update edit của nó
+//tham số thứ 2 để truyền các cái ko muốn lấy vào
+// hàm này chạy thế nào
+// nó sẽ lặp qua các cái key của obj truyền vào
+// nếu mà cái phần tử đó trong obj (obj[key] là 1 obj) => chạy đệ quy (1)
+// nếu ko thì nó check xem trong đó có trong arE ko => ok (2)
+// nếu ko có thì sẽ đẩy vào values
+// khi push cái obj[key] của trường hợp (2) => nó sẽ put cả cái mảng gồm các cái này của cái obj[key] đó vào
+// ví dụ
+//  PERMISSIONS.MANAGE_PRODUCT.PRODUCT.CREATE,
+//  PERMISSIONS.MANAGE_PRODUCT.PRODUCT.UPDATE,
+//  PERMISSIONS.MANAGE_PRODUCT.PRODUCT.DELETE,
+export const getAllValueObject = (obj: any, arrExclude?: string[]) => {
+  try {
+    const values: string[] = []
+    if (typeof obj === 'object') {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object') {
+          // có cái con (ví dụ xét đến cái system => trong cái key đó lại là cái obj => lại gọi đệ quy đến hàm đó)
+          values.push(...getAllValueObject(obj[key], arrExclude))
+        } else {
+          if (!arrExclude?.includes(obj[key])) {
+            values.push(obj[key]) //ko là obj mà nó là string
+          }
+        }
+      }
+    } else {
+      //nếu là string thì push vào luô => case dashboard
+      values.push(obj)
+    }
+
+    return values
+  } catch (error) {
+    return []
+  }
+}
