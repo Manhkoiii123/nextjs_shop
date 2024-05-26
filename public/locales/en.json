@@ -63,5 +63,12 @@
   "title_delete_role": "Delete Role",
   "confirm_delete_role": "Are you sure you want to delete this role group? ",
   "Data_exist_in_system": "Data exist in system",
-  "server_is_error": "Server is error"
+  "server_is_error": "Server is error",
+  "view": "View",
+  "Product_type": "Product type",
+  "Review": "Review",
+  "Order": "Order",
+  "City": "City",
+  "Delivery_type": "Delivery type",
+  "Payment_type": "Payment type"
 }

@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Card, Grid, IconButton, Tooltip, useTheme } from '@mui/material'
+import { Box, Button, Card, Grid, IconButton, Tooltip, useTheme } from '@mui/material'
 import { NextPage } from 'next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { deleteRolesAsync, getAllRolesAsync } from 'src/stores/role/actions'
+import { deleteRolesAsync, getAllRolesAsync, updateRolesAsync } from 'src/stores/role/actions'
 import { useEffect, useState } from 'react'
 import { GridColDef, GridSortModel } from '@mui/x-data-grid'
 import CustomDataGrid from 'src/components/custom-data-grid'
@@ -24,6 +24,7 @@ import Spinner from 'src/components/spinner'
 import ConfirmationDialog from 'src/components/confirmation-dialog'
 import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
 import TablePermission from 'src/views/pages/system/role/components/TablePermission'
+import { getDetailRoles } from 'src/services/role'
 
 type TProps = {}
 
@@ -45,6 +46,12 @@ const RoleListPage: NextPage<TProps> = () => {
     open: false,
     id: ''
   })
+  const [selectedRow, setSelectedRow] = useState({
+    id: '',
+    name: ''
+  })
+  const [loading, setLoading] = useState(false)
+  const [permissionSelected, setPermissionSelected] = useState<string[]>([])
   const { t } = useTranslation()
   const theme = useTheme()
   const [page, setPage] = useState(1)
@@ -55,7 +62,29 @@ const RoleListPage: NextPage<TProps> = () => {
   })
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
+  const handleGetDetailRole = async (id: string) => {
+    setLoading(true)
+    await getDetailRoles(id)
+      .then(res => {
+        if (res?.data) {
+          setPermissionSelected(res.data.permissions || [])
+        }
+        setLoading(false)
+      })
+      .catch(e => {
+        setLoading(false)
+      })
+  }
+  const handleUpdateRole = (id: string, name: string) => {
+    dispatch(updateRolesAsync({ name: name, id: id, permissions: permissionSelected }))
+  }
 
+  useEffect(() => {
+    if (selectedRow.id) {
+      //call cái detail của 1 cái quyền ví dụ admin
+      handleGetDetailRole(selectedRow.id)
+    }
+  }, [selectedRow])
   const router = useRouter()
   const handleGetListRoles = () => {
     dispatch(getAllRolesAsync({ params: { limit: -1, page: -1, search: searchBy, order: sortBy } }))
@@ -183,11 +212,12 @@ const RoleListPage: NextPage<TProps> = () => {
           display: 'flex',
           alignItems: 'center',
           padding: '20px',
-          height: '100%'
+          height: '100%',
+          width: '100%'
         }}
       >
-        <Grid spacing={10} container sx={{ height: '100%', width: '100%' }}>
-          <Grid item md={4} xs={12}>
+        <Grid container sx={{ height: '100%', width: '100%' }}>
+          <Grid item md={4} xs={12} sx={{ maxHeight: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <Box sx={{ width: '300px' }}>
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
@@ -222,11 +252,41 @@ const RoleListPage: NextPage<TProps> = () => {
                 }}
                 disableColumnFilter
                 disableColumnMenu
+                //onclick để xem bấm vào cột nào
+                onRowClick={row => {
+                  //bấm vào thì cái tablePer phải thay đổi theo cái quyền đó=> state
+                  // console.log('🚀 ~ row:', row)
+                  setSelectedRow({ id: row.id as string, name: row?.row?.name })
+                }}
               />
             </Box>
           </Grid>
-          <Grid item md={8} xs={12} sx={{ maxHeight: '100%' }}>
-            <TablePermission />
+          <Grid
+            item
+            md={8}
+            xs={12}
+            sx={{ maxHeight: '100%' }}
+            paddingLeft={{ md: '40px', xs: 0 }}
+            paddingTop={{ md: '0px', xs: '40px' }}
+          >
+            {selectedRow?.id && (
+              <Box sx={{ height: 'calc(100% - 40px)' }}>
+                <TablePermission
+                  permissionSelected={permissionSelected}
+                  setPermissionSelected={setPermissionSelected}
+                />
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type='submit'
+                    variant='contained'
+                    sx={{ mt: 3, mb: 2 }}
+                    onClick={() => handleUpdateRole(selectedRow.id, selectedRow.name)}
+                  >
+                    {t('edit')}
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </Grid>
         </Grid>
       </Box>
