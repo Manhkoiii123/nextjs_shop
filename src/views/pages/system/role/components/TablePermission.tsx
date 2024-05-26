@@ -1,10 +1,11 @@
-import { Button, Card, useTheme } from '@mui/material'
-import { Box, Checkbox, Typography } from '@mui/material'
+import { useTheme } from '@mui/material'
+import { Checkbox, Typography } from '@mui/material'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CustomDataGrid from 'src/components/custom-data-grid'
 import { LIST_DATA_PERMISSIONS, PERMISSIONS } from 'src/configs/permissions'
+import { getAllValueObject } from 'src/utils'
 
 interface TTablePermission {
   setPermissionSelected: Dispatch<SetStateAction<string[]>>
@@ -12,13 +13,62 @@ interface TTablePermission {
 }
 const TablePermission = (props: TTablePermission) => {
   const { permissionSelected, setPermissionSelected } = props
+
   const theme = useTheme()
   const { t } = useTranslation()
-  const handleGetValuePermission = (parentValue: string, value: string, mode: string) => {
+
+  const handleGetValuePermission = (value: string, mode: string, parentValue?: string) => {
     try {
-      return PERMISSIONS[parentValue][value][mode] //tương tự PẺ.pare.value.mode (mode là cái create edit view....)
+      //case 2 là sử lí trường hợp dashboard nó ko đúng định dạng
+      return parentValue ? PERMISSIONS[parentValue][value][mode] : PERMISSIONS[value] //tương tự PẺ.pare.value.mode (mode là cái create edit view....)
     } catch (error) {
       return ''
+    }
+  }
+
+  // hàm để check xem đã check all chưa
+  const handleIsCheck = (value: string, parentValue?: string) => {
+    const allValue = parentValue
+      ? getAllValueObject(PERMISSIONS[parentValue][value])
+      : getAllValueObject(PERMISSIONS[value])
+
+    //khi vào truowgf hợp cái dash thì cái permiss[value ]= dash mà nó ko là obj
+
+    // ví dụ cái cha là settig có 2 con là a và b (mỗi cái có crud)
+    // khi check all cái a thì chạy cái handlecheckAllCheckBoxChildren => set được cái perSel
+    // khi check all cái b thì utowng tự
+    // => khi đó cái ischeck chạy lại => cái isCheckAll của Setting cũng là true
+    // khi đó cái check all của setting cũng được check
+    const isCheckAll = allValue.every(item => permissionSelected.includes(item))
+
+    return { isCheckAll, allValue }
+  }
+  //case xử lí check all của cái con
+  // cái parentValue là ?: là vì có case DASHBOARD nữa
+  const handlecheckAllCheckBoxChildren = (value: string, parentValue?: string) => {
+    const ans = handleIsCheck(value, parentValue)
+    const { isCheckAll, allValue } = ans
+    if (isCheckAll) {
+      // nếu đã có check rồi => bỏ nó đi
+      const filtered = permissionSelected.filter(item => !allValue.includes(item))
+      setPermissionSelected(filtered)
+    } else {
+      //chưa check
+      setPermissionSelected([...new Set([...permissionSelected, ...allValue])])
+    }
+  }
+
+  //check all cái setting chứa cái a và b
+  const handleCheckAllGroup = (value: string) => {
+    const ans = handleIsCheck(value)
+    const { isCheckAll, allValue } = ans
+    if (isCheckAll) {
+      // nếu đã có check rồi => bỏ nó đi
+      const filtered = permissionSelected.filter(item => !allValue.includes(item))
+      setPermissionSelected(filtered)
+    } else {
+      //chưa check
+      setPermissionSelected([...new Set([...permissionSelected, ...allValue])])
     }
   }
   const handleOnChangeCheckBox = (value: string) => {
@@ -33,17 +83,31 @@ const TablePermission = (props: TTablePermission) => {
   const columns: GridColDef[] = [
     {
       field: 'all',
-      headerName: t('All'),
+      headerName: '',
       minWidth: 80,
       maxWidth: 80,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const { row } = params
 
+        //case ấn check hết các ô trong con thì cái ô all của cái đó sẽ được check
+        const ans = handleIsCheck(row.value, row.parentValue)
+        const { isCheckAll } = ans
+
         return (
           <>
             {' '}
-            <Checkbox />
+            <Checkbox
+              checked={isCheckAll}
+              value={row?.value}
+              onChange={e => {
+                if (row.isParent) {
+                  handleCheckAllGroup(e.target.value)
+                } else {
+                  handlecheckAllCheckBoxChildren(e.target.value, row.parentValue)
+                }
+              }}
+            />
           </>
         )
       }
@@ -83,7 +147,7 @@ const TablePermission = (props: TTablePermission) => {
       renderCell: (params: GridRenderCellParams) => {
         // console.log('🚀 ~ TablePermission ~ params:', params) => ra laf thayas
         const { row } = params
-        const value = handleGetValuePermission(row.parentValue, row.value, 'VIEW')
+        const value = handleGetValuePermission(row.value, 'VIEW', row.parentValue)
         // console.log('🚀 ~ TablePermission ~ row:', {
         //   row,
         //   PERMISSIONS,
@@ -114,7 +178,7 @@ const TablePermission = (props: TTablePermission) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const { row } = params
-        const value = handleGetValuePermission(row.parentValue, row.value, 'CREATE')
+        const value = handleGetValuePermission(row.value, 'CREATE', row.parentValue)
 
         return (
           <>
@@ -137,7 +201,7 @@ const TablePermission = (props: TTablePermission) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const { row } = params
-        const value = handleGetValuePermission(row.parentValue, row.value, 'DELETE')
+        const value = handleGetValuePermission(row.value, 'DELETE', row.parentValue)
 
         return (
           <>
@@ -160,7 +224,7 @@ const TablePermission = (props: TTablePermission) => {
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const { row } = params
-        const value = handleGetValuePermission(row.parentValue, row.value, 'UPDATE')
+        const value = handleGetValuePermission(row.value, 'UPDATE', row.parentValue)
 
         return (
           <>
@@ -193,3 +257,8 @@ const TablePermission = (props: TTablePermission) => {
   )
 }
 export default TablePermission
+
+// xử lí cái check all của từng hàng 1
+// ví dụ nếu ấn vào cái check all của parent(ví dụ settting) thì sẽ check all các cái children cả create edit... của nó
+// => case này thì dựa vào cái isP =true
+// nếu ấn cái check all của cái conn (con của setting là cái City )=> thì sẽ check all cái crud của city => handlecheckAllCheckBoxChildren()

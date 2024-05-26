@@ -25,6 +25,8 @@ import ConfirmationDialog from 'src/components/confirmation-dialog'
 import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
 import TablePermission from 'src/views/pages/system/role/components/TablePermission'
 import { getDetailRoles } from 'src/services/role'
+import { PERMISSIONS } from 'src/configs/permissions'
+import { getAllValueObject } from 'src/utils'
 
 type TProps = {}
 
@@ -67,7 +69,16 @@ const RoleListPage: NextPage<TProps> = () => {
     await getDetailRoles(id)
       .then(res => {
         if (res?.data) {
-          setPermissionSelected(res.data.permissions || [])
+          // const isDefaultPermission = [PERMISSIONS.ADMIN, PERMISSIONS.BASIC].some(item =>
+          //   res?.data.permissions.includes(item)
+          // )
+          if (res?.data.permissions.includes(PERMISSIONS.ADMIN)) {
+            setPermissionSelected(getAllValueObject(PERMISSIONS, [PERMISSIONS.ADMIN, PERMISSIONS.BASIC]))
+          } else if (res?.data.permissions.includes(PERMISSIONS.BASIC)) {
+            setPermissionSelected(PERMISSIONS.DASHBOARD)
+          } else {
+            setPermissionSelected(res.data.permissions || [])
+          }
         }
         setLoading(false)
       })
@@ -128,7 +139,6 @@ const RoleListPage: NextPage<TProps> = () => {
                     setOpeCreateEdit({
                       open: true,
                       id: String(params.id)
-                      // id: 'yyyy'
                     })
                   }}
                 ></GridEdit>
@@ -196,6 +206,7 @@ const RoleListPage: NextPage<TProps> = () => {
 
   return (
     <>
+      {loading && <Spinner />}
       <ConfirmationDialog
         title={t('title_delete_role')}
         description={t('confirm_delete_role')}
@@ -233,6 +244,11 @@ const RoleListPage: NextPage<TProps> = () => {
             </Box>
             <Box sx={{ maxHeight: '100%' }}>
               <CustomDataGrid
+                sx={{
+                  '.MuiDataGrid-row': {
+                    // backgroundColor: 'red'
+                  }
+                }}
                 rows={roles.data}
                 columns={columns}
                 pageSizeOptions={[5]}

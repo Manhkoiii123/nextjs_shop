@@ -61,6 +61,16 @@ export const PERMISSIONS: any = {
 }
 export const LIST_DATA_PERMISSIONS: any = [
   {
+    id: 15,
+    name: 'Dashboard',
+    isParent: false,
+    value: 'DASHBOARD',
+    isHideCreate: true,
+    isHideUpdate: true,
+    isHideDelete: true,
+    // isHideCheckAll: true
+  },
+  {
     id: 1,
     name: 'Manage_product',
     isParent: true,
@@ -167,7 +177,7 @@ export const LIST_DATA_PERMISSIONS: any = [
     id: 12,
     name: 'Delivery_type',
     isParent: false,
-    value: 'CIDELIVERY_TYPETY',
+    value: 'DELIVERY_TYPE',
     parentValue: 'SETTING',
     // create: PERMISSIONS.SETTING.DELIVERY_TYPE.CREATE,
     // update: PERMISSIONS.SETTING.DELIVERY_TYPE.UPDATE,
