@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { deleteRolesAsync, getAllRolesAsync, updateRolesAsync } from 'src/stores/role/actions'
 import { useEffect, useState } from 'react'
-import { GridColDef, GridSortModel } from '@mui/x-data-grid'
+import { GridColDef, GridRowClassNameParams, GridSortModel } from '@mui/x-data-grid'
 import CustomDataGrid from 'src/components/custom-data-grid'
 import CustomPagination from 'src/components/custom-pagination'
 import { PAGE_SIZE_OPTIONS } from 'src/configs/gridConfig'
@@ -27,6 +27,7 @@ import TablePermission from 'src/views/pages/system/role/components/TablePermiss
 import { getDetailRoles } from 'src/services/role'
 import { PERMISSIONS } from 'src/configs/permissions'
 import { getAllValueObject } from 'src/utils'
+import { hexToRGBA } from 'src/utils/hex-to-rgba'
 
 type TProps = {}
 
@@ -52,6 +53,8 @@ const RoleListPage: NextPage<TProps> = () => {
     id: '',
     name: ''
   })
+  const [isDisable, setIsDisbale] = useState(false)
+
   const [loading, setLoading] = useState(false)
   const [permissionSelected, setPermissionSelected] = useState<string[]>([])
   const { t } = useTranslation()
@@ -69,14 +72,14 @@ const RoleListPage: NextPage<TProps> = () => {
     await getDetailRoles(id)
       .then(res => {
         if (res?.data) {
-          // const isDefaultPermission = [PERMISSIONS.ADMIN, PERMISSIONS.BASIC].some(item =>
-          //   res?.data.permissions.includes(item)
-          // )
           if (res?.data.permissions.includes(PERMISSIONS.ADMIN)) {
+            setIsDisbale(true)
             setPermissionSelected(getAllValueObject(PERMISSIONS, [PERMISSIONS.ADMIN, PERMISSIONS.BASIC]))
           } else if (res?.data.permissions.includes(PERMISSIONS.BASIC)) {
+            setIsDisbale(true)
             setPermissionSelected(PERMISSIONS.DASHBOARD)
           } else {
+            setIsDisbale(false)
             setPermissionSelected(res.data.permissions || [])
           }
         }
@@ -95,7 +98,7 @@ const RoleListPage: NextPage<TProps> = () => {
       //call cái detail của 1 cái quyền ví dụ admin
       handleGetDetailRole(selectedRow.id)
     }
-  }, [selectedRow])
+  }, [selectedRow.id])
   const router = useRouter()
   const handleGetListRoles = () => {
     dispatch(getAllRolesAsync({ params: { limit: -1, page: -1, search: searchBy, order: sortBy } }))
@@ -167,10 +170,10 @@ const RoleListPage: NextPage<TProps> = () => {
   }, [sortBy, searchBy])
   useEffect(() => {
     if (isSuccessCreateEdit) {
-      if (openCreateEdit.id) {
-        toast.success(t('update-role-success'))
-      } else {
+      if (!openCreateEdit.id) {
         toast.success(t('create-role-success'))
+      } else {
+        toast.success(t('update-role-success'))
       }
       handleGetListRoles()
       handleCloseCreateEdit()
@@ -234,25 +237,25 @@ const RoleListPage: NextPage<TProps> = () => {
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
               </Box>
               <GridCreate
-                onClick={() =>
+                onClick={() => {
                   setOpeCreateEdit({
                     open: true,
                     id: ''
                   })
-                }
+                }}
               />
             </Box>
             <Box sx={{ maxHeight: '100%' }}>
               <CustomDataGrid
                 sx={{
-                  '.MuiDataGrid-row': {
-                    // backgroundColor: 'red'
+                  '.row-selected': {
+                    color: `${theme.palette.primary.main} !important`,
+                    backgroundColor: `${hexToRGBA(theme.palette.primary.main, 0.08)} !important`
                   }
                 }}
                 rows={roles.data}
                 columns={columns}
                 pageSizeOptions={[5]}
-                // checkboxSelection
                 autoHeight
                 getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
                 disableRowSelectionOnClick
@@ -267,11 +270,20 @@ const RoleListPage: NextPage<TProps> = () => {
                   pagination: PaginationComponent
                 }}
                 disableColumnFilter
+                getRowClassName={(row: GridRowClassNameParams) => {
+                  console.log('🚀 ~ row:', row)
+
+                  //khi đó cái nào chọn thì có class này
+                  return row.id === selectedRow.id ? 'row-selected' : ''
+                }}
                 disableColumnMenu
                 //onclick để xem bấm vào cột nào
                 onRowClick={row => {
                   //bấm vào thì cái tablePer phải thay đổi theo cái quyền đó=> state
-                  // console.log('🚀 ~ row:', row)
+                  setOpeCreateEdit({
+                    open: false,
+                    id: row.id as string
+                  })
                   setSelectedRow({ id: row.id as string, name: row?.row?.name })
                 }}
               />
@@ -288,11 +300,13 @@ const RoleListPage: NextPage<TProps> = () => {
             {selectedRow?.id && (
               <Box sx={{ height: 'calc(100% - 40px)' }}>
                 <TablePermission
+                  disabled={isDisable}
                   permissionSelected={permissionSelected}
                   setPermissionSelected={setPermissionSelected}
                 />
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
                   <Button
+                    disabled={isDisable}
                     type='submit'
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
