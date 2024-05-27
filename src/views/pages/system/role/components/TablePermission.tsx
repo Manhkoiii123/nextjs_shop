@@ -10,9 +10,10 @@ import { getAllValueObject } from 'src/utils'
 interface TTablePermission {
   setPermissionSelected: Dispatch<SetStateAction<string[]>>
   permissionSelected: string[]
+  disabled: boolean
 }
 const TablePermission = (props: TTablePermission) => {
-  const { permissionSelected, setPermissionSelected } = props
+  const { permissionSelected, setPermissionSelected, disabled } = props
 
   const theme = useTheme()
   const { t } = useTranslation()
@@ -98,6 +99,7 @@ const TablePermission = (props: TTablePermission) => {
           <>
             {' '}
             <Checkbox
+              disabled={disabled}
               checked={isCheckAll}
               value={row?.value}
               onChange={e => {
@@ -161,6 +163,7 @@ const TablePermission = (props: TTablePermission) => {
           <>
             {!row?.isHideView && !row?.isParent && (
               <Checkbox
+                disabled={disabled}
                 value={value}
                 checked={permissionSelected.includes(value)}
                 onChange={e => handleOnChangeCheckBox(e.target.value)}
@@ -184,6 +187,7 @@ const TablePermission = (props: TTablePermission) => {
           <>
             {!row?.isHideCreate && !row?.isParent && (
               <Checkbox
+                disabled={disabled}
                 value={value}
                 onChange={e => handleOnChangeCheckBox(e.target.value)}
                 checked={permissionSelected.includes(value)}
@@ -207,6 +211,7 @@ const TablePermission = (props: TTablePermission) => {
           <>
             {!row?.isHideDelete && !row?.isParent && (
               <Checkbox
+                disabled={disabled}
                 value={value}
                 onChange={e => handleOnChangeCheckBox(e.target.value)}
                 checked={permissionSelected.includes(value)}
@@ -230,6 +235,7 @@ const TablePermission = (props: TTablePermission) => {
           <>
             {!row?.isHideUpdate && !row?.isParent && (
               <Checkbox
+                disabled={disabled}
                 value={value}
                 onChange={e => handleOnChangeCheckBox(e.target.value)}
                 checked={permissionSelected.includes(value)}
