@@ -8,23 +8,31 @@ import NotAuthorized from 'src/pages/401'
 import { useAuth } from 'src/hooks/useAuth'
 import { useRouter } from 'next/router'
 import { AbilityContext } from '../acl/Can'
+import { PERMISSIONS } from 'src/configs/permissions'
 
 interface AclGuardProps {
   children: ReactNode
   authGuard?: boolean
   guestGuard?: boolean
   aclAbilities: ACLObj
+  permission?: string[]
 }
 
 const AclGuard = (props: AclGuardProps) => {
   // ** Props
-  const { aclAbilities, children, guestGuard = false, authGuard = true } = props
+  const { aclAbilities, children, guestGuard = false, authGuard = true, permission } = props
   const router = useRouter()
   const auth = useAuth()
-  const permissionUser = auth.user?.role?.permissions ?? []
+  const permissionUser = auth.user?.role?.permissions
+    ? auth.user?.role?.permissions.includes(PERMISSIONS.BASIC)
+      ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
+      : auth.user?.role?.permissions //per của người dùng đang đăng nhập
+    : [] //nếu ko có thì trả về mảng []
+
+    
   let ability: AppAbility
   if (auth.user && !ability) {
-    ability = buildAbilityFor(permissionUser, aclAbilities.subject)
+    ability = buildAbilityFor(permissionUser, permission)
   }
   // console.log(ability) //đọc sẽ ko hiểu gì đâu =)) do nó ở dnagj map
   //khi trả về thăng casl => sử dụng cái ab.can để check quyền

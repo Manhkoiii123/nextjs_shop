@@ -8,8 +8,9 @@ import IconifyIcon from 'src/components/Icon'
 import List from '@mui/material/List'
 import { VerticalItems } from 'src/configs/layout'
 import { Box, Tooltip, styled, useTheme } from '@mui/material'
-import { useRouter } from 'next/navigation'
+
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
+import { useRouter } from 'next/router'
 
 export type TVertical = {
   title: string
@@ -197,6 +198,9 @@ const RecursiveListItem: NextPage<TListItems> = ({
 const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({})
   const [activePath, setActivePath] = useState<null | string>('')
+  const router = useRouter()
+  const findParentActivePath = (item: TVertical) => {}
+
   const handleToogleAll = () => {
     setOpenItems({})
   }
@@ -205,6 +209,12 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
       handleToogleAll()
     }
   }, [open])
+
+  useEffect(() => {
+    if (router.asPath) {
+      setActivePath(router.asPath)
+    }
+  }, [router.asPath])
 
   return (
     <List
