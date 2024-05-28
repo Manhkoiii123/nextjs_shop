@@ -56,6 +56,8 @@ const UserDropdown: NextPage = (props: TProps) => {
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+  const { user, logout } = useAuth()
+  const permissionUser = user?.role.permissions ?? []
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -74,8 +76,6 @@ const UserDropdown: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.DASHBOARD)
     handleClose()
   }
-
-  const { user, logout } = useAuth()
 
   return (
     <Fragment>
@@ -191,12 +191,14 @@ const UserDropdown: NextPage = (props: TProps) => {
           </Box>
         </Box>
         <Divider />
-        <MenuItem onClick={handleNavigateManageSystem}>
-          <Avatar>
-            <IconifyIcon icon='arcticons:phone-manager' />
-          </Avatar>{' '}
-          {t('manager_system')}
-        </MenuItem>
+        {permissionUser.length > 0 && (
+          <MenuItem onClick={handleNavigateManageSystem}>
+            <Avatar>
+              <IconifyIcon icon='arcticons:phone-manager' />
+            </Avatar>{' '}
+            {t('manager_system')}
+          </MenuItem>
+        )}
         <MenuItem onClick={handleNavigateProfile}>
           <Avatar>
             <IconifyIcon icon='ph:user-thin' />

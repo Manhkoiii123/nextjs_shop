@@ -271,8 +271,6 @@ const RoleListPage: NextPage<TProps> = () => {
                 }}
                 disableColumnFilter
                 getRowClassName={(row: GridRowClassNameParams) => {
-                  console.log('🚀 ~ row:', row)
-
                   //khi đó cái nào chọn thì có class này
                   return row.id === selectedRow.id ? 'row-selected' : ''
                 }}
