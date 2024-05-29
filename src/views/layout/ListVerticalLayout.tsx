@@ -212,12 +212,12 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
 
   // permissions
 
-  // const permissionUser = user?.role?.permissions
-  //   ? user?.role?.permissions.includes(PERMISSIONS.BASIC)
-  //     ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
-  //     : user?.role?.permissions //per của người dùng đang đăng nhập
-  //   : [] //nếu ko có thì trả về mảng []
-  const permissionUser: string[] = ['DASHBOARD', 'SYSTEM.ROLE.VIEW']
+  const permissionUser = user?.role?.permissions
+    ? user?.role?.permissions.includes(PERMISSIONS.BASIC)
+      ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
+      : user?.role?.permissions //per của người dùng đang đăng nhập
+    : [] //nếu ko có thì trả về mảng []
+  // const permissionUser: string[] = ['DASHBOARD', 'SYSTEM.ROLE.VIEW']
   const hasPermission = (item: any, permissionUser: string[]) => {
     return permissionUser.includes(item.permission) || !item.permission
   }
