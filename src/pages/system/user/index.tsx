@@ -1,11 +1,10 @@
 import { NextPage } from 'next'
+import { PERMISSIONS } from 'src/configs/permissions'
 
 type TProps = {}
 
 const Index: NextPage<TProps> = () => {
   return <h1>User</h1>
 }
-// manh test commit
-// manh test commit
-//
+Index.permission = [PERMISSIONS.SYSTEM.USER.VIEW]
 export default Index

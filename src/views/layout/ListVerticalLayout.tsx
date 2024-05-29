@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
@@ -11,15 +11,19 @@ import { Box, Tooltip, styled, useTheme } from '@mui/material'
 
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { useRouter } from 'next/router'
+import { PERMISSIONS } from 'src/configs/permissions'
+import { useAuth } from 'src/hooks/useAuth'
 
 export type TVertical = {
   title: string
   path?: string
   icon: string
+  permission?: string
   childrens?: {
     title: string
     path?: string
     icon: string
+    permission?: string
   }[]
 }
 type TProps = {
@@ -94,6 +98,8 @@ const RecursiveListItem: NextPage<TListItems> = ({
 
         return (
           <React.Fragment key={index}>
+            {/* ko có con thì ẩn đi */}
+
             <ListItemButton
               sx={{
                 margin: '1px 0',
@@ -199,7 +205,68 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({})
   const [activePath, setActivePath] = useState<null | string>('')
   const router = useRouter()
-  const findParentActivePath = (item: TVertical) => {}
+  const { user } = useAuth()
+  const listVerticalItem = VerticalItems()
+  // lúc mà thằng co nó active thì phải mở thằng cha nó ra
+  // cái hàm này là tìm cha
+
+  // permissions
+
+  // const permissionUser = user?.role?.permissions
+  //   ? user?.role?.permissions.includes(PERMISSIONS.BASIC)
+  //     ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
+  //     : user?.role?.permissions //per của người dùng đang đăng nhập
+  //   : [] //nếu ko có thì trả về mảng []
+  const permissionUser: string[] = ['DASHBOARD', 'SYSTEM.ROLE.VIEW']
+  const hasPermission = (item: any, permissionUser: string[]) => {
+    return permissionUser.includes(item.permission) || !item.permission
+  }
+
+  //viết hàm để format menu (cái nào ko có quyền thì ẩn nó đi, cái nào mà ko có con cũng ẩn đi nốt)
+  const formatMenuByPermission = (menu: any[], permissionUser: string[]) => {
+    if (menu) {
+      return menu.filter(item => {
+        if (hasPermission(item, permissionUser)) {
+          if (item.childrens && item.childrens.length > 0) {
+            item.childrens = formatMenuByPermission(item.childrens, permissionUser)
+          }
+          // if (!item?.childrens?.length && !item.path) {
+          //   return false
+          // }
+
+          return true
+        }
+
+        return false
+      })
+    }
+
+    return []
+  }
+
+  const memoFormatMenu = useMemo(() => {
+    if (permissionUser.includes(PERMISSIONS.ADMIN)) {
+      return listVerticalItem
+    }
+
+    return formatMenuByPermission(listVerticalItem, permissionUser)
+  }, [listVerticalItem, permissionUser])
+
+  const findParentActivePath = (item: TVertical[], activePath: string) => {
+    for (const i of item) {
+      if (i.path === activePath) {
+        return i.title
+      }
+      if (i.childrens && i.childrens.length > 0) {
+        const child = findParentActivePath(i.childrens, activePath)
+        if (child) {
+          return i.title
+        }
+      }
+    }
+
+    return null
+  }
 
   const handleToogleAll = () => {
     setOpenItems({})
@@ -212,6 +279,13 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
 
   useEffect(() => {
     if (router.asPath) {
+      const parentTitle = findParentActivePath(listVerticalItem, router.asPath)
+      if (parentTitle) {
+        setOpenItems({
+          [parentTitle]: true
+        })
+      }
+
       setActivePath(router.asPath)
     }
   }, [router.asPath])
@@ -224,7 +298,7 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
     >
       {/* level để style */}
       <RecursiveListItem
-        items={VerticalItems()}
+        items={memoFormatMenu}
         disabled={!open}
         openItems={openItems}
         setOpenItems={setOpenItems}
