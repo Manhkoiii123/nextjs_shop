@@ -23,13 +23,13 @@ const AclGuard = (props: AclGuardProps) => {
   const { aclAbilities, children, guestGuard = false, authGuard = true, permission } = props
   const router = useRouter()
   const auth = useAuth()
+  //
   const permissionUser = auth.user?.role?.permissions
     ? auth.user?.role?.permissions.includes(PERMISSIONS.BASIC)
       ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
       : auth.user?.role?.permissions //per của người dùng đang đăng nhập
     : [] //nếu ko có thì trả về mảng []
 
-    
   let ability: AppAbility
   if (auth.user && !ability) {
     ability = buildAbilityFor(permissionUser, permission)

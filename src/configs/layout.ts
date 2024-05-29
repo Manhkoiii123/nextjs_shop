@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { PERMISSIONS } from 'src/configs/permissions'
 import { ROUTE_CONFIG } from 'src/configs/route'
 
 export const VerticalItems = () => {
@@ -8,8 +9,8 @@ export const VerticalItems = () => {
     {
       title: t('Dashboard'),
       icon: 'material-symbols-light:dashboard-outline',
-      path: ROUTE_CONFIG.DASHBOARD
-      // permission: PERMISSIONS.DASHBOARD
+      path: ROUTE_CONFIG.DASHBOARD,
+      permission: PERMISSIONS.DASHBOARD
     },
     {
       title: t('System'),
@@ -18,14 +19,14 @@ export const VerticalItems = () => {
         {
           title: t('User'),
           icon: 'iconoir:group',
-          path: ROUTE_CONFIG.SYSTEM.USER
-          // permission: PERMISSIONS.SYSTEM.USER.VIEW
+          path: ROUTE_CONFIG.SYSTEM.USER,
+          permission: PERMISSIONS.SYSTEM.USER.VIEW
         },
         {
           title: t('Role'),
           icon: 'icon-park-outline:permissions',
-          path: ROUTE_CONFIG.SYSTEM.ROLE
-          // permission: PERMISSIONS.SYSTEM.ROLE.VIEW
+          path: ROUTE_CONFIG.SYSTEM.ROLE,
+          permission: PERMISSIONS.SYSTEM.ROLE.VIEW
         }
       ]
     },
@@ -52,8 +53,8 @@ export const VerticalItems = () => {
         {
           title: t('List_order'),
           icon: 'lets-icons:order-light',
-          path: ROUTE_CONFIG.MANAGE_ORDER.ORDER
-          // permission: PERMISSIONS.MANAGE_ORDER.ORDER.VIEW
+          path: ROUTE_CONFIG.MANAGE_ORDER.ORDER,
+          permission: PERMISSIONS.MANAGE_ORDER.ORDER.VIEW
         },
         {
           title: t('List_review'),
