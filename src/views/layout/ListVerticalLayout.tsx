@@ -230,9 +230,10 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
           if (item.childrens && item.childrens.length > 0) {
             item.childrens = formatMenuByPermission(item.childrens, permissionUser)
           }
-          // if (!item?.childrens?.length && !item.path) {
-          //   return false
-          // }
+          //cái nào mà ko có con và ko có path => ko hiện ra
+          if (!item?.childrens?.length && !item.path) {
+            return false
+          }
 
           return true
         }
