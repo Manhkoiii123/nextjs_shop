@@ -12,7 +12,24 @@ export const usePermission = (key: string, actions: TActions[]) => {
     UPDATE: false,
     DELETE: false
   }
-  
+
+  // hàm này để lấy ra các quyền trong PERMISS ban đầu
+  // ví dụ truyền cái role => thì lấy ra được cái đó
+  //ý tưởng
+  // lúc truyền lên cái SYSTEM.ROLE => tacash nó ra thành system và role
+  // lặp qua cái keys đó => đầu tiên là res = obj ban đầu
+  // lần lặp đầu tiên lấy ra được cái mảng chứa obj[SYSTEM]
+  // lần thứ 2 => lấy được cái obj[ROLE]=> là đã lấy được cái crud trong permission cho sẵn
+  // luồng chạy
+  // lấy ra cái perUser của user đố có quyền  = use Auth
+  // dùng 1 cái useEFf
+  // trong đây
+  // lấy ra cái mapPermission từ cái getObjectValue
+  // lặp qua cái actions => mỗi cái là 1 cái mode
+  // nếu mà cái pU là admin => bật all cái mapP[mode] => laf true
+  // nếu ko phải là admin => check cái userP mà chứa cái mapP[mode] => bật cái đó là true, còn ko là false
+  //
+
   const getObjectValue = (obj: any, key: string) => {
     const keys = key.split('.')
     let res = obj
@@ -29,7 +46,6 @@ export const usePermission = (key: string, actions: TActions[]) => {
         }
       }
     }
-    console.log(res)
 
     return res
   }
