@@ -28,6 +28,7 @@ import { getDetailRoles } from 'src/services/role'
 import { PERMISSIONS } from 'src/configs/permissions'
 import { getAllValueObject } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
+import { usePermission } from 'src/hooks/usePermission'
 
 type TProps = {}
 
@@ -53,6 +54,9 @@ const RoleListPage: NextPage<TProps> = () => {
     id: '',
     name: ''
   })
+  //page Nào cần check chỉ cần dugnf thế này là ok
+  const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.ROLE', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
+  //console.log('data', data) // ra được cái quyền của role =>{ VIEW: true, CREATE: true, UPDATE: true, DELETE: true}
   const [isDisable, setIsDisbale] = useState(false)
 
   const [loading, setLoading] = useState(false)
