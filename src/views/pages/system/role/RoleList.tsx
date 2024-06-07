@@ -142,6 +142,7 @@ const RoleListPage: NextPage<TProps> = () => {
               <>
                 {' '}
                 <GridEdit
+                  disabled={!UPDATE}
                   onClick={() => {
                     setOpeCreateEdit({
                       open: true,
@@ -149,7 +150,10 @@ const RoleListPage: NextPage<TProps> = () => {
                     })
                   }}
                 ></GridEdit>
-                <GridDelete onClick={() => setOpenDeleteRole({ open: true, id: String(params.id) })} />
+                <GridDelete
+                  disabled={!DELETE}
+                  onClick={() => setOpenDeleteRole({ open: true, id: String(params.id) })}
+                />
               </>
             )}
           </Box>
