@@ -11,17 +11,14 @@ import IconifyIcon from 'src/components/Icon'
 import { useTranslation } from 'react-i18next'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
 import { getAuthMe } from 'src/services/auth'
-import { UserDataType } from 'src/contexts/types'
 import { convertBase64, seporationFullname, toFullName } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/auth'
 import { updateAuthMeAsync } from 'src/stores/auth/actions'
-import FallbackSpinner from 'src/components/fall-back'
 import Spinner from 'src/components/spinner'
 import CustomSelect from 'src/components/custom-select'
-import CustomModal from 'src/components/custom-modal'
 import { getAllRoles } from 'src/services/role'
 
 type TProps = {}
@@ -35,7 +32,6 @@ type TDefaultValue = {
 }
 
 const ProfilePage: NextPage<TProps> = () => {
-  const [user, setUser] = useState<UserDataType | null>(null)
   const [loading, setLoading] = useState(false)
   const [avatar, setAvatar] = useState('')
   const { t } = useTranslation()
@@ -75,11 +71,10 @@ const ProfilePage: NextPage<TProps> = () => {
     await getAuthMe()
       .then(async response => {
         setLoading(false)
-        setUser({ ...response.data.data })
         const data = response?.data
         if (data) {
           setAvatar(data?.avatar)
-          setIsDisableRole(!!data?.role?.permissions.length)
+          setIsDisableRole(!data?.role?.permissions.length)
           reset({
             role: data?.role._id,
             fullName: toFullName(data?.lastName, data?.middleName, data?.firstName, language),
@@ -91,7 +86,6 @@ const ProfilePage: NextPage<TProps> = () => {
         }
       })
       .catch(() => {
-        setUser(null)
         setLoading(false)
       })
   }

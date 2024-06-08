@@ -25,12 +25,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/stores'
 import { createUserAsync, updateUserAsync } from 'src/stores/user/actions'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { getDetailUser, updateUser } from 'src/services/user'
 import Spinner from 'src/components/spinner'
 import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
-import { convertBase64 } from 'src/utils'
+import { convertBase64, seporationFullname, toFullName } from 'src/utils'
 import CustomSelect from 'src/components/custom-select'
 import { FormHelperText } from '@mui/material'
 import { getAllRoles } from 'src/services/role'
@@ -39,6 +39,8 @@ interface TCreateEditUser {
   open: boolean
   onClose: () => void
   idUser?: string
+  avatar: string
+  setAvatar: Dispatch<SetStateAction<string>>
 }
 type TDefaultValue = {
   password?: string
@@ -51,13 +53,13 @@ type TDefaultValue = {
   city?: string
 }
 const CreateEditUser = (props: TCreateEditUser) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [loading, setLoading] = useState(false)
-  const [avatar, setAvatar] = useState('')
+
   const [optionRoles, setOptionRoles] = useState<{ label: string; value: string }[]>([])
   const [showPassword, setShowPassword] = useState(false)
   const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
-  const { open, onClose, idUser } = props
+  const { open, onClose, idUser, avatar, setAvatar } = props
   const theme = useTheme()
   const defaultValues: TDefaultValue = {
     password: '',
@@ -94,13 +96,39 @@ const CreateEditUser = (props: TCreateEditUser) => {
   const dispatch: AppDispatch = useDispatch()
   const onsubmit = (data: TDefaultValue) => {
     if (!Object.keys(errors).length) {
-      console.log(data)
+      const { firstName, middleName, lastName } = seporationFullname(data?.fullName, i18n.language)
       if (idUser) {
         //update
-        // dispatch(updateUserAsync({ name: data.name, id: idUser }))
+        dispatch(
+          updateUserAsync({
+            id: idUser,
+            firstName,
+            lastName,
+            middleName,
+            phoneNumber: data.phoneNumber,
+            role: data?.role,
+            email: data.email,
+            city: data.city,
+            address: data?.address,
+            avatar: avatar
+          })
+        )
       } else {
         // create
-        // dispatch(createUserAsync({ name: data.name }))
+        dispatch(
+          createUserAsync({
+            firstName,
+            lastName,
+            middleName,
+            password: data?.password ? data?.password : '',
+            phoneNumber: data.phoneNumber,
+            role: data?.role,
+            email: data.email,
+            city: data.city,
+            address: data?.address,
+            avatar: avatar
+          })
+        )
       }
     }
   }
@@ -132,8 +160,16 @@ const CreateEditUser = (props: TCreateEditUser) => {
         const data = res.data
         if (data) {
           reset({
-            // name: data.name
+            fullName: toFullName(data?.lastName, data?.middleName, data?.firstName, i18n.language),
+            password: data.password,
+            phoneNumber: data.phoneNumber,
+            role: data?.role?._id,
+            email: data.email,
+            city: data.city,
+            address: data?.address,
+            status: data?.status
           })
+          setAvatar(data.avatar)
         }
         setLoading(false)
       })
@@ -351,31 +387,31 @@ const CreateEditUser = (props: TCreateEditUser) => {
                           />
                         </Grid>
                       )}
-                      {/* {idUser && ( */}
-                      <Grid item md={6} xs={12}>
-                        <Controller
-                          control={control}
-                          render={({ field: { onChange, onBlur, value } }) => {
-                            return (
-                              <FormControlLabel
-                                control={
-                                  <Switch
-                                    size='medium'
-                                    value={value}
-                                    checked={Boolean(value)}
-                                    onChange={e => {
-                                      onChange(e.target.checked ? 1 : 0)
-                                    }}
-                                  />
-                                }
-                                label={Boolean(value) ? t('Active') : t('Block')}
-                              />
-                            )
-                          }}
-                          name='status'
-                        />
-                      </Grid>
-                      {/* )} */}
+                      {idUser && (
+                        <Grid item md={6} xs={12}>
+                          <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => {
+                              return (
+                                <FormControlLabel
+                                  control={
+                                    <Switch
+                                      size='medium'
+                                      value={value}
+                                      checked={Boolean(value)}
+                                      onChange={e => {
+                                        onChange(e.target.checked ? 1 : 0)
+                                      }}
+                                    />
+                                  }
+                                  label={Boolean(value) ? t('Active') : t('Block')}
+                                />
+                              )
+                            }}
+                            name='status'
+                          />
+                        </Grid>
+                      )}
                     </Grid>
                   </Box>
                 </Grid>

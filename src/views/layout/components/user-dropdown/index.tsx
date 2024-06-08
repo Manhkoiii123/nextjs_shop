@@ -6,7 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import IconifyIcon from '../../../../components/Icon'
 import Image from 'next/image'
 import { useAuth } from 'src/hooks/useAuth'
@@ -18,6 +18,8 @@ import { Typography } from '@mui/material'
 import { toFullName } from 'src/utils'
 import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
+import { useSelector } from 'react-redux'
+import { RootState } from 'src/stores'
 
 type TProps = {}
 
@@ -56,7 +58,15 @@ const UserDropdown: NextPage = (props: TProps) => {
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-  const { user, logout } = useAuth()
+  const { user, logout, setUser } = useAuth()
+  const { userData } = useSelector((state: RootState) => state.auth)
+  // cái này để mà vào lần đầu thì lấy cái avt trong user ra
+  // sau đó nếu mà chạy cái update => cập nhật lại cái user là ok
+  // useEffect(() => {
+  //   if (userData) {
+  //     setUser({ ...userData })
+  //   }
+  // }, [userData])
   const permissionUser = user?.role.permissions ?? []
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -91,9 +101,9 @@ const UserDropdown: NextPage = (props: TProps) => {
           >
             <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
               <Avatar sx={{ width: 32, height: 32 }}>
-                {user?.avatar ? (
+                {userData?.avatar ? (
                   <Image
-                    src={user?.avatar || ''}
+                    src={userData?.avatar || ''}
                     alt='avatar'
                     style={{
                       height: '32px',
@@ -158,9 +168,9 @@ const UserDropdown: NextPage = (props: TProps) => {
         >
           <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
             <Avatar sx={{ width: 32, height: 32 }}>
-              {user?.avatar ? (
+              {userData?.avatar ? (
                 <Image
-                  src={user?.avatar || ''}
+                  src={userData?.avatar || ''}
                   alt='avatar'
                   style={{
                     height: '32px',
