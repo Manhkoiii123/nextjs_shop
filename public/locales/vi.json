@@ -82,5 +82,7 @@
   "FullName": "Họ và tên",
   "email": "Email",
   "role": "Quyền",
-  "phoneNumber": "Số điện thoại"
+  "phoneNumber": "Số điện thoại",
+  "Name_user": "Tên người dùng",
+  "enter_name_user": "Nhập tên người dùng"
 }

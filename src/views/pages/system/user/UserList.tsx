@@ -26,6 +26,7 @@ import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { usePermission } from 'src/hooks/usePermission'
 import { deleteUserAsync, getAllUserAsync } from 'src/stores/user/actions'
 import { getDetailUser } from 'src/services/user'
+import CreateEditUser from 'src/views/pages/system/user/components/CreateEditUser'
 
 type TProps = {}
 
@@ -42,10 +43,10 @@ const UserListPage: NextPage<TProps> = () => {
     messageErrorDelete,
     typeError
   } = useSelector((state: RootState) => state.user)
-  console.log('users', users)
+
   const [sortBy, setSortBy] = useState('created asc')
   const [searchBy, setSearchBy] = useState('')
-  const [openCreateEdit, setOpeCreateEdit] = useState({
+  const [openCreateEdit, setOpenCreateEdit] = useState({
     open: false,
     id: ''
   })
@@ -66,6 +67,7 @@ const UserListPage: NextPage<TProps> = () => {
     open: false,
     id: ''
   })
+  console.log(openCreateEdit)
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
   const handleGetDetailUser = async (id: string) => {
@@ -110,7 +112,7 @@ const UserListPage: NextPage<TProps> = () => {
       field: 'fullName',
       headerName: t('FullName'),
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       renderCell: params => {
         const { row } = params
         const fullname = toFullName(row?.lastName || '', row?.middleName || '', row?.firstName || '', i18n.language)
@@ -121,8 +123,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'email',
       headerName: t('email'),
-      maxWidth: 200,
-      minWidth: 200,
+      maxWidth: 300,
+      minWidth: 300,
       renderCell: params => {
         const { row } = params
 
@@ -133,8 +135,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'role',
       headerName: t('role'),
-      maxWidth: 200,
-      minWidth: 200,
+      maxWidth: 150,
+      minWidth: 150,
       renderCell: params => {
         const { row } = params
 
@@ -144,8 +146,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'phoneNumber',
       headerName: t('phoneNumber'),
-      maxWidth: 200,
-      minWidth: 200,
+      maxWidth: 150,
+      minWidth: 150,
       renderCell: params => {
         const { row } = params
 
@@ -155,8 +157,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'city',
       headerName: t('city'),
-      maxWidth: 200,
-      minWidth: 200,
+      maxWidth: 150,
+      minWidth: 150,
       renderCell: params => {
         const { row } = params
 
@@ -179,12 +181,12 @@ const UserListPage: NextPage<TProps> = () => {
               <GridEdit
                 disabled={!UPDATE}
                 onClick={() => {
-                  setOpeCreateEdit({
+                  setOpenCreateEdit({
                     open: true,
                     id: String(params.id)
                   })
                 }}
-              ></GridEdit>
+              />
               <GridDelete disabled={!DELETE} onClick={() => setOpenDeleteUser({ open: true, id: String(params.id) })} />
             </>
           </Box>
@@ -193,7 +195,7 @@ const UserListPage: NextPage<TProps> = () => {
     }
   ]
   const handleCloseCreateEdit = () => {
-    setOpeCreateEdit({
+    setOpenCreateEdit({
       open: false,
       id: ''
     })
@@ -257,7 +259,7 @@ const UserListPage: NextPage<TProps> = () => {
         open={openDeleteUser.open}
         handleClose={() => setOpenDeleteUser({ open: false, id: '' })}
       />
-      {/* <CreateEditUser idUser={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} /> */}
+      <CreateEditUser idUser={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} />
       {isLoading && <Spinner />}
       <Box
         sx={{
@@ -277,7 +279,7 @@ const UserListPage: NextPage<TProps> = () => {
             <GridCreate
               disabled={!CREATE}
               onClick={() => {
-                setOpeCreateEdit({
+                setOpenCreateEdit({
                   open: true,
                   id: ''
                 })
@@ -310,7 +312,7 @@ const UserListPage: NextPage<TProps> = () => {
             }}
             disableColumnMenu
             onRowClick={row => {
-              setOpeCreateEdit({
+              setOpenCreateEdit({
                 open: false,
                 id: row.id as string
               })
