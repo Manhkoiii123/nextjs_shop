@@ -54,6 +54,8 @@
   "Name_role": "Name Role",
   "edit_role": "Edit Role",
   "create_role": "Create Role",
+  "edit_user": "Edit User",
+  "create_user": "Create User",
   "create-role-success": "Create role success",
   "update-role-success": "Update role success",
   "delete-role-success": "Delete role success",
@@ -80,5 +82,7 @@
   "FullName": "Fullname",
   "email": "Email",
   "role": "Role",
-  "phoneNumber": "Phone number"
+  "phoneNumber": "Phone number",
+  "Name_user": "User name",
+  "enter_name_user": "Enter user name"
 }
