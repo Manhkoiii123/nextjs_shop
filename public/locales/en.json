@@ -84,5 +84,12 @@
   "role": "Role",
   "phoneNumber": "Phone number",
   "Name_user": "User name",
-  "enter_name_user": "Enter user name"
+  "enter_name_user": "Enter user name",
+  "Active": "Active",
+  "Block": "Block",
+  "Rules_email": "Email is not invalid",
+  "Rules_password": "The password is contain charator,special charactor,number",
+  "The phone number is min 9 number": "The phone number is min 9 number",
+  "Required_field": "This field is required",
+  "Enter_password": "Enter your password"
 }

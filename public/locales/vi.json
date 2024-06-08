@@ -84,5 +84,13 @@
   "role": "Quyền",
   "phoneNumber": "Số điện thoại",
   "Name_user": "Tên người dùng",
-  "enter_name_user": "Nhập tên người dùng"
+  "enter_name_user": "Nhập tên người dùng",
+
+  "Active": "Đang hoạt động",
+  "Block": "Chặn",
+  "Rules_email": "Email không đúng định dạng",
+  "Rules_password": "Mật khẩu bao gồm ký tự, ký tự đặc biệt, số",
+  "The phone number is min 9 number": "Số điện thoại tối thiểu là 9 chữ số",
+  "Required_field": "Trường này là bắt buộc",
+  "Enter_password": "Vui lòng nhập mật khẩu"
 }

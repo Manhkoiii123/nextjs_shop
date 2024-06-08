@@ -367,8 +367,8 @@ const ProfilePage: NextPage<TProps> = () => {
                         <CustomSelect
                           fullWidth
                           onChange={onChange}
-                          options={[]}
-                          // options={optionRoles}
+                          // options={[]}
+                          options={optionsRole}
                           error={Boolean(errors?.city)}
                           onBlur={onBlur}
                           value={value}
