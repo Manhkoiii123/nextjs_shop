@@ -44,7 +44,7 @@ const UserListPage: NextPage<TProps> = () => {
     typeError
   } = useSelector((state: RootState) => state.user)
 
-  const [sortBy, setSortBy] = useState('created asc')
+  const [sortBy, setSortBy] = useState('createdAt asc')
   const [searchBy, setSearchBy] = useState('')
   const [openCreateEdit, setOpenCreateEdit] = useState({
     open: false,
@@ -59,6 +59,7 @@ const UserListPage: NextPage<TProps> = () => {
 
   const [loading, setLoading] = useState(false)
   const [permissionSelected, setPermissionSelected] = useState<string[]>([])
+  const [avatar, setAvatar] = useState('')
   const { t } = useTranslation()
   const theme = useTheme()
   const [page, setPage] = useState(1)
@@ -67,29 +68,9 @@ const UserListPage: NextPage<TProps> = () => {
     open: false,
     id: ''
   })
-  console.log(openCreateEdit)
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
-  const handleGetDetailUser = async (id: string) => {
-    setLoading(true)
-    await getDetailUser(id)
-      .then(res => {
-        if (res?.data) {
-        }
-        setLoading(false)
-      })
-      .catch(e => {
-        setLoading(false)
-      })
-  }
 
-  useEffect(() => {
-    if (selectedRow.id) {
-      //call cái detail của 1 cái quyền ví dụ admin
-      handleGetDetailUser(selectedRow.id)
-    }
-  }, [selectedRow.id])
-  const router = useRouter()
   const handleGetListUser = () => {
     dispatch(getAllUserAsync({ params: { limit: -1, page: -1, search: searchBy, order: sortBy } }))
   }
@@ -199,6 +180,7 @@ const UserListPage: NextPage<TProps> = () => {
       open: false,
       id: ''
     })
+    setAvatar('')
   }
 
   const handleSort = (sort: GridSortModel) => {
@@ -218,6 +200,7 @@ const UserListPage: NextPage<TProps> = () => {
       }
       handleGetListUser()
       handleCloseCreateEdit()
+      setAvatar('')
       dispatch(resetInitialState())
     } else if (isErrorCreateEdit && messageErrorCreateEdit) {
       //config show lỗi ko lấy từ mess nữa
@@ -234,6 +217,9 @@ const UserListPage: NextPage<TProps> = () => {
       dispatch(resetInitialState())
     }
   }, [isErrorCreateEdit, isSuccessCreateEdit, messageErrorCreateEdit])
+  const handleDeleteUser = () => {
+    dispatch(deleteUserAsync(openDeleteUser.id))
+  }
   useEffect(() => {
     if (isSuccessDelete) {
       toast.success(t('delete-user-success'))
@@ -244,9 +230,6 @@ const UserListPage: NextPage<TProps> = () => {
       toast.error(t(messageErrorDelete))
     }
   }, [isSuccessDelete, isErrorDelete, messageErrorDelete])
-  const handleDeleteUser = () => {
-    dispatch(deleteUserAsync(openDeleteUser.id))
-  }
 
   return (
     <>
@@ -259,7 +242,13 @@ const UserListPage: NextPage<TProps> = () => {
         open={openDeleteUser.open}
         handleClose={() => setOpenDeleteUser({ open: false, id: '' })}
       />
-      <CreateEditUser idUser={openCreateEdit.id} open={openCreateEdit.open} onClose={handleCloseCreateEdit} />
+      <CreateEditUser
+        idUser={openCreateEdit.id}
+        open={openCreateEdit.open}
+        onClose={handleCloseCreateEdit}
+        avatar={avatar}
+        setAvatar={setAvatar}
+      />
       {isLoading && <Spinner />}
       <Box
         sx={{
@@ -311,13 +300,13 @@ const UserListPage: NextPage<TProps> = () => {
               return row.id === selectedRow.id ? 'row-selected' : ''
             }}
             disableColumnMenu
-            onRowClick={row => {
-              setOpenCreateEdit({
-                open: false,
-                id: row.id as string
-              })
-              setSelectedRow({ id: row.id as string, name: row?.row?.name })
-            }}
+            // onRowClick={row => {
+            //   setOpenCreateEdit({
+            //     open: true,
+            //     id: row.id as string
+            //   })
+            //   setSelectedRow({ id: row.id as string, name: row?.row?.name })
+            // }}
           />
         </Grid>
       </Box>

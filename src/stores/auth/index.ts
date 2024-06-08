@@ -1,8 +1,24 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
+import { UserDataType } from 'src/contexts/types'
 import { updateAuthMeAsync, registerAuthAsync, chagePasswordMeAsync } from 'src/stores/auth/actions'
 
-const initialState = {
+type TInit = {
+  isLoading: boolean
+  isSuccess: boolean
+  isError: boolean
+  message: string
+  typeError: string
+  isSuccessUpdate: boolean
+  isErrorUpdate: boolean
+  messageUpdate: string
+  isSuccessChangePassword: boolean
+  isErrorChangePassword: boolean
+  messageChangePassword: string
+  userData: UserDataType | null
+}
+
+const initialState: TInit = {
   isLoading: false,
   isSuccess: true,
   isError: false,
@@ -13,7 +29,8 @@ const initialState = {
   messageUpdate: '',
   isSuccessChangePassword: true,
   isErrorChangePassword: false,
-  messageChangePassword: ''
+  messageChangePassword: '',
+  userData: null
 }
 
 export const authSlice = createSlice({
@@ -39,7 +56,6 @@ export const authSlice = createSlice({
       state.isLoading = true
     })
     builder.addCase(registerAuthAsync.fulfilled, (state, action) => {
-      // console.log('🚀 ~ builder.addCase ~ action:', action
       state.isLoading = false
       state.isError = !action.payload.data?.email
       state.isSuccess = !!action.payload.data?.email //có emial là thành công
@@ -58,12 +74,13 @@ export const authSlice = createSlice({
       state.isLoading = true
     })
     builder.addCase(updateAuthMeAsync.fulfilled, (state, action) => {
-      // console.log('🚀 ~ builder.addCase ~ action:', action
+      console.log(action)
       state.isLoading = false
       state.isErrorUpdate = !action.payload.data?.email
       state.isSuccessUpdate = !!action.payload.data?.email //có emial là thành công
       state.messageUpdate = action.payload.message
       state.typeError = action.payload.typeError
+      state.userData = action.payload.data
     })
     builder.addCase(updateAuthMeAsync.rejected, (state, action) => {
       state.isErrorUpdate = true
@@ -71,6 +88,7 @@ export const authSlice = createSlice({
       state.isLoading = false
       state.messageUpdate = ''
       state.typeError = ''
+      state.userData = null
     })
     //change password me
     builder.addCase(chagePasswordMeAsync.pending, (state, action) => {
