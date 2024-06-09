@@ -62,11 +62,11 @@ const UserDropdown: NextPage = (props: TProps) => {
   const { userData } = useSelector((state: RootState) => state.auth)
   // cái này để mà vào lần đầu thì lấy cái avt trong user ra
   // sau đó nếu mà chạy cái update => cập nhật lại cái user là ok
-  // useEffect(() => {
-  //   if (userData) {
-  //     setUser({ ...userData })
-  //   }
-  // }, [userData])
+  useEffect(() => {
+    if (userData) {
+      setUser({ ...userData })
+    }
+  }, [userData])
   const permissionUser = user?.role.permissions ?? []
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -101,9 +101,9 @@ const UserDropdown: NextPage = (props: TProps) => {
           >
             <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
               <Avatar sx={{ width: 32, height: 32 }}>
-                {userData?.avatar ? (
+                {user?.avatar ? (
                   <Image
-                    src={userData?.avatar || ''}
+                    src={user?.avatar || ''}
                     alt='avatar'
                     style={{
                       height: '32px',
@@ -168,9 +168,9 @@ const UserDropdown: NextPage = (props: TProps) => {
         >
           <StyledBadge overlap='circular' anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant='dot'>
             <Avatar sx={{ width: 32, height: 32 }}>
-              {userData?.avatar ? (
+              {user?.avatar ? (
                 <Image
-                  src={userData?.avatar || ''}
+                  src={user?.avatar || ''}
                   alt='avatar'
                   style={{
                     height: '32px',
