@@ -10,10 +10,10 @@ type TProps = {
   pageSize: number // ** current size row
   rowLength: number
   pageSizeOptions: number[]
-  setPage: Dispatch<SetStateAction<number>>
-  setPageSize: Dispatch<SetStateAction<number>>
+  setPage?: Dispatch<SetStateAction<number>>
+  setPageSize?: Dispatch<SetStateAction<number>>
   onChangePagination: (page: number, pageSize: number) => void
-  totalPage: number
+  totalPage?: number
 }
 
 const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
@@ -21,7 +21,9 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
     props
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value)
+    if (setPage) {
+      setPage(value)
+    }
   }
 
   const { t } = useTranslation()
