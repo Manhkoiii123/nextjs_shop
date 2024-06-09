@@ -29,7 +29,7 @@ import GridCreate from 'src/components/grid-create'
 import InputSearch from 'src/components/input-search'
 
 import toast from 'react-hot-toast'
-import { resetInitialState } from 'src/stores/role'
+
 import Spinner from 'src/components/spinner'
 import ConfirmationDialog from 'src/components/confirmation-dialog'
 import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
@@ -43,6 +43,7 @@ import { PERMISSIONS } from 'src/configs/permissions'
 import CustomSelect from 'src/components/custom-select'
 import { getAllRoles } from 'src/services/role'
 import { OBJECT_STATUS_USER } from 'src/configs/user'
+import { resetInitialState } from 'src/stores/user'
 
 type TProps = {}
 type TSelectedRow = { id: string; role: { name: string; permissions: string[] } }
@@ -272,6 +273,16 @@ const UserListPage: NextPage<TProps> = () => {
       setSortBy('createdAt asc')
     }
   }
+  const handleDeleteUser = () => {
+    dispatch(deleteUserAsync(openDeleteUser.id))
+  }
+  const handleDeleteUserMultiple = () => {
+    dispatch(
+      deleteMultipleUserAsync({
+        userIds: selectedRow.map(item => item.id)
+      })
+    )
+  }
 
   useEffect(() => {
     handleGetListUser()
@@ -285,7 +296,6 @@ const UserListPage: NextPage<TProps> = () => {
       }
       handleGetListUser()
       handleCloseCreateEdit()
-      setAvatar('')
       dispatch(resetInitialState())
     } else if (isErrorCreateEdit && messageErrorCreateEdit) {
       const errorConfig = OBJECT_TYPE_ERROR_ROLE[typeError]
@@ -301,16 +311,7 @@ const UserListPage: NextPage<TProps> = () => {
       dispatch(resetInitialState())
     }
   }, [isErrorCreateEdit, isSuccessCreateEdit, messageErrorCreateEdit])
-  const handleDeleteUser = () => {
-    dispatch(deleteUserAsync(openDeleteUser.id))
-  }
-  const handleDeleteUserMultiple = () => {
-    dispatch(
-      deleteMultipleUserAsync({
-        userIds: selectedRow.map(item => item.id)
-      })
-    )
-  }
+
   useEffect(() => {
     setFilterBy({
       roleId: roleSelected,
