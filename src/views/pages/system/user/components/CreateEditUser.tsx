@@ -98,7 +98,8 @@ const CreateEditUser = (props: TCreateEditUser) => {
     if (!Object.keys(errors).length) {
       const { firstName, middleName, lastName } = seporationFullname(data?.fullName, i18n.language)
       if (idUser) {
-        //update
+        // console.log(data)
+        // update
         dispatch(
           updateUserAsync({
             id: idUser,
@@ -110,7 +111,8 @@ const CreateEditUser = (props: TCreateEditUser) => {
             email: data.email,
             city: data.city,
             address: data?.address,
-            avatar: avatar
+            avatar: avatar,
+            status: data.status
           })
         )
       } else {
@@ -182,6 +184,8 @@ const CreateEditUser = (props: TCreateEditUser) => {
       reset({
         ...defaultValues
       })
+      setAvatar('')
+      setShowPassword(false)
     } else {
       if (idUser) {
         fetchApiDetailUser(idUser)

@@ -86,6 +86,7 @@
   "Name_user": "User name",
   "enter_name_user": "Enter user name",
   "Active": "Active",
+  "status": "Status",
   "Block": "Block",
   "Rules_email": "Email is not invalid",
   "Rules_password": "The password is contain charator,special charactor,number",
@@ -97,5 +98,6 @@
   "delete-user-multiple-success": "Delete multiple user success",
   "delete-user-multiple-error": "Delete multiple user failed",
   "title_delete_user_multiple": "Delete multiple user",
-  "confirm_delete_user_multiple": "Are you sure you want to delete these user?"
+  "confirm_delete_user_multiple": "Are you sure you want to delete these user?",
+  "Search_your_role": "Search role"
 }

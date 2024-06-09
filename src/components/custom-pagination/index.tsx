@@ -1,4 +1,4 @@
-import React, { Ref } from 'react'
+import React, { Dispatch, Ref, SetStateAction } from 'react'
 import Box from '@mui/material/Box'
 import { MenuItem, Pagination, PaginationProps, Select, styled } from '@mui/material'
 import { useTranslation } from 'react-i18next'
@@ -10,11 +10,19 @@ type TProps = {
   pageSize: number // ** current size row
   rowLength: number
   pageSizeOptions: number[]
+  setPage: Dispatch<SetStateAction<number>>
+  setPageSize: Dispatch<SetStateAction<number>>
   onChangePagination: (page: number, pageSize: number) => void
+  totalPage: number
 }
 
 const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
-  const { pageSize, page, rowLength, pageSizeOptions, onChangePagination, ...rests } = props
+  const { pageSize, page, rowLength, pageSizeOptions, totalPage, setPage, setPageSize, onChangePagination, ...rests } =
+    props
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value)
+  }
 
   const { t } = useTranslation()
 
@@ -26,11 +34,10 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
         {' '}
         <span>{t('Đang hiển thị')} </span>
         <span style={{ fontWeight: 'bold' }}>
-          {page === 1 ? page : 1 + pageSize}
-
+          {(page - 1) * pageSize + 1}
           {' - '}
         </span>
-        <span style={{ fontWeight: 'bold' }}>{page * pageSize} </span>
+        <span style={{ fontWeight: 'bold' }}>{page * pageSize <= rowLength ? page * pageSize : rowLength} </span>
         <span>{t('trên')} </span>
         <span style={{ fontWeight: 'bold' }}>{rowLength}</span>
       </Box>
@@ -57,7 +64,7 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
             })}
           </Select>
         </Box>
-        <StylePagination color='primary' {...rests} />
+        <StylePagination color='primary' {...rests} count={totalPage} onChange={handleChange} page={page} />
       </Box>
     </Box>
   )
