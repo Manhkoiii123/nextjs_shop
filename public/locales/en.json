@@ -91,5 +91,11 @@
   "Rules_password": "The password is contain charator,special charactor,number",
   "The phone number is min 9 number": "The phone number is min 9 number",
   "Required_field": "This field is required",
-  "Enter_password": "Enter your password"
+  "Enter_password": "Enter your password",
+  "selected": "Selected",
+  "Xóa": "Delete",
+  "delete-user-multiple-success": "Delete multiple user success",
+  "delete-user-multiple-error": "Delete multiple user failed",
+  "title_delete_user_multiple": "Delete multiple user",
+  "confirm_delete_user_multiple": "Are you sure you want to delete these user?"
 }

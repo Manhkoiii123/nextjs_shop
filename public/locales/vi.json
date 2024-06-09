@@ -92,5 +92,11 @@
   "Rules_password": "Mật khẩu bao gồm ký tự, ký tự đặc biệt, số",
   "The phone number is min 9 number": "Số điện thoại tối thiểu là 9 chữ số",
   "Required_field": "Trường này là bắt buộc",
-  "Enter_password": "Vui lòng nhập mật khẩu"
+  "Enter_password": "Vui lòng nhập mật khẩu",
+  "selected": "Đã chọn",
+  "Xóa": "Xóa",
+  "delete-user-multiple-success": "Xóa nhiều người dùng thành công",
+  "delete-user-multiple-error": "Xóa nhiều người dùng thất bại",
+  "title_delete_user_multiple": "Xóa nhiều người dùng",
+  "confirm_delete_user_multiple": "Bạn chắc chắn muốn xóa nhiều người dùng ?"
 }
