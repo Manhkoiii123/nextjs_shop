@@ -58,7 +58,7 @@ export const userSlice = createSlice({
     })
     builder.addCase(getAllUserAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.users.data = action.payload.data.users
+      state.users.data = action.payload.data.users || []
       state.users.total = action.payload.data.totalCount
     })
     builder.addCase(getAllUserAsync.rejected, (state, action) => {

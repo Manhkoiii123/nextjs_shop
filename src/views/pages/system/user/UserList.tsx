@@ -1,5 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Button, Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  Chip,
+  ChipProps,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+  styled,
+  useTheme
+} from '@mui/material'
 import { NextPage } from 'next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
@@ -25,13 +37,28 @@ import { toFullName } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { usePermission } from 'src/hooks/usePermission'
 import { deleteMultipleUserAsync, deleteUserAsync, getAllUserAsync } from 'src/stores/user/actions'
-import { deleteMultipleUser, getDetailUser } from 'src/services/user'
 import CreateEditUser from 'src/views/pages/system/user/components/CreateEditUser'
 import TableHeader from 'src/components/table-header'
 import { PERMISSIONS } from 'src/configs/permissions'
+import CustomSelect from 'src/components/custom-select'
+import { getAllRoles } from 'src/services/role'
+import { OBJECT_STATUS_USER } from 'src/configs/user'
 
 type TProps = {}
 type TSelectedRow = { id: string; role: { name: string; permissions: string[] } }
+
+const ActiveUserStyled = styled(Chip)<ChipProps>(({ theme }) => ({
+  backgroundColor: `rgba(${theme.palette.primary.main},0.08)`,
+  color: theme.palette.primary.main,
+  fontSize: '14px',
+  padding: '8px 4px'
+}))
+const UnactiveUserStyled = styled(Chip)<ChipProps>(({ theme }) => ({
+  backgroundColor: `rgba(${theme.palette.error.main},0.08)`,
+  color: theme.palette.error.main,
+  fontSize: '14px',
+  padding: '8px 4px'
+}))
 
 const UserListPage: NextPage<TProps> = () => {
   const { i18n } = useTranslation()
@@ -55,11 +82,32 @@ const UserListPage: NextPage<TProps> = () => {
     open: false,
     id: ''
   })
+  const CONSTANT_STATUS_USER = OBJECT_STATUS_USER()
+  const [optionRoles, setOptionRoles] = useState<{ label: string; value: string }[]>([])
+  const fetchRoles = async () => {
+    setLoading(true)
+    await getAllRoles({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.roles
+        if (data) {
+          setOptionRoles(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchRoles()
+  }, [])
   //page Nào cần check chỉ cần dugnf thế này là ok
   const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.USER', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
 
   const [loading, setLoading] = useState(false)
   const [selectedRow, setSelectedRow] = useState<TSelectedRow[]>([])
+  const [roleSelected, setRoleSelected] = useState<string>('')
+  const [statusSelected, setStatusSelected] = useState<string>('')
+  const [filterBy, setFilterBy] = useState<Record<string, string>>({})
   const [avatar, setAvatar] = useState('')
   const { t } = useTranslation()
   const theme = useTheme()
@@ -84,11 +132,17 @@ const UserListPage: NextPage<TProps> = () => {
     }
   }
   const handleGetListUser = () => {
-    dispatch(getAllUserAsync({ params: { limit: -1, page: -1, search: searchBy, order: sortBy } }))
+    const query = { params: { limit: pageSize, page: page, search: searchBy, order: sortBy, ...filterBy } }
+    dispatch(getAllUserAsync(query))
   }
 
-  const handleOnChangePagination = (page: number, pageSize: number) => {}
+  const handleOnChangePagination = (page: number, pageSize: number) => {
+    setPage(page)
+    setPageSize(pageSize)
+  }
   const PaginationComponent = () => {
+    const totalPage = Math.ceil(users.total / pageSize)
+
     return (
       <CustomPagination
         onChangePagination={handleOnChangePagination}
@@ -96,13 +150,16 @@ const UserListPage: NextPage<TProps> = () => {
         rowLength={users.total}
         pageSize={pageSize}
         page={page}
+        setPage={setPage}
+        setPageSize={setPageSize}
+        totalPage={totalPage}
       />
     )
   }
 
   const columns: GridColDef[] = [
     {
-      field: 'fullName',
+      field: i18n.language === 'vi' ? 'lastName' : 'firstName',
       headerName: t('FullName'),
       flex: 1,
       minWidth: 150,
@@ -116,8 +173,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'email',
       headerName: t('email'),
-      maxWidth: 300,
-      minWidth: 300,
+      maxWidth: 200,
+      minWidth: 200,
       renderCell: params => {
         const { row } = params
 
@@ -128,8 +185,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'role',
       headerName: t('role'),
-      maxWidth: 150,
-      minWidth: 150,
+      maxWidth: 100,
+      minWidth: 100,
       renderCell: params => {
         const { row } = params
 
@@ -157,6 +214,18 @@ const UserListPage: NextPage<TProps> = () => {
 
         // return <Typography>{row.city}</Typography>
         return <Typography>a</Typography>
+      }
+    },
+    {
+      field: 'status',
+      headerName: t('status'),
+      maxWidth: 150,
+      minWidth: 150,
+      renderCell: params => {
+        const { row } = params
+
+        // return <Typography>{row.city}</Typography>
+        return <>{row.status ? <ActiveUserStyled label={t('Active')} /> : <UnactiveUserStyled label={t('Block')} />}</>
       }
     },
     {
@@ -197,12 +266,16 @@ const UserListPage: NextPage<TProps> = () => {
 
   const handleSort = (sort: GridSortModel) => {
     const sortOption = sort[0]
-    setSortBy(`${sortOption.field} ${sortOption.sort}`)
+    if (sortOption) {
+      setSortBy(`${sortOption.field} ${sortOption.sort}`)
+    } else {
+      setSortBy('createdAt asc')
+    }
   }
 
   useEffect(() => {
     handleGetListUser()
-  }, [sortBy, searchBy])
+  }, [sortBy, searchBy, i18n.language, page, pageSize, filterBy])
   useEffect(() => {
     if (isSuccessCreateEdit) {
       if (!openCreateEdit.id) {
@@ -238,6 +311,12 @@ const UserListPage: NextPage<TProps> = () => {
       })
     )
   }
+  useEffect(() => {
+    setFilterBy({
+      roleId: roleSelected,
+      status: statusSelected
+    })
+  }, [roleSelected, statusSelected])
   useEffect(() => {
     if (isSuccessDelete) {
       toast.success(t('delete-user-success'))
@@ -308,6 +387,25 @@ const UserListPage: NextPage<TProps> = () => {
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 4, width: '100%', gap: 4 }}
             >
               <Box sx={{ width: '300px' }}>
+                <CustomSelect
+                  fullWidth
+                  onChange={e => setStatusSelected(e.target.value as string)}
+                  options={Object.values(CONSTANT_STATUS_USER)}
+                  value={statusSelected}
+                  placeholder={t('status')}
+                />
+              </Box>
+
+              <Box sx={{ width: '300px' }}>
+                <CustomSelect
+                  fullWidth
+                  onChange={e => setRoleSelected(e.target.value as string)}
+                  options={optionRoles}
+                  value={roleSelected}
+                  placeholder={t('Search_your_role')}
+                />
+              </Box>
+              <Box sx={{ width: '300px' }}>
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
               </Box>
               <GridCreate
@@ -339,7 +437,6 @@ const UserListPage: NextPage<TProps> = () => {
             checkboxSelection
             rows={users.data}
             columns={columns}
-            pageSizeOptions={[5]}
             autoHeight
             getRowId={row => row._id} //custom cái id theo _id chứ ko lấy mặc định là id
             disableRowSelectionOnClick

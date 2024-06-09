@@ -275,7 +275,7 @@ const RoleListPage: NextPage<TProps> = () => {
                 slots={{
                   // cái này để cutom pagination nó là 1 hàm trả về cái comp này
                   // viết hàm PaginationComponent trả về cái customPa của ta
-                  pagination: PaginationComponent
+                  // pagination: PaginationComponent
                 }}
                 disableColumnFilter
                 getRowClassName={(row: GridRowClassNameParams) => {

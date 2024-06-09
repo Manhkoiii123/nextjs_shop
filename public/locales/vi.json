@@ -85,7 +85,7 @@
   "phoneNumber": "Số điện thoại",
   "Name_user": "Tên người dùng",
   "enter_name_user": "Nhập tên người dùng",
-
+  "status": "Trạng thái",
   "Active": "Đang hoạt động",
   "Block": "Chặn",
   "Rules_email": "Email không đúng định dạng",
@@ -98,5 +98,6 @@
   "delete-user-multiple-success": "Xóa nhiều người dùng thành công",
   "delete-user-multiple-error": "Xóa nhiều người dùng thất bại",
   "title_delete_user_multiple": "Xóa nhiều người dùng",
-  "confirm_delete_user_multiple": "Bạn chắc chắn muốn xóa nhiều người dùng ?"
+  "confirm_delete_user_multiple": "Bạn chắc chắn muốn xóa nhiều người dùng ?",
+  "Search_your_role": "Nhập quyền"
 }
