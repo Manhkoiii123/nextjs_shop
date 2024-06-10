@@ -227,14 +227,24 @@ const DeliveryTypeListPage: NextPage<TProps> = () => {
       }
     }
   ]
+
+  const handleOnChangePagination = (page: number, pageSize: number) => {
+    setPage(page)
+    setPageSize(pageSize)
+  }
   const PaginationComponent = () => {
+    const totalPage = Math.ceil(deliveryTypes.total / pageSize)
+
     return (
       <CustomPagination
-        onChangePagination={handleOnchangePagination}
+        onChangePagination={handleOnChangePagination}
         pageSizeOptions={PAGE_SIZE_OPTIONS}
+        rowLength={deliveryTypes.total}
         pageSize={pageSize}
         page={page}
-        rowLength={deliveryTypes.total}
+        setPage={setPage}
+        setPageSize={setPageSize}
+        totalPage={totalPage}
       />
     )
   }
