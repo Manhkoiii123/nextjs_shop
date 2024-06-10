@@ -1,8 +1,9 @@
 import { NextPage } from 'next'
+import DeliveryTypeListPage from 'src/views/pages/settings/delivery-method/DeliveryTypeList'
 
 type TProps = {}
 
 const Index: NextPage<TProps> = () => {
-  return <h1>delivery type</h1>
+  return <DeliveryTypeListPage />
 }
 export default Index
