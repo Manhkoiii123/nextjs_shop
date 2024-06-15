@@ -15,11 +15,12 @@ import { convertBase64, seporationFullname, toFullName } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
-import { resetInitialState } from 'src/stores/auth'
+import { resetInitialState, updateUserredux } from 'src/stores/auth'
 import { updateAuthMeAsync } from 'src/stores/auth/actions'
 import Spinner from 'src/components/spinner'
 import CustomSelect from 'src/components/custom-select'
 import { getAllRoles } from 'src/services/role'
+import { getAllCity } from 'src/services/city'
 
 type TProps = {}
 type TDefaultValue = {
@@ -102,10 +103,15 @@ const ProfilePage: NextPage<TProps> = () => {
         role: data.role,
         phoneNumber: data.phoneNumber,
         address: data.address,
-        // city: data.city,
+        city: data.city,
         avatar
       })
     )
+  }
+  const fetchAuthMe = async () => {
+    const tmp = await getAuthMe()
+    
+    dispatch(updateUserredux(tmp.data))
   }
   const [optionsRole, setOptionRole] = useState<{ label: string; value: string }[]>([])
   const fetchRoles = async () => {
@@ -120,9 +126,22 @@ const ProfilePage: NextPage<TProps> = () => {
       })
       .catch(e => setLoading(false))
   }
-
+  const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
+  const fetchAllCity = async () => {
+    setLoading(true)
+    await getAllCity({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.cities
+        if (data) {
+          setOptionCities(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
   useEffect(() => {
     fetchRoles()
+    fetchAllCity()
   }, [])
   useEffect(() => {
     if (messageUpdate) {
@@ -130,7 +149,7 @@ const ProfilePage: NextPage<TProps> = () => {
         toast.error(messageUpdate)
       } else if (isSuccessUpdate) {
         toast.success(messageUpdate)
-        getAuthMe()
+        fetchAuthMe()
       }
       dispatch(resetInitialState())
     }
@@ -362,7 +381,7 @@ const ProfilePage: NextPage<TProps> = () => {
                           fullWidth
                           onChange={onChange}
                           // options={[]}
-                          options={optionsRole}
+                          options={optionCities}
                           error={Boolean(errors?.city)}
                           onBlur={onBlur}
                           value={value}

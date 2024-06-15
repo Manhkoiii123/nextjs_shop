@@ -49,6 +49,10 @@ export const authSlice = createSlice({
       state.isErrorChangePassword = false
       state.isSuccessChangePassword = true
       state.messageChangePassword = ''
+    },
+    updateUserredux: (state, action) => {
+      console.log(action)
+      state.userData = action.payload
     }
   },
   extraReducers: builder => {
@@ -74,13 +78,12 @@ export const authSlice = createSlice({
       state.isLoading = true
     })
     builder.addCase(updateAuthMeAsync.fulfilled, (state, action) => {
-      console.log(action)
       state.isLoading = false
       state.isErrorUpdate = !action.payload.data?.email
       state.isSuccessUpdate = !!action.payload.data?.email //có emial là thành công
       state.messageUpdate = action.payload.message
       state.typeError = action.payload.typeError
-      state.userData = action.payload.data
+      // state.userData = action.payload.data
     })
     builder.addCase(updateAuthMeAsync.rejected, (state, action) => {
       state.isErrorUpdate = true
@@ -111,6 +114,6 @@ export const authSlice = createSlice({
   }
 })
 
-export const { resetInitialState } = authSlice.actions
+export const { resetInitialState, updateUserredux } = authSlice.actions
 
 export default authSlice.reducer

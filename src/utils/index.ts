@@ -80,7 +80,7 @@ export const getAllValueObject = (obj: any, arrExclude?: string[]) => {
         }
       }
     } else {
-      //nếu là string thì push vào luô => case dashboard
+      //nếu là string thì push vào luôn => case dashboard
       values.push(obj)
     }
 
@@ -88,4 +88,25 @@ export const getAllValueObject = (obj: any, arrExclude?: string[]) => {
   } catch (error) {
     return []
   }
+}
+
+// viết hàm để format filter nhiều cái 1 lúc => ý tuwoogrn theo api yêu cầu
+// ví dụ [a,b,c] => a|b|c
+// nó tổng quát luôn cho cả {
+//   a:[a,b,c],
+//   b,
+//   c
+// }
+export const formatFilter = (filter: any) => {
+  const res: Record<string, string[] | string> = {}
+  Object.keys(filter)?.forEach((key: string) => {
+    if (Array.isArray(filter[key]) && filter[key].length > 0) {
+      res[key] = filter[key].join('|')
+    } else if (filter[key]) {
+      // là chuỗi
+      res[key] = filter[key]
+    }
+  })
+
+  return res
 }

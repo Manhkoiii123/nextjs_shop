@@ -67,7 +67,7 @@ const UserDropdown: NextPage = (props: TProps) => {
       setUser({ ...userData })
     }
   }, [userData])
-  const permissionUser = user?.role.permissions ?? []
+  const permissionUser = user?.role?.permissions ?? []
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
