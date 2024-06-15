@@ -1,8 +1,9 @@
 import { NextPage } from 'next'
+import PaymentTypeListPage from 'src/views/pages/settings/payment-method/PaymentTypeList'
 
 type TProps = {}
 
 const Index: NextPage<TProps> = () => {
-  return <h1>payment type</h1>
+  return <PaymentTypeListPage />
 }
 export default Index
