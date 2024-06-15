@@ -33,7 +33,7 @@ import toast from 'react-hot-toast'
 import Spinner from 'src/components/spinner'
 import ConfirmationDialog from 'src/components/confirmation-dialog'
 import { OBJECT_TYPE_ERROR_ROLE } from 'src/configs/role'
-import { toFullName } from 'src/utils'
+import { formatFilter, toFullName } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { usePermission } from 'src/hooks/usePermission'
 import { deleteMultipleUserAsync, deleteUserAsync, getAllUserAsync } from 'src/stores/user/actions'
@@ -44,6 +44,7 @@ import CustomSelect from 'src/components/custom-select'
 import { getAllRoles } from 'src/services/role'
 import { OBJECT_STATUS_USER } from 'src/configs/user'
 import { resetInitialState } from 'src/stores/user'
+import { getAllCity } from 'src/services/city'
 
 type TProps = {}
 type TSelectedRow = { id: string; role: { name: string; permissions: string[] } }
@@ -85,6 +86,7 @@ const UserListPage: NextPage<TProps> = () => {
   })
   const CONSTANT_STATUS_USER = OBJECT_STATUS_USER()
   const [optionRoles, setOptionRoles] = useState<{ label: string; value: string }[]>([])
+  const [optionCity, setOptionCity] = useState<{ label: string; value: string }[]>([])
   const fetchRoles = async () => {
     setLoading(true)
     await getAllRoles({ params: { limit: -1, page: -1 } })
@@ -97,9 +99,22 @@ const UserListPage: NextPage<TProps> = () => {
       })
       .catch(e => setLoading(false))
   }
+  const fetchAllCity = async () => {
+    setLoading(true)
+    await getAllCity({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.cities
+        if (data) {
+          setOptionCity(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
 
   useEffect(() => {
     fetchRoles()
+    fetchAllCity()
   }, [])
   //page Nào cần check chỉ cần dugnf thế này là ok
   const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.USER', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
@@ -108,7 +123,8 @@ const UserListPage: NextPage<TProps> = () => {
   const [selectedRow, setSelectedRow] = useState<TSelectedRow[]>([])
   const [roleSelected, setRoleSelected] = useState<string>('')
   const [statusSelected, setStatusSelected] = useState<string>('')
-  const [filterBy, setFilterBy] = useState<Record<string, string>>({})
+  const [citySelected, setCitySelected] = useState<string[]>([])
+  const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   const [avatar, setAvatar] = useState('')
   const { t } = useTranslation()
   const theme = useTheme()
@@ -133,7 +149,9 @@ const UserListPage: NextPage<TProps> = () => {
     }
   }
   const handleGetListUser = () => {
-    const query = { params: { limit: pageSize, page: page, search: searchBy, order: sortBy, ...filterBy } }
+    const query = {
+      params: { limit: pageSize, page: page, search: searchBy, order: sortBy, ...formatFilter(filterBy) }
+    }
     dispatch(getAllUserAsync(query))
   }
 
@@ -180,7 +198,6 @@ const UserListPage: NextPage<TProps> = () => {
         const { row } = params
 
         return <Typography>{row.email}</Typography>
-        // return <Typography>a</Typography>
       }
     },
     {
@@ -213,8 +230,7 @@ const UserListPage: NextPage<TProps> = () => {
       renderCell: params => {
         const { row } = params
 
-        // return <Typography>{row.city}</Typography>
-        return <Typography>a</Typography>
+        return <Typography>{row?.city?.name}</Typography>
       }
     },
     {
@@ -315,9 +331,11 @@ const UserListPage: NextPage<TProps> = () => {
   useEffect(() => {
     setFilterBy({
       roleId: roleSelected,
-      status: statusSelected
+      status: statusSelected,
+      cityId: citySelected
+      // cityId: ''
     })
-  }, [roleSelected, statusSelected])
+  }, [roleSelected, statusSelected, citySelected])
   useEffect(() => {
     if (isSuccessDelete) {
       toast.success(t('delete-user-success'))
@@ -387,6 +405,18 @@ const UserListPage: NextPage<TProps> = () => {
             <Box
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 4, width: '100%', gap: 4 }}
             >
+              <Box sx={{ width: '300px' }}>
+                <CustomSelect
+                  fullWidth
+                  multiple
+                  onChange={e => {
+                    setCitySelected(e.target.value as string[])
+                  }}
+                  options={optionCity}
+                  value={citySelected}
+                  placeholder={t('city')}
+                />
+              </Box>
               <Box sx={{ width: '300px' }}>
                 <CustomSelect
                   fullWidth

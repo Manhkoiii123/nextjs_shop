@@ -34,6 +34,7 @@ import { convertBase64, seporationFullname, toFullName } from 'src/utils'
 import CustomSelect from 'src/components/custom-select'
 import { FormHelperText } from '@mui/material'
 import { getAllRoles } from 'src/services/role'
+import { getAllCity } from 'src/services/city'
 
 interface TCreateEditUser {
   open: boolean
@@ -146,9 +147,22 @@ const CreateEditUser = (props: TCreateEditUser) => {
       })
       .catch(e => setLoading(false))
   }
+  const fetchAllCity = async () => {
+    setLoading(true)
+    await getAllCity({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.cities
+        if (data) {
+          setOptionCities(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
 
   useEffect(() => {
     fetchRoles()
+    fetchAllCity()
   }, [])
   const handleUploadAvatar = async (file: File) => {
     const base64 = await convertBase64(file)
