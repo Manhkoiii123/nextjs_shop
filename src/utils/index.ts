@@ -118,6 +118,7 @@ export const stringToSlug = (str: string) => {
     str = str.replace(RegExp(from[i], 'gi'), to[i])
   }
 
+  //
   str = str
     .toLowerCase()
     .trim()

@@ -378,7 +378,7 @@ const ProductTypeListPage: NextPage<TProps> = () => {
             getRowId={row => row._id}
             disableRowSelectionOnClick
             slots={{
-              pagination: PaginationComponent
+              pagination: productTypes.data.length > 0 ? PaginationComponent : null
             }}
             rowSelectionModel={selectedRow}
             onRowSelectionModelChange={(row: GridRowSelectionModel) => {

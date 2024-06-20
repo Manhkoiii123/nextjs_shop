@@ -353,7 +353,7 @@ const CityListPage: NextPage<TProps> = () => {
             getRowId={row => row._id}
             disableRowSelectionOnClick
             slots={{
-              pagination: PaginationComponent
+              pagination: Citys.data.length > 0 ? PaginationComponent : null
             }}
             rowSelectionModel={selectedRow}
             onRowSelectionModelChange={(row: GridRowSelectionModel) => {

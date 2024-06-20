@@ -1,5 +1,6 @@
 // ** Import Next
 import { NextPage } from 'next'
+import { PERMISSIONS } from 'src/configs/permissions'
 import ProductTypeListPage from 'src/views/pages/manage-product/product-type/ProductTypeList'
 
 // ** Pages
@@ -12,5 +13,5 @@ const Index: NextPage<TProps> = () => {
   return <ProductTypeListPage />
 }
 
-// Index.permission = [PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.VIEW]
+Index.permission = [PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.VIEW]
 export default Index
