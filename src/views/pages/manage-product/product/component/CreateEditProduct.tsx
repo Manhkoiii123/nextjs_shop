@@ -24,21 +24,19 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/stores'
-import { createUserAsync, updateUserAsync } from 'src/stores/user/actions'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { getDetailUser, updateUser } from 'src/services/user'
+import { useEffect, useState } from 'react'
 import Spinner from 'src/components/spinner'
-import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
 import { convertBase64, seporationFullname, stringToSlug, toFullName } from 'src/utils'
 import CustomSelect from 'src/components/custom-select'
 import { FormHelperText } from '@mui/material'
-import { getAllRoles } from 'src/services/role'
-import { getAllCity } from 'src/services/city'
 import { createProductAsync, updateProductAsync } from 'src/stores/product/actions'
 import { getDetailsProduct } from 'src/services/product'
 import { getAllProductTypes } from 'src/services/product-type'
 import CustomDatePicker from 'src/components/custom-date-picker'
+import CustomEditor from 'src/components/custom-editor'
+import { EditorState, convertToRaw } from 'draft-js'
+import draftToHtml from 'draftjs-to-html'
 
 interface TCreateEditUser {
   open: boolean
@@ -48,11 +46,11 @@ interface TCreateEditUser {
 type TDefaultValue = {
   name: string
   type: string
-  discount?: number
-  price: number
-  description: string
+  discount?: string
+  price: string
+  description: EditorState
   slug: string
-  countInStock: number
+  countInStock: string
   status: number
   discountEndDate?: Date | null
   discountStartDate?: Date | null
@@ -67,11 +65,11 @@ const CreateEditProduct = (props: TCreateEditUser) => {
   const defaultValues: TDefaultValue = {
     name: '',
     type: '',
-    price: 0,
-    discount: 0,
-    description: '',
+    price: '',
+    discount: '',
+    description: EditorState.createEmpty(),
     slug: '',
-    countInStock: 0,
+    countInStock: '',
     status: 0,
     discountEndDate: null,
     discountStartDate: null
@@ -79,38 +77,91 @@ const CreateEditProduct = (props: TCreateEditUser) => {
   const schema = yup.object().shape({
     name: yup.string().required(t('Required_field')),
     slug: yup.string().required(t('Required_field')),
-    price: yup
-      .number()
-      .required(t('Required_field'))
-      .test('least_count', t('least_1_in_count'), value => {
-        return Number(value) >= 1000
-      }),
     type: yup.string().required(t('Required_field')),
+    // location: yup.string().required(t('Required_field')),
     countInStock: yup
-      .number()
+      .string()
       .required(t('Required_field'))
       .test('least_count', t('least_1_in_count'), value => {
         return Number(value) >= 1
       }),
-    description: yup.string().required(t('Required_field')),
-    discount: yup.number(),
-    discountEndDate: yup.date().nullable(),
-    discountStartDate: yup.date().nullable(),
-    status: yup.number().required(t('Required_field'))
+    discount: yup
+      .string()
+      .notRequired()
+      .test('least_discount', t('least_1_in_discount'), (value, context: any) => {
+        const discountStartDate = context?.parent?.discountStartDate
+        const discountEndDate = context?.parent?.discountEndDate
+        if (value) {
+          if (!discountStartDate) {
+            setError('discountStartDate', { type: 'required_start_discount', message: t('required_start_discount') })
+          }
+
+          if (!discountEndDate) {
+            setError('discountEndDate', { type: 'required_end_discount', message: t('required_end_discount') })
+          }
+        } else {
+          clearErrors('discountEndDate')
+          clearErrors('discountStartDate')
+        }
+
+        return !value || Number(value) >= 1
+      }),
+    discountStartDate: yup
+      .date()
+      .notRequired()
+      .test('required_start_discount', t('required_start_discount'), (value, context: any) => {
+        const discount = context?.parent?.discount
+
+        return (discount && value) || !discount
+      })
+      .test('less_end_discount', t('required_less_end_discount'), (value, context: any) => {
+        const discountEndDate = context?.parent?.discountEndDate
+        if (value && discountEndDate && discountEndDate.getTime() > value?.getTime()) {
+          clearErrors('discountEndDate')
+        }
+
+        return (discountEndDate && value && discountEndDate.getTime() > value?.getTime()) || !discountEndDate
+      }),
+    discountEndDate: yup
+      .date()
+      .notRequired()
+      .test('required_end_discount', t('required_end_discount'), (value, context: any) => {
+        const discountStartDate = context?.parent?.discountStartDate
+
+        return (discountStartDate && value) || !discountStartDate
+      })
+      .test('than_start_discount', t('required_than_start_discount'), (value, context: any) => {
+        const discountStartDate = context?.parent?.discountStartDate
+        if (value && discountStartDate && discountStartDate.getTime() < value?.getTime()) {
+          clearErrors('discountStartDate')
+        }
+
+        return (discountStartDate && value && discountStartDate.getTime() < value?.getTime()) || !discountStartDate
+      }),
+    status: yup.number().required(t('Required_field')),
+    description: yup.object().required(t('Required_field')),
+    price: yup
+      .string()
+      .required(t('Required_field'))
+      .test('least_count', t('least_1_in_count'), value => {
+        return Number(value) >= 1000
+      })
   })
   const {
     control,
     handleSubmit,
     reset,
     getValues,
-    formState: { errors }
+    formState: { errors },
+    setError,
+    clearErrors
   } = useForm({
     defaultValues: defaultValues,
     mode: 'onSubmit',
     resolver: yupResolver(schema)
   })
   const dispatch: AppDispatch = useDispatch()
-  const onsubmit = (data: TDefaultValue) => {
+  const onsubmit = (data: any) => {
     if (!Object.keys(errors).length) {
       if (idProduct) {
         // update
@@ -126,7 +177,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
             image: imageProduct,
             type: data.type,
             discount: Number(data.discount) || 0,
-            description: data.description,
+            description: data.description ? draftToHtml(convertToRaw(data.description.getCurrentContent())) : '',
             countInStock: Number(data.countInStock)
           })
         )
@@ -143,7 +194,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
             image: imageProduct,
             type: data.type,
             discount: Number(data.discount) || 0,
-            description: data.description,
+            description: data.description ? draftToHtml(convertToRaw(data.description.getCurrentContent())) : '',
             countInStock: Number(data.countInStock)
           })
         )
@@ -458,7 +509,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                           control={control}
                           render={({ field: { onChange, onBlur, value } }) => (
                             <CustomTextField
-                              required
                               fullWidth
                               label={t('Discount(percent)')}
                               placeholder={t('Enter_discount')}
@@ -485,7 +535,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                           control={control}
                           render={({ field: { onChange, onBlur, value } }) => (
                             <CustomDatePicker
-                              required
                               onChange={(date: Date | null) => {
                                 onChange(date)
                               }}
@@ -505,7 +554,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                           control={control}
                           render={({ field: { onChange, onBlur, value } }) => (
                             <CustomDatePicker
-                              required
                               onChange={(date: Date | null) => {
                                 onChange(date)
                               }}
@@ -518,6 +566,23 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                             />
                           )}
                           name='discountEndDate'
+                        />
+                      </Grid>
+                      <Grid item md={12} xs={12}>
+                        <Controller
+                          control={control}
+                          render={({ field: { onChange, onBlur, value } }) => (
+                            <CustomEditor
+                              onEditorStateChange={onChange}
+                              label={`${t('Description')}`}
+                              onBlur={onBlur}
+                              editorState={value as EditorState}
+                              placeholder={t('Enter_your_description')}
+                              error={Boolean(errors?.description)}
+                              helperText={errors?.description?.message}
+                            />
+                          )}
+                          name='description'
                         />
                       </Grid>
                     </Grid>

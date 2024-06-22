@@ -16,7 +16,7 @@ import {
 
 export const getAllProducts = async (data: { params: TParamsGetProducts }) => {
   try {
-    const res = await axios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}`, data)
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}`, data)
 
     return res.data
   } catch (error) {
