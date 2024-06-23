@@ -11,7 +11,8 @@ import {
   TParamsGetProducts,
   TParamsCreateProduct,
   TParamsDeleteMultipleProduct,
-  TParamsEditProduct
+  TParamsEditProduct,
+  TProduct
 } from 'src/types/product'
 
 export const getAllProducts = async (data: { params: TParamsGetProducts }) => {

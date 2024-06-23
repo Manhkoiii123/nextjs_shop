@@ -24,10 +24,10 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/stores'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import Spinner from 'src/components/spinner'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
-import { convertBase64, seporationFullname, stringToSlug, toFullName } from 'src/utils'
+import { convertBase64, covertHtmlToDraft, seporationFullname, stringToSlug, toFullName } from 'src/utils'
 import CustomSelect from 'src/components/custom-select'
 import { FormHelperText } from '@mui/material'
 import { createProductAsync, updateProductAsync } from 'src/stores/product/actions'
@@ -37,11 +37,14 @@ import CustomDatePicker from 'src/components/custom-date-picker'
 import CustomEditor from 'src/components/custom-editor'
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
+import { formatDate } from 'src/utils/date'
 
 interface TCreateEditUser {
   open: boolean
   onClose: () => void
   idProduct?: string
+  imageProduct: string
+  setImageProduct: Dispatch<SetStateAction<string>>
 }
 type TDefaultValue = {
   name: string
@@ -58,9 +61,9 @@ type TDefaultValue = {
 const CreateEditProduct = (props: TCreateEditUser) => {
   const { t, i18n } = useTranslation()
   const [loading, setLoading] = useState(false)
-  const [imageProduct, setImageProduct] = useState('')
+  // const [imageProduct, setImageProduct] = useState('')
   const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
-  const { open, onClose, idProduct } = props
+  const { open, onClose, idProduct, imageProduct, setImageProduct } = props
   const theme = useTheme()
   const defaultValues: TDefaultValue = {
     name: '',
@@ -164,7 +167,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
   const onsubmit = (data: any) => {
     if (!Object.keys(errors).length) {
       if (idProduct) {
-        // update
         dispatch(
           updateProductAsync({
             id: idProduct,
@@ -182,7 +184,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
           })
         )
       } else {
-        // create
         dispatch(
           createProductAsync({
             name: data.name,
@@ -229,11 +230,23 @@ const CreateEditProduct = (props: TCreateEditUser) => {
       .then(res => {
         const data = res.data
         if (data) {
-          reset({})
-          setImageProduct(data.imageProduct)
+          reset({
+            name: data.name,
+            type: data.type,
+            price: data.price,
+            discount: data.discount,
+            description: data.description ? covertHtmlToDraft(data.description) : '',
+            slug: data.slug,
+            countInStock: data.countInStock,
+            status: data.status,
+            discountEndDate: data.discountEndDate ? new Date(data.discountEndDate) : null,
+            discountStartDate: data.discountStartDate ? new Date(data.discountStartDate) : null
+          })
+          setImageProduct(data.image)
         }
         setLoading(false)
       })
+
       .catch(e => {
         setLoading(false)
       })
@@ -395,7 +408,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                                     display: 'block',
                                     color: errors?.status
                                       ? theme.palette.error.main
-                                      : `rgba(${theme.palette.customColors.main}, 0.42)`
+                                      : `rgba(${theme.palette.customColors.main}, 0.68)`
                                   }}
                                 >
                                   {t('Status_product')}
@@ -411,7 +424,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                                       }}
                                     />
                                   }
-                                  label={Boolean(value) ? t('Active') : t('Block')}
+                                  label={Boolean(value) ? t('Public') : t('Private')}
                                 />
                               </Box>
                             )
@@ -475,7 +488,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                                   display: 'block',
                                   color: errors?.type
                                     ? theme.palette.error.main
-                                    : `rgba(${theme.palette.customColors.main}, 0.42)`
+                                    : `rgba(${theme.palette.customColors.main}, 0.68)`
                                 }}
                               >
                                 {t('Type_product')}
@@ -494,7 +507,7 @@ const CreateEditProduct = (props: TCreateEditUser) => {
                                   sx={{
                                     color: errors?.type
                                       ? theme.palette.error.main
-                                      : `rgba(${theme.palette.customColors.main}, 0.42)`
+                                      : `rgba(${theme.palette.customColors.main}, 0.68)`
                                   }}
                                 >
                                   {errors?.type?.message}
