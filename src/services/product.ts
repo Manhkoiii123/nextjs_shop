@@ -24,6 +24,15 @@ export const getAllProducts = async (data: { params: TParamsGetProducts }) => {
     return error
   }
 }
+export const getAllProductsPublic = async (data: { params: TParamsGetProducts }) => {
+  try {
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/public`, data)
+
+    return res.data
+  } catch (error) {
+    return error
+  }
+}
 
 export const createProduct = async (data: TParamsCreateProduct) => {
   try {
@@ -59,6 +68,15 @@ export const deleteProduct = async (id: string) => {
 export const getDetailsProduct = async (id: string) => {
   try {
     const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/${id}`)
+
+    return res.data
+  } catch (error: any) {
+    return error?.response?.data
+  }
+}
+export const getDetailsProductPublic = async (id: string) => {
+  try {
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/public/${id}`)
 
     return res.data
   } catch (error: any) {

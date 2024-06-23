@@ -17,6 +17,7 @@ import { Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import Link from 'next/link'
 
 const drawerWidth: number = 240
 
@@ -78,8 +79,14 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
             <IconifyIcon icon='ic:baseline-menu' />
           </IconButton>
         )}
-        <Typography component='h1' variant='h6' color='inherit' noWrap sx={{ flexGrow: 1 }}>
-          Dashboard
+        <Typography
+          component='h1'
+          variant='h6'
+          color='primary'
+          noWrap
+          sx={{ flexGrow: 1, fontWeight: '600', cursor: 'pointer' }}
+        >
+          <Link href={ROUTE_CONFIG.HOME}>ManhShop</Link>
         </Typography>
         <LanguageDropdown></LanguageDropdown>
         <ModeToggle />
