@@ -332,5 +332,14 @@
   "ratings": "ratings",
   "comments": "comments",
   "Product_details": "Details product",
-  "product_Name": "Product name"
+  "product_Name": "Product name",
+  "sản phẩm trong kho": "products in stock",
+  "Còn": "Have",
+  "Từ 4.5 trở lên": "From 4.5 and up",
+  "Từ 4 trở lên": "From 4 and up",
+  "Từ 3.5 trở lên": "From 3.5 and up",
+  "Từ 3 trở lên": "From 3 and up",
+  "Count_in_stock_product": "Have {{count}} products in stock",
+  "Sold_product_count": "Sold {{count}} product",
+  "Hết hàng": "Out of stock"
 }

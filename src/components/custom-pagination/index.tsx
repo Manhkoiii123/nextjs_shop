@@ -14,11 +14,22 @@ type TProps = {
   setPageSize?: Dispatch<SetStateAction<number>>
   onChangePagination: (page: number, pageSize: number) => void
   totalPage?: number
+  isHideShow?: boolean
 }
 
 const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
-  const { pageSize, page, rowLength, pageSizeOptions, totalPage, setPage, setPageSize, onChangePagination, ...rests } =
-    props
+  const {
+    pageSize,
+    page,
+    rowLength,
+    pageSizeOptions,
+    totalPage,
+    setPage,
+    setPageSize,
+    onChangePagination,
+    isHideShow,
+    ...rests
+  } = props
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     if (setPage) {
@@ -30,20 +41,35 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
 
   return (
     <Box
-      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingLeft: '4px' }}
+      justifyContent={{
+        xs: 'center',
+        md: 'space-between'
+      }}
+      sx={{ display: 'flex', alignItems: 'center', width: '100%', paddingLeft: '4px' }}
     >
-      <Box>
-        {' '}
-        <span>{t('Đang hiển thị')} </span>
-        <span style={{ fontWeight: 'bold' }}>
-          {(page - 1) * pageSize + 1}
-          {' - '}
-        </span>
-        <span style={{ fontWeight: 'bold' }}>{page * pageSize <= rowLength ? page * pageSize : rowLength} </span>
-        <span>{t('trên')} </span>
-        <span style={{ fontWeight: 'bold' }}>{rowLength}</span>
-      </Box>
-      <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+      {!isHideShow ? (
+        <Box>
+          {' '}
+          <span>{t('Đang hiển thị')} </span>
+          <span style={{ fontWeight: 'bold' }}>
+            {(page - 1) * pageSize + 1}
+            {' - '}
+          </span>
+          <span style={{ fontWeight: 'bold' }}>{page * pageSize <= rowLength ? page * pageSize : rowLength} </span>
+          <span>{t('trên')} </span>
+          <span style={{ fontWeight: 'bold' }}>{rowLength}</span>
+        </Box>
+      ) : (
+        <Box></Box>
+      )}
+
+      <Box
+        flexDirection={{
+          xs: 'column',
+          md: 'row'
+        }}
+        sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}
+      >
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <span>{t('Số dòng hiển thị')}</span>
           <Select

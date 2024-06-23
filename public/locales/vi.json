@@ -355,5 +355,14 @@
   "ratings": "đánh giá",
   "comments": "bình luận",
   "Product_details": "Chi tiết sản phẩm",
-  "product_Name": "Tên sản phẩm"
+  "product_Name": "Tên sản phẩm",
+  "sản phẩm trong kho": "sản phẩm trong kho",
+  "Còn": "Còn",
+  "Từ 4.5 trở lên": "Từ 4.5 trở lên",
+  "Từ 4 trở lên": "Từ 4 trở lên",
+  "Từ 3.5 trở lên": "Từ 3.5 trở lên",
+  "Từ 3 trở lên": "Từ 3 trở lên",
+  "Count_in_stock_product": "Còn {{count}} sản phẩm trong kho",
+  "Sold_product_count": "Đã bán {{count}} sản phẩm",
+  "Hết hàng": "Hết hàng"
 }
