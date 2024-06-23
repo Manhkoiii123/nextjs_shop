@@ -241,7 +241,6 @@ const UserListPage: NextPage<TProps> = () => {
       renderCell: params => {
         const { row } = params
 
-        // return <Typography>{row.city}</Typography>
         return <>{row.status ? <ActiveUserStyled label={t('Active')} /> : <UnactiveUserStyled label={t('Block')} />}</>
       }
     },

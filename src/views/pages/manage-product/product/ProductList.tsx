@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ** Mui
-import { Box, Grid, Typography, useTheme } from '@mui/material'
+import { Box, Chip, Grid, Typography, styled, useTheme } from '@mui/material'
 import { GridColDef, GridRowSelectionModel, GridSortModel } from '@mui/x-data-grid'
 
 // ** Redux
@@ -37,9 +37,14 @@ import { PAGE_SIZE_OPTIONS } from 'src/configs/gridConfig'
 
 // ** Utils
 import { formatDate } from 'src/utils/date'
-import { resetInitialState } from 'src/stores/product-type'
 import { deleteMultipleProductAsync, deleteProductAsync, getAllProductsAsync } from 'src/stores/product/actions'
 import CreateEditProduct from 'src/views/pages/manage-product/product/component/CreateEditProduct'
+import { resetInitialState } from 'src/stores/product'
+import { ChipProps } from '@mui/material'
+import CustomSelect from 'src/components/custom-select'
+import { OBJECT_STATUS_PRODUCT } from 'src/configs/product'
+import { getAllProductTypes } from 'src/services/product-type'
+import { formatFilter } from 'src/utils'
 
 type TProps = {}
 
@@ -64,7 +69,11 @@ const ProductList: NextPage<TProps> = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
   const [page, setPage] = useState(1)
   const [selectedRow, setSelectedRow] = useState<string[]>([])
-
+  const [imageProduct, setImageProduct] = useState('')
+  const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
+  const [typeSelected, setTypeSelected] = useState<string[]>([])
+  const [statusSelected, setStatusSelected] = useState<string[]>([])
+  const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   // ** Hooks
   const { VIEW, UPDATE, DELETE, CREATE } = usePermission('MANAGE_PRODUCT.PRODUCT_TYPE', [
     'CREATE',
@@ -75,6 +84,7 @@ const ProductList: NextPage<TProps> = () => {
 
   /// ** redux
   const dispatch: AppDispatch = useDispatch()
+  const CONSTANT_STATUS_PRODUCT = OBJECT_STATUS_PRODUCT()
   const {
     products,
     isSuccessCreateEdit,
@@ -89,13 +99,26 @@ const ProductList: NextPage<TProps> = () => {
     isErrorMultipleDelete,
     messageErrorMultipleDelete
   } = useSelector((state: RootState) => state.product)
-
   // ** theme
   const theme = useTheme()
+  const ActiveUserStyled = styled(Chip)<ChipProps>(({ theme }) => ({
+    backgroundColor: `rgba(${theme.palette.primary.main},0.08)`,
+    color: theme.palette.primary.main,
+    fontSize: '14px',
+    padding: '8px 4px'
+  }))
+  const UnactiveUserStyled = styled(Chip)<ChipProps>(({ theme }) => ({
+    backgroundColor: `rgba(${theme.palette.error.main},0.08)`,
+    color: theme.palette.error.main,
+    fontSize: '14px',
+    padding: '8px 4px'
+  }))
 
   // fetch api
   const handleGetListProducts = () => {
-    const query = { params: { limit: pageSize, page: page, search: searchBy, order: sortBy } }
+    const query = {
+      params: { limit: pageSize, page: page, search: searchBy, order: sortBy, ...formatFilter(filterBy) }
+    }
     dispatch(getAllProductsAsync(query))
   }
 
@@ -125,6 +148,7 @@ const ProductList: NextPage<TProps> = () => {
       open: false,
       id: ''
     })
+    setImageProduct('')
   }
 
   const handleDeleteProduct = () => {
@@ -168,6 +192,28 @@ const ProductList: NextPage<TProps> = () => {
       />
     )
   }
+  const [loading, setLoading] = useState(false)
+
+  const fetchAllType = async () => {
+    setLoading(true)
+    await getAllProductTypes({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.productTypes
+        if (data) {
+          setOptionTypes(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchAllType()
+  }, [])
+
+  useEffect(() => {
+    setFilterBy({ productType: typeSelected, status: statusSelected })
+  }, [statusSelected, typeSelected])
 
   const columns: GridColDef[] = [
     {
@@ -182,6 +228,17 @@ const ProductList: NextPage<TProps> = () => {
       }
     },
     {
+      field: 'type',
+      headerName: t('Type'),
+      flex: 1,
+      minWidth: 200,
+      renderCell: params => {
+        const { row } = params
+
+        return <Typography>{row?.type.name}</Typography>
+      }
+    },
+    {
       field: 'slug',
       headerName: t('Slug'),
       minWidth: 200,
@@ -193,14 +250,38 @@ const ProductList: NextPage<TProps> = () => {
       }
     },
     {
-      field: 'createdAt',
-      headerName: t('Created_date'),
+      field: 'price',
+      headerName: t('Price'),
+      minWidth: 200,
+      maxWidth: 200,
+      renderCell: params => {
+        const { row } = params
+
+        return <Typography>{row?.price}</Typography>
+      }
+    },
+    {
+      field: 'countInStock',
+      headerName: t('Count_in_stock'),
       minWidth: 180,
       maxWidth: 180,
       renderCell: params => {
         const { row } = params
 
-        return <Typography>{formatDate(row?.createdAt, { dateStyle: 'short' })}</Typography>
+        return <Typography>{row?.countInStock}</Typography>
+      }
+    },
+    {
+      field: 'status',
+      headerName: t('status'),
+      maxWidth: 150,
+      minWidth: 150,
+      renderCell: params => {
+        const { row } = params
+
+        return (
+          <>{row.status ? <ActiveUserStyled label={t('Public')} /> : <UnactiveUserStyled label={t('Private')} />}</>
+        )
       }
     },
     {
@@ -241,7 +322,7 @@ const ProductList: NextPage<TProps> = () => {
   useEffect(() => {
     handleGetListProducts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, searchBy, page, pageSize])
+  }, [sortBy, searchBy, page, pageSize, filterBy])
 
   useEffect(() => {
     if (isSuccessCreateEdit) {
@@ -312,7 +393,13 @@ const ProductList: NextPage<TProps> = () => {
         title={t('Title_delete_multiple_product')}
         description={t('Confirm_delete_multiple_product')}
       />
-      <CreateEditProduct open={openCreateEdit.open} onClose={handleCloseCreateEdit} idProduct={openCreateEdit.id} />
+      <CreateEditProduct
+        imageProduct={imageProduct}
+        setImageProduct={setImageProduct}
+        open={openCreateEdit.open}
+        onClose={handleCloseCreateEdit}
+        idProduct={openCreateEdit.id}
+      />
       {isLoading && <Spinner />}
       <Box
         sx={{
@@ -330,8 +417,29 @@ const ProductList: NextPage<TProps> = () => {
             <Box
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, mb: 4, width: '100%' }}
             >
-              <Box sx={{ width: '200px' }}>
+              <Box sx={{ width: '300px' }}>
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)} />
+              </Box>
+              <Box sx={{ width: '300px' }}>
+                <CustomSelect
+                  fullWidth
+                  multiple
+                  onChange={e => {
+                    setTypeSelected(e.target.value as string[])
+                  }}
+                  options={optionTypes}
+                  value={typeSelected}
+                  placeholder={t('Type')}
+                />
+              </Box>
+              <Box sx={{ width: '300px' }}>
+                <CustomSelect
+                  fullWidth
+                  onChange={e => setStatusSelected(e.target.value as string[])}
+                  options={Object.values(CONSTANT_STATUS_PRODUCT)}
+                  value={statusSelected}
+                  placeholder={t('status')}
+                />
               </Box>
               <GridCreate
                 disabled={!CREATE}
