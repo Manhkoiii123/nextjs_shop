@@ -27,7 +27,14 @@ import { AppDispatch } from 'src/stores'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import Spinner from 'src/components/spinner'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
-import { convertBase64, covertHtmlToDraft, seporationFullname, stringToSlug, toFullName } from 'src/utils'
+import {
+  convertBase64,
+  covertHtmlToDraft,
+  formatNumberToLocal,
+  seporationFullname,
+  stringToSlug,
+  toFullName
+} from 'src/utils'
 import CustomSelect from 'src/components/custom-select'
 import { FormHelperText } from '@mui/material'
 import { createProductAsync, updateProductAsync } from 'src/stores/product/actions'

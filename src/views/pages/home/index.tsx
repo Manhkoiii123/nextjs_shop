@@ -14,12 +14,12 @@ import CustomPagination from 'src/components/custom-pagination'
 // ** Config
 import { PAGE_SIZE_OPTIONS } from 'src/configs/gridConfig'
 import { formatFilter } from 'src/utils'
-import CardProduct from 'src/views/pages/home/components/CardProduct'
+import CardProduct from 'src/views/pages/product/components/CardProduct'
 import { getAllProductsPublic } from 'src/services/product'
 import { TProduct } from 'src/types/product'
 import { getAllProductTypes } from 'src/services/product-type'
 import InputSearch from 'src/components/input-search'
-import FilterProduct from 'src/views/pages/home/components/FilterProduct'
+import FilterProduct from 'src/views/pages/product/components/FilterProduct'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({

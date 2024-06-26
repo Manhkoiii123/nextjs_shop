@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next'
 import { TProduct } from 'src/types/product'
 import Image from 'next/image'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
+import { useRouter } from 'next/navigation'
+import { ROUTE_CONFIG } from 'src/configs/route'
+import { formatNumberToLocal } from 'src/utils'
 
 interface TCardProduct {
   data: TProduct
@@ -19,12 +22,19 @@ interface TCardProduct {
 
 const Styledcard = styled(Card)(({ theme }) => ({
   position: 'relative',
-  boxShadow: theme.shadows[4]
+  boxShadow: theme.shadows[4],
+  '.MuiCardMedia-root.MuiCardMedia-media': {
+    objectFit: 'contain'
+  }
 }))
 
 const CardProduct = (props: TCardProduct) => {
   const { data } = props
+  const router = useRouter()
   const { t } = useTranslation()
+  const handleNavigateDetail = (slug: string) => {
+    router.push(`${ROUTE_CONFIG.PRODUCT}/${slug}`)
+  }
   const theme = useTheme()
 
   return (
@@ -34,6 +44,7 @@ const CardProduct = (props: TCardProduct) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <CardContent sx={{ padding: '8px 24px' }}>
             <Typography
+              onClick={() => handleNavigateDetail(data.slug)}
               variant='h5'
               sx={{
                 color: theme.palette.primary.main,
@@ -43,7 +54,8 @@ const CardProduct = (props: TCardProduct) => {
                 WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 1,
                 overflow: 'hidden',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                cursor: 'pointer'
               }}
             >
               {data.name}
@@ -68,7 +80,7 @@ const CardProduct = (props: TCardProduct) => {
                       fontSize: '14px'
                     }}
                   >
-                    {data.price} đ
+                    {formatNumberToLocal(data.price)} đ
                   </Typography>
                 )}
                 <Typography
@@ -79,7 +91,10 @@ const CardProduct = (props: TCardProduct) => {
                     fontSize: '18px'
                   }}
                 >
-                  {data.discount > 0 ? data.price * (1 - data.discount / 100) : data.price} đ
+                  {data.discount > 0
+                    ? formatNumberToLocal(data.price * (1 - data.discount / 100))
+                    : formatNumberToLocal(data.price)}{' '}
+                  đ
                 </Typography>
               </Box>
               {data.discount > 0 && (
@@ -151,7 +166,13 @@ const CardProduct = (props: TCardProduct) => {
               {!!data.averageRating && (
                 <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <b>{data.averageRating}</b>
-                  <IconifyIcon icon='emojione:star' fontSize={16} style={{ position: 'relative', top: '-1px' }} />
+                  <Rating
+                    name='read-only'
+                    sx={{ fontSize: '16px' }}
+                    precision={0.1}
+                    defaultValue={data.averageRating}
+                    readOnly
+                  />
                 </Typography>
               )}
             </Box>

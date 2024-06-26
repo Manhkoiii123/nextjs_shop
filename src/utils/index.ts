@@ -138,3 +138,13 @@ export const covertHtmlToDraft = (html: string) => {
 
   return editorState
 }
+export const formatNumberToLocal = (value: string | number) => {
+  try {
+    return Number(value).toLocaleString('vi-VN', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    })
+  } catch (error) {
+    return value
+  }
+}
