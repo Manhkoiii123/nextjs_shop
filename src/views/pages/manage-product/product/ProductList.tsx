@@ -44,7 +44,7 @@ import { ChipProps } from '@mui/material'
 import CustomSelect from 'src/components/custom-select'
 import { OBJECT_STATUS_PRODUCT } from 'src/configs/product'
 import { getAllProductTypes } from 'src/services/product-type'
-import { formatFilter } from 'src/utils'
+import { formatFilter, formatNumberToLocal } from 'src/utils'
 
 type TProps = {}
 
@@ -257,7 +257,7 @@ const ProductList: NextPage<TProps> = () => {
       renderCell: params => {
         const { row } = params
 
-        return <Typography>{row?.price}</Typography>
+        return <Typography>{formatNumberToLocal(row?.price)}</Typography>
       }
     },
     {
