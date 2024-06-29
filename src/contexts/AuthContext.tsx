@@ -16,6 +16,8 @@ import instanceAxios from 'src/helpers/axios'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { addProductToCard } from 'src/stores/order-product'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -34,6 +36,7 @@ type Props = {
 }
 
 const AuthProvider = ({ children }: Props) => {
+  const dispatch = useDispatch()
   const { t } = useTranslation()
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
@@ -97,7 +100,12 @@ const AuthProvider = ({ children }: Props) => {
     logoutAuth().then(res => {
       setUser(null)
       clearLocalUserData()
-      router.push('/login')
+      dispatch(
+        addProductToCard({
+          orderItems: []
+        })
+      )
+      router.push('/')
     })
   }
 
