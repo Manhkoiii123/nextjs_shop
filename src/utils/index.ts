@@ -1,5 +1,6 @@
 import { ContentState, EditorState } from 'draft-js'
 import htmlToDraft from 'html-to-draftjs'
+import { TItemOrderProduct } from 'src/types/order-product-type'
 
 export const toFullName = (lastName: string, middleName: string, firstName: string, language: string) => {
   if (language === 'vi') {
@@ -146,5 +147,30 @@ export const formatNumberToLocal = (value: string | number) => {
     })
   } catch (error) {
     return value
+  }
+}
+
+export const cloneDeep = (data: any) => {
+  try {
+    return JSON.parse(JSON.stringify(data))
+  } catch (error) {
+    return data
+  }
+}
+
+//imutable => khi dùng state trong redux thì ko thay đổi giá trị được trong redux tt như useState => prev tt như state
+export const convertAddProductToCart = (orderItem: TItemOrderProduct[], addItem: TItemOrderProduct) => {
+  try {
+    const cloneOrderItem = cloneDeep(orderItem)
+    const findItem = cloneOrderItem.find((item: TItemOrderProduct) => item.product === addItem.product)
+    if (findItem) {
+      findItem.amount += addItem.amount
+    } else {
+      cloneOrderItem.push(addItem)
+    }
+
+    return cloneOrderItem
+  } catch (error) {
+    return orderItem
   }
 }

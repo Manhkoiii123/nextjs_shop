@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import Link from 'next/link'
+import CardProduct from 'src/views/layout/components/card-product'
 
 const drawerWidth: number = 240
 
@@ -90,6 +91,7 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
         </Typography>
         <LanguageDropdown></LanguageDropdown>
         <ModeToggle />
+        <CardProduct />
         {user ? (
           <UserDropdown />
         ) : (

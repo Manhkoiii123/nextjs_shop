@@ -2,7 +2,7 @@
 import { NextPage } from 'next'
 
 // ** React
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ** Mui
@@ -40,6 +40,7 @@ const HomePage: NextPage<TProps> = () => {
     totalPage: 0,
     totalCount: 0
   })
+  const firstRender = useRef<boolean>(false)
   const [pageSize, setPageSize] = useState(3)
   const [page, setPage] = useState(1)
   const theme = useTheme()
@@ -47,7 +48,24 @@ const HomePage: NextPage<TProps> = () => {
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   const [productTypeSelected, setProductTypeSelected] = useState('')
   const [productReviewSelected, setProductReviewSelected] = useState('')
+  const fetchAllType = async () => {
+    setLoading(true)
+    await getAllProductTypes({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res.data.productTypes
+        if (data) {
+          setOptionTypes(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+          setProductTypeSelected(data[0]?._id)
+          firstRender.current = true
+        }
+        setLoading(false)
+      })
+      .catch(e => setLoading(false))
+  }
 
+  useEffect(() => {
+    fetchAllType()
+  }, [])
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setProductTypeSelected(newValue)
   }
@@ -72,23 +90,6 @@ const HomePage: NextPage<TProps> = () => {
       }
     })
   }
-  const fetchAllType = async () => {
-    setLoading(true)
-    await getAllProductTypes({ params: { limit: -1, page: -1 } })
-      .then(res => {
-        const data = res.data.productTypes
-        if (data) {
-          setOptionTypes(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
-          //   setProductTypeSelected(data[0]?._id)
-        }
-        setLoading(false)
-      })
-      .catch(e => setLoading(false))
-  }
-
-  useEffect(() => {
-    fetchAllType()
-  }, [])
 
   const handleOnChangePagination = (page: number, pageSize: number) => {
     setPage(page)
@@ -98,11 +99,15 @@ const HomePage: NextPage<TProps> = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    setFilterBy({ productType: productTypeSelected, minStar: productReviewSelected })
+    if (firstRender.current) {
+      setFilterBy({ productType: productTypeSelected, minStar: productReviewSelected })
+    }
   }, [productTypeSelected, productReviewSelected])
 
   useEffect(() => {
-    handleGetListProducts()
+    if (firstRender.current) {
+      handleGetListProducts()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, searchBy, page, pageSize, filterBy])
 

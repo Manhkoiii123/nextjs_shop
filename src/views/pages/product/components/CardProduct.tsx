@@ -14,7 +14,12 @@ import Image from 'next/image'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { useRouter } from 'next/navigation'
 import { ROUTE_CONFIG } from 'src/configs/route'
-import { formatNumberToLocal } from 'src/utils'
+import { convertAddProductToCart, formatNumberToLocal } from 'src/utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/stores'
+import { addProductToCard } from 'src/stores/order-product'
+import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface TCardProduct {
   data: TProduct
@@ -35,7 +40,32 @@ const CardProduct = (props: TCardProduct) => {
   const handleNavigateDetail = (slug: string) => {
     router.push(`${ROUTE_CONFIG.PRODUCT}/${slug}`)
   }
+  const { user } = useAuth()
+  const dispatch: AppDispatch = useDispatch()
+  const { orderItems } = useSelector((state: RootState) => state.orderProduct)
+
   const theme = useTheme()
+  const handleAddToCard = (item: TProduct) => {
+    const productCart = getLocalProductCart()
+    const parseData = productCart ? JSON.parse(productCart) : {}
+    const listOrderItem = convertAddProductToCart(orderItems, {
+      name: item.name,
+      amount: 1,
+      image: item.image,
+      price: item.price,
+      discount: item.discount,
+      product: item._id
+    })
+
+    if (user?._id) {
+      dispatch(
+        addProductToCard({
+          orderItems: listOrderItem
+        })
+      )
+      setLocalProductToCart({ ...parseData, [user._id]: listOrderItem })
+    }
+  }
 
   return (
     <Styledcard sx={{ minHeight: 350 }}>
@@ -49,13 +79,13 @@ const CardProduct = (props: TCardProduct) => {
               sx={{
                 color: theme.palette.primary.main,
                 fontWeight: 'bold',
-                lineHeight: '1.5em',
                 display: '-webkit-box',
                 WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 1,
+                WebkitLineClamp: 2,
                 overflow: 'hidden',
                 marginBottom: '8px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                minHeight: '49px'
               }}
             >
               {data.name}
@@ -219,6 +249,7 @@ const CardProduct = (props: TCardProduct) => {
             type='button'
             fullWidth
             variant='contained'
+            onClick={() => handleAddToCard(data)}
             sx={{
               height: '40px',
               display: 'flex',
