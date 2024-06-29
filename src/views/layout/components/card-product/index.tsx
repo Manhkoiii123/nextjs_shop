@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import Avatar from '@mui/material/Avatar'
 import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
+import MenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
@@ -15,13 +15,19 @@ import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import { Typography } from '@mui/material'
-import { toFullName } from 'src/utils'
-import { styled } from '@mui/material/styles'
+import { formatNumberToLocal, toFullName } from 'src/utils'
+import { styled, useTheme } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from 'src/stores'
 import { getLocalProductCart } from 'src/helpers/storage'
 import { addProductToCard } from 'src/stores/order-product'
+import { TItemOrderProduct } from 'src/types/order-product-type'
+import { Button } from '@mui/material'
+
+const StyleMenuItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
+  minWidth: '400px'
+}))
 
 type TProps = {}
 
@@ -72,7 +78,12 @@ const CardProduct: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.DASHBOARD)
     handleClose()
   }
+  const theme = useTheme()
   const { orderItems } = useSelector((state: RootState) => state.orderProduct)
+
+  const handleNavigateDetailsProduct = (slug: string) => {
+    router.push(`${ROUTE_CONFIG.PRODUCT}/${slug}`)
+  }
 
   return (
     <Fragment>
@@ -129,7 +140,63 @@ const CardProduct: NextPage = (props: TProps) => {
         }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      ></Menu>
+      >
+        {orderItems.map((item: TItemOrderProduct) => (
+          <StyleMenuItem key={item.product} onClick={() => handleNavigateDetailsProduct(item.slug)}>
+            <Avatar src={item.image} sx={{ height: '60px !important', width: '60px !important' }} />
+            <Box style={{ flex: 1 }}>
+              <Typography sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {item.name}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {item.discount > 0 && (
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        color: theme.palette.error.main,
+                        fontWeight: 'bold',
+                        textDecoration: 'line-through',
+                        fontSize: '10px'
+                      }}
+                    >
+                      {formatNumberToLocal(item.price)} VND
+                    </Typography>
+                  )}
+                  <Typography
+                    variant='h4'
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontWeight: 'bold',
+                      fontSize: '12px'
+                    }}
+                  >
+                    {item.discount > 0 ? (
+                      <>{formatNumberToLocal((item.price * (100 - item.discount)) / 100)}</>
+                    ) : (
+                      <>{formatNumberToLocal(item.price)}</>
+                    )}{' '}
+                    VND
+                  </Typography>
+                </Box>
+                <Typography>
+                  x <b>{item.amount}</b>
+                </Typography>
+              </Box>
+            </Box>
+          </StyleMenuItem>
+        ))}
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            type='submit'
+            variant='contained'
+            sx={{ mt: 3, mb: 2, mr: 2 }}
+            // onClick={handleNavigateMyCart}
+          >
+            {t('View_cart')}
+          </Button>
+        </Box>
+      </Menu>
     </Fragment>
   )
 }

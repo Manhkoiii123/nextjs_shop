@@ -8,4 +8,5 @@ const index = () => {
 
 export default index
 index.getLayout = (page: ReactNode) => <LayoutNotApp>{page}</LayoutNotApp>
-index.guestGuard = true
+index.guestGuard = false
+index.authGuard = false
