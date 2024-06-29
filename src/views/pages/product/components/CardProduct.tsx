@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { TProduct } from 'src/types/product'
 import Image from 'next/image'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import { convertAddProductToCart, formatNumberToLocal } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
@@ -54,7 +54,8 @@ const CardProduct = (props: TCardProduct) => {
       image: item.image,
       price: item.price,
       discount: item.discount,
-      product: item._id
+      product: item._id,
+      slug: item.slug
     })
 
     if (user?._id) {
@@ -64,6 +65,11 @@ const CardProduct = (props: TCardProduct) => {
         })
       )
       setLocalProductToCart({ ...parseData, [user._id]: listOrderItem })
+    } else {
+      router.replace({
+        pathname: '/login',
+        query: { returnUrl: router.asPath }
+      })
     }
   }
 
