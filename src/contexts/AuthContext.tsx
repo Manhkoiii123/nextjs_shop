@@ -17,7 +17,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { addProductToCard } from 'src/stores/order-product'
+import { updateProductToCard } from 'src/stores/order-product'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -101,7 +101,7 @@ const AuthProvider = ({ children }: Props) => {
       setUser(null)
       clearLocalUserData()
       dispatch(
-        addProductToCard({
+        updateProductToCard({
           orderItems: []
         })
       )
