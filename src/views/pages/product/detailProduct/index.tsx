@@ -4,7 +4,7 @@ import { Button, IconButton, Rating } from '@mui/material'
 import { Box, Grid, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import IconifyIcon from 'src/components/Icon'
@@ -17,7 +17,7 @@ import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
 import spacing from 'src/theme/spacing'
 import { TProduct } from 'src/types/product'
-import { convertUpdateProductToCart, formatNumberToLocal } from 'src/utils'
+import { convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 
 const DetailProductPage = () => {
@@ -54,15 +54,20 @@ const DetailProductPage = () => {
     }
   }, [productId])
 
+  const memo = useMemo(() => {
+    return dataProduct && isExpiry(dataProduct.discountStartDate, dataProduct.discountEndDate)
+  }, [dataProduct])
   const handleAddToCard = (item: TProduct) => {
     const productCart = getLocalProductCart()
     const parseData = productCart ? JSON.parse(productCart) : {}
+    const discountItem =
+      dataProduct && isExpiry(dataProduct.discountStartDate, dataProduct.discountEndDate) ? item.discount : 0
     const listOrderItem = convertUpdateProductToCart(orderItems, {
       name: item.name,
       amount: amountProduct,
       image: item.image,
       price: item.price,
-      discount: item.discount,
+      discount: discountItem,
       product: item._id,
       slug: item.slug
     })
@@ -193,7 +198,7 @@ const DetailProductPage = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      {dataProduct.discount > 0 && (
+                      {dataProduct.discount > 0 && memo && (
                         <Typography
                           variant='h4'
                           sx={{
@@ -214,13 +219,13 @@ const DetailProductPage = () => {
                           fontSize: '24px'
                         }}
                       >
-                        {dataProduct.discount > 0
+                        {dataProduct.discount > 0 && memo
                           ? formatNumberToLocal(dataProduct.price * (1 - dataProduct.discount / 100))
                           : formatNumberToLocal(dataProduct.price)}{' '}
                         đ
                       </Typography>
                     </Box>
-                    {dataProduct.discount > 0 && (
+                    {dataProduct.discount > 0 && memo && (
                       <Box
                         sx={{
                           backgroundColor: hexToRGBA(theme.palette.error.main, 0.4),

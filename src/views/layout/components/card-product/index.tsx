@@ -24,6 +24,7 @@ import { getLocalProductCart } from 'src/helpers/storage'
 import { updateProductToCard } from 'src/stores/order-product'
 import { TItemOrderProduct } from 'src/types/order-product-type'
 import { Button } from '@mui/material'
+import NoData from 'src/components/no-data'
 
 const StyleMenuItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
   minWidth: '400px'
@@ -186,9 +187,14 @@ const CardProduct: NextPage = (props: TProps) => {
             </Box>
           </>
         ) : (
-          <>
-            <Box sx={{ padding: '40px' }}>{t('Không có dữ liệu')}</Box>
-          </>
+          <Box
+            sx={{
+              height: '200px',
+              width: '200px'
+            }}
+          >
+            <NoData />
+          </Box>
         )}
       </Menu>
     </Fragment>

@@ -14,6 +14,7 @@ import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { updateProductToCard } from 'src/stores/order-product'
 import { useAuth } from 'src/hooks/useAuth'
+import NoData from 'src/components/no-data'
 
 type TProps = {}
 
@@ -329,7 +330,14 @@ const MyCardPage: NextPage<TProps> = () => {
             </Box>
           </Fragment>
         ) : (
-          <Box>{t('Không có dữ liệu')}</Box>
+          <Box
+            sx={{
+              height: '100%',
+              width: '100%'
+            }}
+          >
+            <NoData />
+          </Box>
         )}
       </Box>
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 4 }}>

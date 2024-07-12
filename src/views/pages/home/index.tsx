@@ -20,6 +20,7 @@ import { TProduct } from 'src/types/product'
 import { getAllProductTypes } from 'src/services/product-type'
 import InputSearch from 'src/components/input-search'
 import FilterProduct from 'src/views/pages/product/components/FilterProduct'
+import NoData from 'src/components/no-data'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -160,8 +161,13 @@ const HomePage: NextPage<TProps> = () => {
                   })}
                 </>
               ) : (
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                  <Typography>Không có dữ liệu</Typography>
+                <Box
+                  sx={{
+                    height: '100%',
+                    width: '100%'
+                  }}
+                >
+                  <NoData />
                 </Box>
               )}
             </Grid>

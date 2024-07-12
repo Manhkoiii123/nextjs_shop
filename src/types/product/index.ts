@@ -9,7 +9,7 @@ export type TParamsGetProducts = {
 export type TParamsCreateProduct = {
   name: string
   type: string
-  // location: string
+  location: string
   discount: number
   price: number
   description?: string
@@ -26,7 +26,7 @@ export type TParamsEditProduct = {
   name: string
   type: string
   discount: number
-  // location: string
+  location: string
   price: number
   description: string
   slug: string
