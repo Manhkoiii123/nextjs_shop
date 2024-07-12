@@ -59,30 +59,21 @@ const CardProduct: NextPage = (props: TProps) => {
       )
     }
   }, [user?._id])
-  const permissionUser = user?.role?.permissions ?? []
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
   const handleClose = () => {
     setAnchorEl(null)
   }
-  const handleNavigateProfile = () => {
-    router.push(ROUTE_CONFIG.MY_PROFILE)
-    handleClose()
-  }
-  const handleNavigateChangePassword = () => {
-    router.push(ROUTE_CONFIG.CHANGE_PASSWORD)
-    handleClose()
-  }
-  const handleNavigateManageSystem = () => {
-    router.push(ROUTE_CONFIG.DASHBOARD)
-    handleClose()
-  }
+
   const theme = useTheme()
   const { orderItems } = useSelector((state: RootState) => state.orderProduct)
 
   const handleNavigateDetailsProduct = (slug: string) => {
     router.push(`${ROUTE_CONFIG.PRODUCT}/${slug}`)
+  }
+  const handleNavigateMyCart = () => {
+    router.push(ROUTE_CONFIG.MY_CART)
   }
 
   return (
@@ -187,12 +178,7 @@ const CardProduct: NextPage = (props: TProps) => {
           </StyleMenuItem>
         ))}
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            type='submit'
-            variant='contained'
-            sx={{ mt: 3, mb: 2, mr: 2 }}
-            // onClick={handleNavigateMyCart}
-          >
+          <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, mr: 2 }} onClick={handleNavigateMyCart}>
             {t('View_cart')}
           </Button>
         </Box>
