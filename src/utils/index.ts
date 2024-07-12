@@ -176,3 +176,15 @@ export const convertUpdateProductToCart = (orderItem: TItemOrderProduct[], addIt
     return orderItem
   }
 }
+
+export const isExpiry = (startDate: Date | null, endDate: Date | null) => {
+  if (startDate && endDate) {
+    const curTime = new Date().getTime()
+    const startTime = new Date(startDate).getTime()
+    const endTime = new Date(endDate).getTime()
+
+    return startTime <= curTime && endTime >= curTime
+  }
+
+  return false
+}

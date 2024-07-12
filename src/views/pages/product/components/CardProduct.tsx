@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
@@ -14,7 +14,7 @@ import Image from 'next/image'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
-import { convertUpdateProductToCart, formatNumberToLocal } from 'src/utils'
+import { convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
@@ -47,13 +47,14 @@ const CardProduct = (props: TCardProduct) => {
   const theme = useTheme()
   const handleAddToCard = (item: TProduct) => {
     const productCart = getLocalProductCart()
+    const discountItem = isExpiry(data.discountStartDate, data.discountEndDate) ? item.discount : 0
     const parseData = productCart ? JSON.parse(productCart) : {}
     const listOrderItem = convertUpdateProductToCart(orderItems, {
       name: item.name,
       amount: 1,
       image: item.image,
       price: item.price,
-      discount: item.discount,
+      discount: discountItem,
       product: item._id,
       slug: item.slug
     })
@@ -72,6 +73,10 @@ const CardProduct = (props: TCardProduct) => {
       })
     }
   }
+
+  const memo = useMemo(() => {
+    return isExpiry(data.discountStartDate, data.discountEndDate)
+  }, [data.discountStartDate, data.discountEndDate])
 
   return (
     <Styledcard sx={{ minHeight: 350 }}>
@@ -106,7 +111,7 @@ const CardProduct = (props: TCardProduct) => {
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                {data.discount > 0 && (
+                {data.discount > 0 && memo && (
                   <Typography
                     variant='h4'
                     sx={{
@@ -127,13 +132,13 @@ const CardProduct = (props: TCardProduct) => {
                     fontSize: '18px'
                   }}
                 >
-                  {data.discount > 0
+                  {data.discount > 0 && memo
                     ? formatNumberToLocal(data.price * (1 - data.discount / 100))
                     : formatNumberToLocal(data.price)}{' '}
                   đ
                 </Typography>
               </Box>
-              {data.discount > 0 && (
+              {data.discount > 0 && memo && (
                 <Box
                   sx={{
                     backgroundColor: hexToRGBA(theme.palette.error.main, 0.4),
