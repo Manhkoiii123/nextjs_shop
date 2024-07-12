@@ -110,7 +110,7 @@ const ProfilePage: NextPage<TProps> = () => {
   }
   const fetchAuthMe = async () => {
     const tmp = await getAuthMe()
-    
+
     dispatch(updateUserredux(tmp.data))
   }
   const [optionsRole, setOptionRole] = useState<{ label: string; value: string }[]>([])
