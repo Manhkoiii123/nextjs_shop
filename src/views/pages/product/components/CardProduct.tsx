@@ -14,10 +14,10 @@ import Image from 'next/image'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
-import { convertAddProductToCart, formatNumberToLocal } from 'src/utils'
+import { convertUpdateProductToCart, formatNumberToLocal } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
-import { addProductToCard } from 'src/stores/order-product'
+import { updateProductToCard } from 'src/stores/order-product'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
 
@@ -48,7 +48,7 @@ const CardProduct = (props: TCardProduct) => {
   const handleAddToCard = (item: TProduct) => {
     const productCart = getLocalProductCart()
     const parseData = productCart ? JSON.parse(productCart) : {}
-    const listOrderItem = convertAddProductToCart(orderItems, {
+    const listOrderItem = convertUpdateProductToCart(orderItems, {
       name: item.name,
       amount: 1,
       image: item.image,
@@ -60,7 +60,7 @@ const CardProduct = (props: TCardProduct) => {
 
     if (user?._id) {
       dispatch(
-        addProductToCard({
+        updateProductToCard({
           orderItems: listOrderItem
         })
       )

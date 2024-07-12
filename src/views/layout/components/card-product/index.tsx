@@ -21,7 +21,7 @@ import Badge from '@mui/material/Badge'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from 'src/stores'
 import { getLocalProductCart } from 'src/helpers/storage'
-import { addProductToCard } from 'src/stores/order-product'
+import { updateProductToCard } from 'src/stores/order-product'
 import { TItemOrderProduct } from 'src/types/order-product-type'
 import { Button } from '@mui/material'
 
@@ -53,7 +53,7 @@ const CardProduct: NextPage = (props: TProps) => {
     const parseData = productCard ? JSON.parse(productCard) : []
     if (user?._id) {
       dispatch(
-        addProductToCard({
+        updateProductToCard({
           orderItems: parseData[user?._id] || []
         })
       )
@@ -132,56 +132,64 @@ const CardProduct: NextPage = (props: TProps) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {orderItems.map((item: TItemOrderProduct) => (
-          <StyleMenuItem key={item.product} onClick={() => handleNavigateDetailsProduct(item.slug)}>
-            <Avatar src={item.image} sx={{ height: '60px !important', width: '60px !important' }} />
-            <Box style={{ flex: 1 }}>
-              <Typography sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {item.name}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {item.discount > 0 && (
-                    <Typography
-                      variant='h6'
-                      sx={{
-                        color: theme.palette.error.main,
-                        fontWeight: 'bold',
-                        textDecoration: 'line-through',
-                        fontSize: '10px'
-                      }}
-                    >
-                      {formatNumberToLocal(item.price)} VND
-                    </Typography>
-                  )}
-                  <Typography
-                    variant='h4'
-                    sx={{
-                      color: theme.palette.primary.main,
-                      fontWeight: 'bold',
-                      fontSize: '12px'
-                    }}
-                  >
-                    {item.discount > 0 ? (
-                      <>{formatNumberToLocal((item.price * (100 - item.discount)) / 100)}</>
-                    ) : (
-                      <>{formatNumberToLocal(item.price)}</>
-                    )}{' '}
-                    VND
+        {orderItems.length > 0 ? (
+          <>
+            {orderItems.map((item: TItemOrderProduct) => (
+              <StyleMenuItem key={item.product} onClick={() => handleNavigateDetailsProduct(item.slug)}>
+                <Avatar src={item.image} sx={{ height: '60px !important', width: '60px !important' }} />
+                <Box style={{ flex: 1 }}>
+                  <Typography sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.name}
                   </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      {item.discount > 0 && (
+                        <Typography
+                          variant='h6'
+                          sx={{
+                            color: theme.palette.error.main,
+                            fontWeight: 'bold',
+                            textDecoration: 'line-through',
+                            fontSize: '10px'
+                          }}
+                        >
+                          {formatNumberToLocal(item.price)} VND
+                        </Typography>
+                      )}
+                      <Typography
+                        variant='h4'
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 'bold',
+                          fontSize: '12px'
+                        }}
+                      >
+                        {item.discount > 0 ? (
+                          <>{formatNumberToLocal((item.price * (100 - item.discount)) / 100)}</>
+                        ) : (
+                          <>{formatNumberToLocal(item.price)}</>
+                        )}{' '}
+                        VND
+                      </Typography>
+                    </Box>
+                    <Typography>
+                      x <b>{item.amount}</b>
+                    </Typography>
+                  </Box>
                 </Box>
-                <Typography>
-                  x <b>{item.amount}</b>
-                </Typography>
-              </Box>
+              </StyleMenuItem>
+            ))}
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, mr: 2 }} onClick={handleNavigateMyCart}>
+                {t('View_cart')}
+              </Button>
             </Box>
-          </StyleMenuItem>
-        ))}
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, mr: 2 }} onClick={handleNavigateMyCart}>
-            {t('View_cart')}
-          </Button>
-        </Box>
+          </>
+        ) : (
+          <>
+            <Box sx={{ padding: '40px' }}>{t('Không có dữ liệu')}</Box>
+          </>
+        )}
       </Menu>
     </Fragment>
   )

@@ -1,17 +1,23 @@
 'use client'
 
-import { Button, Rating } from '@mui/material'
+import { Button, IconButton, Rating } from '@mui/material'
 import { Box, Grid, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import IconifyIcon from 'src/components/Icon'
 import Spinner from 'src/components/spinner'
+import CustomTextField from 'src/components/text-field'
+import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
+import { useAuth } from 'src/hooks/useAuth'
 import { getDetailsProductPublic } from 'src/services/product'
+import { AppDispatch, RootState } from 'src/stores'
+import { updateProductToCard } from 'src/stores/order-product'
 import spacing from 'src/theme/spacing'
 import { TProduct } from 'src/types/product'
-import { formatNumberToLocal } from 'src/utils'
+import { convertUpdateProductToCart, formatNumberToLocal } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 
 const DetailProductPage = () => {
@@ -20,6 +26,11 @@ const DetailProductPage = () => {
 
   const router = useRouter()
   const productId = router.query.productId as string
+  const { user } = useAuth()
+  const dispatch: AppDispatch = useDispatch()
+  const { orderItems } = useSelector((state: RootState) => state.orderProduct)
+
+  const [amountProduct, setAmountProduct] = useState(1)
 
   const { t } = useTranslation()
   const theme = useTheme()
@@ -42,6 +53,34 @@ const DetailProductPage = () => {
       fetchDetailProduct(productId)
     }
   }, [productId])
+
+  const handleAddToCard = (item: TProduct) => {
+    const productCart = getLocalProductCart()
+    const parseData = productCart ? JSON.parse(productCart) : {}
+    const listOrderItem = convertUpdateProductToCart(orderItems, {
+      name: item.name,
+      amount: amountProduct,
+      image: item.image,
+      price: item.price,
+      discount: item.discount,
+      product: item._id,
+      slug: item.slug
+    })
+
+    if (user?._id) {
+      dispatch(
+        updateProductToCard({
+          orderItems: listOrderItem
+        })
+      )
+      setLocalProductToCart({ ...parseData, [user._id]: listOrderItem })
+    } else {
+      router.replace({
+        pathname: '/login',
+        query: { returnUrl: router.asPath }
+      })
+    }
+  }
 
   if (!dataProduct) return null
 
@@ -207,16 +246,76 @@ const DetailProductPage = () => {
                     )}
                   </Box>
                 </Box>
+                <Box sx={{ display: 'flex', mt: 8, alignItems: 'center', gap: 2, maxWidth: '200px' }}>
+                  <IconButton
+                    onClick={() => {
+                      if (amountProduct > 1) setAmountProduct(prev => prev - 1)
+                    }}
+                    sx={{
+                      backgroundColor: `${theme.palette.primary.main} !important`,
+                      color: `${theme.palette.common.white}`
+                    }}
+                  >
+                    <IconifyIcon icon='ic:sharp-minus' />
+                  </IconButton>
+
+                  <CustomTextField
+                    type='number'
+                    value={amountProduct}
+                    onChange={e => {
+                      setAmountProduct(+e.target.value)
+                    }}
+                    inputProps={{
+                      inputMode: 'numeric',
+                      min: 1,
+                      max: dataProduct.countInStock
+                    }}
+                    sx={{
+                      '.MuiInputBase-input.MuiFilledInput-input': {
+                        width: '20px'
+                      },
+                      '.MuiInputBase-root.MuiFilledInput-root': {
+                        borderRadius: '0px',
+                        borderTop: 'none',
+                        borderRight: 'none',
+                        borderLeft: 'none',
+                        '&.Mui-focused': {
+                          backgroundColor: `${theme.palette.background.paper} !important`,
+                          boxShadow: 'none !important'
+                        }
+                      },
+                      'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button': {
+                        WebkitAppearance: 'none',
+                        margin: 0
+                      },
+                      'input[type=number]': {
+                        MozAppearance: 'textfield'
+                      }
+                    }}
+                  />
+                  <IconButton
+                    onClick={() => {
+                      if (amountProduct < dataProduct.countInStock) setAmountProduct(prev => prev + 1)
+                    }}
+                    sx={{
+                      backgroundColor: `${theme.palette.primary.main} !important`,
+                      color: `${theme.palette.common.white}`
+                    }}
+                  >
+                    <IconifyIcon icon='ic:round-plus' />
+                  </IconButton>
+                </Box>
                 <Box
                   sx={{
                     display: 'flex',
                     alignContent: 'center',
                     gap: 6,
                     mt: 8,
-                    padding: '0 12px 10px'
+                    paddingBottom: '10px'
                   }}
                 >
                   <Button
+                    onClick={() => handleAddToCard(dataProduct)}
                     type='button'
                     variant='contained'
                     sx={{

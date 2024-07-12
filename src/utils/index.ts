@@ -159,8 +159,9 @@ export const cloneDeep = (data: any) => {
 }
 
 //imutable => khi dùng state trong redux thì ko thay đổi giá trị được trong redux tt như useState => prev tt như state
-export const convertAddProductToCart = (orderItem: TItemOrderProduct[], addItem: TItemOrderProduct) => {
+export const convertUpdateProductToCart = (orderItem: TItemOrderProduct[], addItem: TItemOrderProduct) => {
   try {
+    let res = []
     const cloneOrderItem = cloneDeep(orderItem)
     const findItem = cloneOrderItem.find((item: TItemOrderProduct) => item.product === addItem.product)
     if (findItem) {
@@ -168,8 +169,9 @@ export const convertAddProductToCart = (orderItem: TItemOrderProduct[], addItem:
     } else {
       cloneOrderItem.push(addItem)
     }
+    res = cloneOrderItem.filter((item: TItemOrderProduct) => item.amount > 0)
 
-    return cloneOrderItem
+    return res
   } catch (error) {
     return orderItem
   }
