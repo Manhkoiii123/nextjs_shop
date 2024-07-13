@@ -341,5 +341,6 @@
   "Từ 3 trở lên": "From 3 and up",
   "Count_in_stock_product": "Have {{count}} products in stock",
   "Sold_product_count": "Sold {{count}} product",
-  "Hết hàng": "Out of stock"
+  "Hết hàng": "Out of stock",
+  "Seach_name_product": "Seach name product"
 }

@@ -8,6 +8,7 @@ import { useDebounce } from 'src/hooks/useDebounce'
 interface TInputSearch {
   value: string
   onChange: (value: string) => void
+  placeholder: string
 }
 
 const Search = styled('div')(({ theme }) => ({
@@ -49,8 +50,8 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 }))
 
 const InputSearch = (props: TInputSearch) => {
-  const { value, onChange } = props
   const { t } = useTranslation()
+  const { value, onChange, placeholder = t('Search') } = props
   const [search, setSearch] = useState(value)
   const debounceSearch = useDebounce(search, 500)
   useEffect(() => {
@@ -67,7 +68,7 @@ const InputSearch = (props: TInputSearch) => {
         onChange={e => {
           setSearch(e.target.value)
         }}
-        placeholder='Search…'
+        placeholder={placeholder}
         inputProps={{ 'aria-label': 'search' }}
       />
     </Search>

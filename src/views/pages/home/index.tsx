@@ -21,6 +21,7 @@ import { getAllProductTypes } from 'src/services/product-type'
 import InputSearch from 'src/components/input-search'
 import FilterProduct from 'src/views/pages/product/components/FilterProduct'
 import NoData from 'src/components/no-data'
+import { getAllCity } from 'src/services/city'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -49,6 +50,8 @@ const HomePage: NextPage<TProps> = () => {
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   const [productTypeSelected, setProductTypeSelected] = useState('')
   const [productReviewSelected, setProductReviewSelected] = useState('')
+  const [productLocationSelected, setProductLocationSelected] = useState('')
+  const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
   const fetchAllType = async () => {
     setLoading(true)
     await getAllProductTypes({ params: { limit: -1, page: -1 } })
@@ -63,15 +66,39 @@ const HomePage: NextPage<TProps> = () => {
       })
       .catch(e => setLoading(false))
   }
+  const fetchAllCities = async () => {
+    setLoading(true)
+    await getAllCity({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res?.data.cities
+        if (data) {
+          setOptionCities(data?.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => {
+        setLoading(false)
+      })
+  }
 
   useEffect(() => {
     fetchAllType()
+    fetchAllCities()
   }, [])
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setProductTypeSelected(newValue)
   }
-  const handleFilterProduct = (review: string) => {
-    setProductReviewSelected(review)
+  const handleFilterProduct = (value: string, type: string) => {
+    switch (type) {
+      case 'review':
+        setProductReviewSelected(value)
+        break
+      case 'location':
+        setProductLocationSelected(value)
+        break
+      default:
+        break
+    }
   }
 
   // fetch api
@@ -96,14 +123,22 @@ const HomePage: NextPage<TProps> = () => {
     setPage(page)
     setPageSize(pageSize)
   }
+  const handleResetFilter = () => {
+    setProductLocationSelected('')
+    setProductReviewSelected('')
+  }
 
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (firstRender.current) {
-      setFilterBy({ productType: productTypeSelected, minStar: productReviewSelected })
+      setFilterBy({
+        productType: productTypeSelected,
+        minStar: productReviewSelected,
+        productLocation: productLocationSelected
+      })
     }
-  }, [productTypeSelected, productReviewSelected])
+  }, [productTypeSelected, productReviewSelected, productLocationSelected])
 
   useEffect(() => {
     if (firstRender.current) {
@@ -139,13 +174,23 @@ const HomePage: NextPage<TProps> = () => {
           sx={{ display: 'flex', alignContent: 'center', mt: 4 }}
         >
           <Box sx={{ width: '300px' }}>
-            <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)} />
+            <InputSearch
+              placeholder={t('Seach_name_product')}
+              value={searchBy}
+              onChange={(value: string) => setSearchBy(value)}
+            />
           </Box>
         </Box>
         <Grid container spacing={8}>
           <Grid item md={3} display={{ md: 'flex', xs: 'none' }}>
             <Box sx={{ width: '100%' }}>
-              <FilterProduct handleFilterProduct={handleFilterProduct} />
+              <FilterProduct
+                locationSelected={productLocationSelected}
+                reviewSelected={productReviewSelected}
+                handleReset={handleResetFilter}
+                optionCities={optionCities}
+                handleFilterProduct={handleFilterProduct}
+              />
             </Box>
           </Grid>
           <Grid item md={9} xs={12}>
