@@ -364,5 +364,6 @@
   "Từ 3 trở lên": "Từ 3 trở lên",
   "Count_in_stock_product": "Còn {{count}} sản phẩm trong kho",
   "Sold_product_count": "Đã bán {{count}} sản phẩm",
-  "Hết hàng": "Hết hàng"
+  "Hết hàng": "Hết hàng",
+  "Seach_name_product": "Tìm kiếm theo tên sản phẩm"
 }

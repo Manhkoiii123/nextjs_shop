@@ -8,21 +8,24 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import IconifyIcon from 'src/components/Icon'
+import NoData from 'src/components/no-data'
 import Spinner from 'src/components/spinner'
 import CustomTextField from 'src/components/text-field'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
-import { getDetailsProductPublic } from 'src/services/product'
+import { getDetailsProductPublic, getListRelasedProductBySlug } from 'src/services/product'
 import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
-import spacing from 'src/theme/spacing'
 import { TProduct } from 'src/types/product'
 import { convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
+import CardProduct from 'src/views/pages/product/components/CardProduct'
+import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedProduct'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
+  const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
 
   const router = useRouter()
   const productId = router.query.productId as string
@@ -48,9 +51,24 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
+  const fetchListRelasedProduct = async (slug: string) => {
+    setLoading(true)
+    await getListRelasedProductBySlug({ params: { slug: slug } })
+      .then(res => {
+        setLoading(false)
+        const data = res.data
+        if (data) {
+          setListRelatedProduct(data.products)
+        }
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }
   useEffect(() => {
     if (productId) {
       fetchDetailProduct(productId)
+      fetchListRelasedProduct(productId)
     }
   }, [productId])
 
@@ -109,9 +127,10 @@ const DetailProductPage = () => {
                   width={0}
                   height={0}
                   style={{
-                    width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
+                    width: '100%',
+                    maxHeight: '400px',
+                    objectFit: 'contain',
                     borderRadius: '15px'
                   }}
                 />
@@ -184,6 +203,23 @@ const DetailProductPage = () => {
                       </Typography>
                     )}
                   </Box>
+                  {dataProduct.location && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 4 }}>
+                      <IconifyIcon icon={'akar-icons:location'} />
+
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontSize: '14px',
+                          whiteSpace: 'nowrap',
+                          mt: '1px'
+                        }}
+                      >
+                        {dataProduct.location.name}
+                      </Typography>
+                    </Box>
+                  )}
                   <Box
                     sx={{
                       display: 'flex',
@@ -353,51 +389,125 @@ const DetailProductPage = () => {
             </Grid>
           </Box>
         </Grid>
-        <Grid
-          container
-          item
-          md={12}
-          xs={12}
-          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4, mt: 6 }}
-        >
-          <Box sx={{ height: '100%', width: '100%' }}>
+        <Grid container mt={6}>
+          <Grid
+            container
+            item
+            md={8.5}
+            xs={12}
+            sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}
+          >
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 2,
-                marginBottom: '8px',
-                mt: 4,
-                padding: '8px',
-                borderRadius: '8px',
-                backgroundColor: theme.palette.customColors.bodyBg
+                width: '100%',
+                height: '100%'
               }}
             >
-              <Typography
-                variant='h4'
+              <Box
                 sx={{
-                  fontWeight: 'bold',
-                  fontSize: '18px',
-                  color: `rgba(${theme.palette.customColors.main}, 0.68)`
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  marginBottom: '8px',
+                  mt: 4,
+                  padding: '8px',
+                  borderRadius: '8px',
+                  backgroundColor: theme.palette.customColors.bodyBg
                 }}
               >
-                {t('Description_product')}
-              </Typography>
+                <Typography
+                  variant='h4'
+                  sx={{
+                    fontWeight: 'bold',
+                    fontSize: '18px',
+                    color: `rgba(${theme.palette.customColors.main}, 0.68)`
+                  }}
+                >
+                  {t('Description_product')}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  mt: 4,
+                  color: `rgba(${theme.palette.customColors.main}, 0.42)`,
+                  fontSize: '14px',
+                  backgroundColor: theme.palette.customColors.bodyBg,
+                  padding: 4,
+                  borderRadius: '10px'
+                }}
+                dangerouslySetInnerHTML={{ __html: dataProduct.description }}
+              />
             </Box>
+          </Grid>
+          <Grid container item md={3.5} xs={12} mt={{ md: 0, xs: 5 }}>
             <Box
               sx={{
-                mt: 4,
-                color: `rgba(${theme.palette.customColors.main}, 0.42)`,
-                fontSize: '14px',
-                backgroundColor: theme.palette.customColors.bodyBg,
-                padding: 4,
-                borderRadius: '10px'
+                height: '100%',
+                width: '100%',
+                marginLeft: { md: 5, xs: 0 },
+                backgroundColor: theme.palette.background.paper,
+                borderRadius: '15px',
+                py: 5,
+                px: 4
               }}
-              dangerouslySetInnerHTML={{ __html: dataProduct.description }}
-            />
-          </Box>
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  marginBottom: '8px',
+                  mt: 4,
+                  padding: '8px',
+                  borderRadius: '8px',
+                  backgroundColor: theme.palette.customColors.bodyBg
+                }}
+              >
+                <Typography
+                  variant='h4'
+                  sx={{
+                    fontWeight: 'bold',
+                    fontSize: '18px',
+                    color: `rgba(${theme.palette.customColors.main}, 0.68)`
+                  }}
+                >
+                  {t('Product_same')}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  mt: 4
+                }}
+              >
+                {listRelatedProduct.length > 0 ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {listRelatedProduct.map(item => {
+                      return <CardRelatedProduct key={item._id} item={item} />
+                    })}
+                  </Box>
+                ) : (
+                  <Box sx={{ width: '100%', mt: 10 }}>
+                    <NoData />
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Grid>
         </Grid>
+      </Grid>
+      <Grid container item md={12} xs={12} mt={6}>
+        <Box
+          sx={{
+            height: '100%',
+            width: '100%',
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: '15px',
+            py: 5,
+            px: 4
+          }}
+        ></Box>
       </Grid>
     </>
   )

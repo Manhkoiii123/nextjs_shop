@@ -12,7 +12,8 @@ import {
   TParamsCreateProduct,
   TParamsDeleteMultipleProduct,
   TParamsEditProduct,
-  TProduct
+  TProduct,
+  TParamsGetRelatedProduct
 } from 'src/types/product'
 
 export const getAllProducts = async (data: { params: TParamsGetProducts }) => {
@@ -77,6 +78,15 @@ export const getDetailsProduct = async (id: string) => {
 export const getDetailsProductPublic = async (slug: string) => {
   try {
     const res = await axios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/public/slug/${slug}`)
+
+    return res.data
+  } catch (error: any) {
+    return error?.response?.data
+  }
+}
+export const getListRelasedProductBySlug = async (data: { params: TParamsGetRelatedProduct }) => {
+  try {
+    const res = await axios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/related`, data)
 
     return res.data
   } catch (error: any) {

@@ -204,18 +204,6 @@ const CardProduct = (props: TCardProduct) => {
                   </Typography>
                 </Box>
               )}
-              {!!data.averageRating && (
-                <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <b>{data.averageRating}</b>
-                  <Rating
-                    name='read-only'
-                    sx={{ fontSize: '16px' }}
-                    precision={0.1}
-                    defaultValue={data.averageRating}
-                    readOnly
-                  />
-                </Typography>
-              )}
             </Box>
             <Box>
               {data.sold > 0 && (
@@ -223,10 +211,27 @@ const CardProduct = (props: TCardProduct) => {
                   {t('Sold_product_count', { count: data.sold })}
                 </Typography>
               )}
+              {data.location && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconifyIcon icon={'akar-icons:location'} />
+
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontSize: '14px',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {data.location.name}
+                  </Typography>
+                </Box>
+              )}
             </Box>
+
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                {/* {!!data.averageRating ? (
+                {!!data.averageRating ? (
                   <Typography sx={{ display: 'flex', alignItems: 'center' }}>
                     <Rating
                       name='read-only'
@@ -238,7 +243,7 @@ const CardProduct = (props: TCardProduct) => {
                   </Typography>
                 ) : (
                   <Rating name='read-only' sx={{ fontSize: '16px' }} defaultValue={0} precision={0.5} readOnly />
-                )} */}
+                )}
                 <Typography sx={{ display: 'flex', alignItems: 'center' }}>
                   {!!data.totalReviews ? <b>{data.totalReviews}</b> : <span>{t('not_review')}</span>}
                 </Typography>
