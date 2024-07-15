@@ -119,3 +119,40 @@ export const deleteMultipleProduct = async (data: TParamsDeleteMultipleProduct) 
     return error?.response?.data
   }
 }
+export const likeProduct = async (data: { productId: string }) => {
+  try {
+    const res = await instanceAxios.post(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/like`, data)
+    if (res?.data?.status === 'Success') {
+      return {
+        data: {
+          _id: 1
+        }
+      }
+    }
+
+    return {
+      data: null
+    }
+  } catch (error: any) {
+    return error?.response?.data
+  }
+}
+export const unLikeProduct = async (data: { productId: string }) => {
+  try {
+    const res = await instanceAxios.post(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/unlike`, data)
+
+    if (res?.data?.status === 'Success') {
+      return {
+        data: {
+          _id: 1
+        }
+      }
+    }
+
+    return {
+      data: null
+    }
+  } catch (error: any) {
+    return error?.response?.data
+  }
+}

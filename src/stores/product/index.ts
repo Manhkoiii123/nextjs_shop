@@ -7,7 +7,9 @@ import {
   deleteMultipleProductAsync,
   deleteProductAsync,
   getAllProductsAsync,
+  likeProductAsync,
   serviceName,
+  unlikeProductAsync,
   updateProductAsync
 } from 'src/stores/product/actions'
 
@@ -26,7 +28,17 @@ const initialState = {
   isSuccessMultipleDelete: false,
   isErrorMultipleDelete: false,
   messageErrorMultipleDelete: '',
+  isSuccessLike: false,
+  isErrorLike: false,
+  messageErrorLike: '',
+  isSuccessUnLike: false,
+  isErrorUnLike: false,
+  messageErrorUnLike: '',
   products: {
+    data: [],
+    total: 0
+  },
+  likedProducts: {
     data: [],
     total: 0
   }
@@ -51,6 +63,12 @@ export const productSlice = createSlice({
       state.isSuccessMultipleDelete = false
       state.isErrorMultipleDelete = true
       state.messageErrorMultipleDelete = ''
+      state.isSuccessLike = false
+      state.isErrorLike = true
+      state.messageErrorLike = ''
+      state.isSuccessUnLike = false
+      state.isErrorUnLike = true
+      state.messageErrorUnLike = ''
     }
   },
   extraReducers: builder => {
@@ -114,6 +132,29 @@ export const productSlice = createSlice({
       state.isSuccessMultipleDelete = !!action.payload?.data
       state.isErrorMultipleDelete = !action.payload?.data
       state.messageErrorMultipleDelete = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    // ** like product
+    builder.addCase(likeProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(likeProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessLike = !!action.payload?.data?._id
+      state.isErrorLike = !action.payload?.data?._id
+      state.messageErrorLike = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+
+    // ** unlike product
+    builder.addCase(unlikeProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(unlikeProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessUnLike = !!action.payload?.data?._id
+      state.isErrorUnLike = !action.payload?.data?._id
+      state.messageErrorUnLike = action.payload?.message
       state.typeError = action.payload?.typeError
     })
   }

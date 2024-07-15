@@ -20,6 +20,7 @@ import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
+import { likeProductAsync, unlikeProductAsync } from 'src/stores/product/actions'
 
 interface TCardProduct {
   data: TProduct
@@ -35,6 +36,7 @@ const Styledcard = styled(Card)(({ theme }) => ({
 
 const CardProduct = (props: TCardProduct) => {
   const { data } = props
+  console.log('🚀 ~ CardProduct ~ data:', data)
   const router = useRouter()
   const { t } = useTranslation()
   const handleNavigateDetail = (slug: string) => {
@@ -77,6 +79,22 @@ const CardProduct = (props: TCardProduct) => {
   const memo = useMemo(() => {
     return isExpiry(data.discountStartDate, data.discountEndDate)
   }, [data.discountStartDate, data.discountEndDate])
+
+  const handleToggleLikeProduct = (id: string, liked: boolean) => {
+    //liked để biết đã like hay chưa
+    if (user?._id) {
+      if (liked) {
+        dispatch(unlikeProductAsync({ productId: id }))
+      } else {
+        dispatch(likeProductAsync({ productId: id }))
+      }
+    } else {
+      router.replace({
+        pathname: '/login',
+        query: { returnUrl: router.asPath }
+      })
+    }
+  }
 
   return (
     <Styledcard sx={{ minHeight: 350 }}>
@@ -249,13 +267,13 @@ const CardProduct = (props: TCardProduct) => {
                 </Typography>
               </Box>
               <IconButton
-              // onClick={() => handleToggleLikeProduct(data._id, Boolean(user && data?.likedBy?.includes(user._id)))}
+                onClick={() => handleToggleLikeProduct(data._id, Boolean(user && data?.likedBy?.includes(user._id)))}
               >
-                {/* {user && data?.likedBy?.includes(user._id) ? ( */}
-                <IconifyIcon icon='mdi:heart' style={{ color: theme.palette.primary.main }} />
-                {/* ) : ( */}
-                {/* <Icon icon='tabler:heart' style={{ color: theme.palette.primary.main }} /> */}
-                {/* )} */}
+                {user && data?.likedBy?.includes(user._id) ? (
+                  <IconifyIcon icon='mdi:heart' style={{ color: theme.palette.primary.main }} />
+                ) : (
+                  <IconifyIcon icon='tabler:heart' style={{ color: theme.palette.primary.main }} />
+                )}
               </IconButton>
             </Box>
           </CardContent>
