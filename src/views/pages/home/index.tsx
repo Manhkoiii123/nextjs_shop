@@ -22,6 +22,11 @@ import InputSearch from 'src/components/input-search'
 import FilterProduct from 'src/views/pages/product/components/FilterProduct'
 import NoData from 'src/components/no-data'
 import { getAllCity } from 'src/services/city'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/stores'
+import { OBJECT_TYPE_ERROR_PRODUCT } from 'src/configs/error'
+import { resetInitialState } from 'src/stores/product'
+import toast from 'react-hot-toast'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -46,12 +51,23 @@ const HomePage: NextPage<TProps> = () => {
   const [pageSize, setPageSize] = useState(3)
   const [page, setPage] = useState(1)
   const theme = useTheme()
+  const dispatch: AppDispatch = useDispatch()
   const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   const [productTypeSelected, setProductTypeSelected] = useState('')
   const [productReviewSelected, setProductReviewSelected] = useState('')
   const [productLocationSelected, setProductLocationSelected] = useState('')
   const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
+  const {
+    isSuccessLike,
+    isSuccessUnLike,
+    isErrorLike,
+    isErrorUnLike,
+    typeError,
+    messageErrorLike,
+    messageErrorUnLike
+  } = useSelector((state: RootState) => state.product)
+
   const fetchAllType = async () => {
     setLoading(true)
     await getAllProductTypes({ params: { limit: -1, page: -1 } })
@@ -146,6 +162,40 @@ const HomePage: NextPage<TProps> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, searchBy, page, pageSize, filterBy])
+
+  useEffect(() => {
+    if (isSuccessLike) {
+      toast.success(t('Like_product_success'))
+      handleGetListProducts()
+      dispatch(resetInitialState())
+    } else if (isErrorLike && messageErrorLike && typeError) {
+      const errorConfig = OBJECT_TYPE_ERROR_PRODUCT[typeError]
+      if (errorConfig) {
+        toast.error(t(errorConfig))
+      } else {
+        toast.error(t('Like_product_error'))
+      }
+      dispatch(resetInitialState())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessLike, isErrorLike, messageErrorLike, typeError])
+
+  useEffect(() => {
+    if (isSuccessUnLike) {
+      toast.success(t('Unlike_product_success'))
+      dispatch(resetInitialState())
+      handleGetListProducts()
+    } else if (isErrorUnLike && messageErrorUnLike && typeError) {
+      const errorConfig = OBJECT_TYPE_ERROR_PRODUCT[typeError]
+      if (errorConfig) {
+        toast.error(t(errorConfig))
+      } else {
+        toast.error(t('Unlike_product_error'))
+      }
+      dispatch(resetInitialState())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessUnLike, isErrorUnLike, messageErrorUnLike, typeError])
 
   return (
     <>

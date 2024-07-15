@@ -187,20 +187,18 @@ const MyCardPage: NextPage<TProps> = () => {
                           justifyContent: 'center'
                         }}
                       >
-                        {item.discount > 0 && (
-                          <Typography
-                            variant='h6'
-                            mt={2}
-                            sx={{
-                              color: theme.palette.error.main,
-                              fontWeight: 'bold',
-                              textDecoration: 'line-through',
-                              fontSize: '20px'
-                            }}
-                          >
-                            {formatNumberToLocal(item.price)} VND
-                          </Typography>
-                        )}
+                        <Typography
+                          variant='h6'
+                          mt={2}
+                          sx={{
+                            color: item.discount > 0 ? theme.palette.error.main : theme.palette.primary.main,
+                            fontWeight: 'bold',
+                            textDecoration: item.discount > 0 ? 'line-through' : 'none',
+                            fontSize: '18px'
+                          }}
+                        >
+                          {formatNumberToLocal(item.price)} VND
+                        </Typography>
                       </Box>
                       <Box
                         sx={{
@@ -211,22 +209,21 @@ const MyCardPage: NextPage<TProps> = () => {
                           justifyContent: 'center'
                         }}
                       >
-                        <Typography
-                          variant='h4'
-                          mt={2}
-                          sx={{
-                            color: theme.palette.primary.main,
-                            fontWeight: 'bold',
-                            fontSize: '20px'
-                          }}
-                        >
-                          {item.discount > 0 ? (
-                            <>{formatNumberToLocal((item.price * (100 - item.discount)) / 100)}</>
-                          ) : (
-                            <>{formatNumberToLocal(item.price)}</>
-                          )}{' '}
-                          VND
-                        </Typography>
+                        {item.discount > 0 && (
+                          <Typography
+                            variant='h4'
+                            mt={2}
+                            sx={{
+                              color: theme.palette.primary.main,
+                              fontWeight: 'bold',
+                              fontSize: '18px'
+                            }}
+                          >
+                            {formatNumberToLocal((item.price * (100 - item.discount)) / 100)}
+                            VND
+                          </Typography>
+                        )}
+
                         {item.discount > 0 && (
                           <Box
                             sx={{
