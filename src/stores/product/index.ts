@@ -7,6 +7,8 @@ import {
   deleteMultipleProductAsync,
   deleteProductAsync,
   getAllProductsAsync,
+  getAllProductsLikedAsync,
+  getAllProductsViewedAsync,
   likeProductAsync,
   serviceName,
   unlikeProductAsync,
@@ -39,6 +41,10 @@ const initialState = {
     total: 0
   },
   likedProducts: {
+    data: [],
+    total: 0
+  },
+  viewedProducts: {
     data: [],
     total: 0
   }
@@ -156,6 +162,35 @@ export const productSlice = createSlice({
       state.isErrorUnLike = !action.payload?.data?._id
       state.messageErrorUnLike = action.payload?.message
       state.typeError = action.payload?.typeError
+    })
+    // ** get all viewed products
+    builder.addCase(getAllProductsViewedAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(getAllProductsViewedAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.viewedProducts.data = action.payload?.data?.products || []
+      state.viewedProducts.total = action.payload?.data?.totalCount
+    })
+    builder.addCase(getAllProductsViewedAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.viewedProducts.data = []
+      state.viewedProducts.total = 0
+    })
+
+    // ** get all liked products
+    builder.addCase(getAllProductsLikedAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(getAllProductsLikedAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.likedProducts.data = action.payload?.data?.products || []
+      state.likedProducts.total = action.payload?.data?.totalCount
+    })
+    builder.addCase(getAllProductsLikedAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.likedProducts.data = []
+      state.likedProducts.total = 0
     })
   }
 })

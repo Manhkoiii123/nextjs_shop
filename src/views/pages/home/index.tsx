@@ -182,7 +182,7 @@ const HomePage: NextPage<TProps> = () => {
 
   useEffect(() => {
     if (isSuccessUnLike) {
-      toast.success(t('Unlike_product_success'))
+      toast.success(t('UnLike_product_success'))
       dispatch(resetInitialState())
       handleGetListProducts()
     } else if (isErrorUnLike && messageErrorUnLike && typeError) {
@@ -190,7 +190,7 @@ const HomePage: NextPage<TProps> = () => {
       if (errorConfig) {
         toast.error(t(errorConfig))
       } else {
-        toast.error(t('Unlike_product_error'))
+        toast.error(t('UnLike_product_error'))
       }
       dispatch(resetInitialState())
     }
