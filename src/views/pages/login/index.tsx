@@ -71,7 +71,6 @@ const LoginPage: NextPage<TProps> = () => {
     if (!Object.keys(errors).length) {
       login({ ...data, rememberMe: isRemember }, err => {
         if (err?.response?.data?.typeError === 'INVALID')
-          // console.log('🚀 ~ onsubmit ~ err:', err)
           toast.error(t('the_emmail_or_pass_wrong'))
       })
     }

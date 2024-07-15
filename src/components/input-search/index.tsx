@@ -52,7 +52,11 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 const InputSearch = (props: TInputSearch) => {
   const { t } = useTranslation()
   const { value, onChange, placeholder = t('Search') } = props
-  const [search, setSearch] = useState(value)
+  const [search, setSearch] = useState('')
+  // console.log('🚀 ~ InputSearch ~ value:', value)
+  useEffect(() => {
+    setSearch(value)
+  }, [value])
   const debounceSearch = useDebounce(search, 500)
   useEffect(() => {
     onChange(debounceSearch)

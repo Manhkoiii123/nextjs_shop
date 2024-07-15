@@ -156,3 +156,21 @@ export const unLikeProduct = async (data: { productId: string }) => {
     return error?.response?.data
   }
 }
+export const getAllProductsLiked = async (data: { params: TParamsGetProducts }) => {
+  try {
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/liked/me`, data)
+
+    return res.data
+  } catch (error) {
+    return error
+  }
+}
+export const getAllProductsViewed = async (data: { params: TParamsGetProducts }) => {
+  try {
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_PRODUCT.PRODUCT.INDEX}/viewed/me`, data)
+
+    return res.data
+  } catch (error) {
+    return error
+  }
+}

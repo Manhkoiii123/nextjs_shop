@@ -6,6 +6,8 @@ import {
   deleteMultipleProduct,
   deleteProduct,
   getAllProducts,
+  getAllProductsLiked,
+  getAllProductsViewed,
   likeProduct,
   unLikeProduct,
   updateProduct
@@ -24,6 +26,22 @@ export const getAllProductsAsync = createAsyncThunk(
   `${serviceName}/get-all`,
   async (data: { params: TParamsGetProducts }) => {
     const response = await getAllProducts(data)
+
+    return response
+  }
+)
+export const getAllProductsLikedAsync = createAsyncThunk(
+  `${serviceName}/get-all-liked`,
+  async (data: { params: TParamsGetProducts }) => {
+    const response = await getAllProductsLiked(data)
+
+    return response
+  }
+)
+export const getAllProductsViewedAsync = createAsyncThunk(
+  `${serviceName}/get-all-viewed`,
+  async (data: { params: TParamsGetProducts }) => {
+    const response = await getAllProductsViewed(data)
 
     return response
   }

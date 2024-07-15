@@ -86,6 +86,10 @@ const UserDropdown: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.DASHBOARD)
     handleClose()
   }
+  const handleNavigateMyProduct = () => {
+    router.push(ROUTE_CONFIG.MY_PRODUCT)
+    handleClose()
+  }
 
   return (
     <Fragment>
@@ -203,30 +207,34 @@ const UserDropdown: NextPage = (props: TProps) => {
         <Divider />
         {permissionUser.length > 0 && (
           <MenuItem onClick={handleNavigateManageSystem}>
-            <Avatar>
+            <Avatar sx={{ backgroundColor: 'transparent' }}>
               <IconifyIcon icon='arcticons:phone-manager' />
             </Avatar>{' '}
             {t('manager_system')}
           </MenuItem>
         )}
         <MenuItem onClick={handleNavigateProfile}>
-          <Avatar>
+          <Avatar sx={{ backgroundColor: 'transparent' }}>
             <IconifyIcon icon='ph:user-thin' />
           </Avatar>{' '}
           {t('my_profile')}
+        </MenuItem>
+        <MenuItem onClick={handleNavigateMyProduct}>
+          <Avatar sx={{ backgroundColor: 'transparent' }}>
+            <IconifyIcon icon='fluent-mdl2:product-release' />
+          </Avatar>{' '}
+          {t('My_product')}
         </MenuItem>
         <MenuItem onClick={handleNavigateChangePassword}>
           <Avatar sx={{ backgroundColor: 'transparent' }}>
             <IconifyIcon icon={'solar:lock-password-linear'}></IconifyIcon>
           </Avatar>
-          <ListItemIcon></ListItemIcon>
           {t('change_pass')}
         </MenuItem>
         <MenuItem onClick={logout}>
           <Avatar sx={{ backgroundColor: 'transparent' }}>
             <IconifyIcon icon={'material-symbols-light:logout-sharp'}></IconifyIcon>
           </Avatar>
-          <ListItemIcon></ListItemIcon>
           {t('logout')}
         </MenuItem>
       </Menu>
