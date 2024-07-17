@@ -100,12 +100,12 @@ const AuthProvider = ({ children }: Props) => {
     logoutAuth().then(res => {
       setUser(null)
       clearLocalUserData()
+      router.push(router.asPath)
       dispatch(
         updateProductToCard({
           orderItems: []
         })
       )
-      router.push('/')
     })
   }
 
