@@ -7,3 +7,4 @@ export const REFRESH_TOKEN = 'refreshToken'
 export const USERDATA = 'userdata'
 export const TEMPORARY_TOKEN = 'temporaryToken'
 
+export const LIST_PAGE_PUBLIC = ['/product', '/']

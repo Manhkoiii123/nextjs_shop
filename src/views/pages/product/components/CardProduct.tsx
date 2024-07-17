@@ -83,8 +83,10 @@ const CardProduct = (props: TCardProduct) => {
     //liked để biết đã like hay chưa
     if (user?._id) {
       if (liked) {
+        console.log('🚀 ~ handleToggleLikeProduct ~ unlike:')
         dispatch(unlikeProductAsync({ productId: id }))
       } else {
+        console.log('🚀 ~ handleToggleLikeProduct ~ like:')
         dispatch(likeProductAsync({ productId: id }))
       }
     } else {

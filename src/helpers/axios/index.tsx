@@ -38,9 +38,18 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
   const router = useRouter()
   const { setUser, user } = useAuth()
 
+  // cái api nào vừa dùng ở public vừa dùng ở private như cái detail
+  // 2 th 1 là tính số view => private ( cần acct) còn xem chi tiết của khách vãng lai
+  // thêm cái ispublic vòa lúc truyền lên
+  // nếu mà có accT || tem thì chạy với config  có acc
+  // còn neeys ko có thì chia tiếp làm 2 tf
+  // có isPub => return cofig ban đầu tức là ko gửi kém acc lên
+  // ếu mà ko có cái ispub Nốt thì mới đá về login
+
   instanceAxios.interceptors.request.use(async config => {
     const { accessToken, refreshToken } = getLocalUserData() //để luôn lấy cái mới nhất token
     const { temporaryToken } = getTemporaryToken()
+    const isPublicApi = config?.params?.isPublic
     if (accessToken || temporaryToken) {
       let decodeAccessToken: any = {}
       if (accessToken) {
@@ -93,13 +102,14 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
           handleRedirectLogin(router, setUser)
         }
       }
-    } else {
+    } else if (!isPublicApi) {
       //ko có acctoken
       handleRedirectLogin(router, setUser)
     }
 
     return config
   })
+
   instanceAxios.interceptors.response.use(response => {
     return response
   })

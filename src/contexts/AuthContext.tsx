@@ -5,7 +5,7 @@ import { createContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 
 // ** Config
-import authConfig from 'src/configs/auth'
+import authConfig, { LIST_PAGE_PUBLIC } from 'src/configs/auth'
 
 // ** Types
 import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
@@ -100,7 +100,20 @@ const AuthProvider = ({ children }: Props) => {
     logoutAuth().then(res => {
       setUser(null)
       clearLocalUserData()
-      router.push(router.asPath)
+      // nếu mà ko phải các trang public thì logout sẽ đá ra các trang khác
+      // nếu đang ở các trang public thì vẫn ở nguyên trang đó
+      //ví dụ đang ở home logout ra thì vẫn phải ở home
+      if (!LIST_PAGE_PUBLIC.some(item => router.asPath?.startsWith(item))) {
+        if (router.asPath !== '/') {
+          router.replace({
+            pathname: '/login',
+            query: { returnUrl: router.asPath }
+          })
+        } else {
+          router.replace('/login')
+        }
+      }
+      // router.push(router.asPath)
       dispatch(
         updateProductToCard({
           orderItems: []
