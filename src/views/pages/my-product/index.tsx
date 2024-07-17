@@ -53,7 +53,7 @@ const MyProductPage: NextPage<TProps> = () => {
   const [loading, setLoading] = useState(false)
   const [searchBy, setSearchBy] = useState('')
   const [tabActive, setTabActive] = useState(TYPE_VALUE.viewed)
-  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[1])
   const [page, setPage] = useState(1)
   const [optionTypes, setOptionTypes] = useState([
     {
@@ -102,7 +102,7 @@ const MyProductPage: NextPage<TProps> = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTabActive(newValue)
     setPage(1)
-    setPageSize(PAGE_SIZE_OPTIONS[0])
+    setPageSize(PAGE_SIZE_OPTIONS[1])
     setSearchBy('')
   }
 
@@ -155,7 +155,7 @@ const MyProductPage: NextPage<TProps> = () => {
 
   useEffect(() => {
     handleGetListData()
-  }, [searchBy, tabActive])
+  }, [searchBy, tabActive, page, pageSize])
 
   return (
     <>
@@ -247,9 +247,14 @@ const MyProductPage: NextPage<TProps> = () => {
           <CustomPagination
             onChangePagination={handleOnchangePagination}
             pageSizeOptions={PAGE_SIZE_OPTIONS}
+            rowLength={tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total}
             pageSize={pageSize}
             page={page}
-            rowLength={tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total}
+            setPage={setPage}
+            setPageSize={setPageSize}
+            totalPage={Math.ceil(
+              (tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total) / pageSize
+            )}
             isHideShow
           />
         </Box>
