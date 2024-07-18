@@ -15,6 +15,9 @@ import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { updateProductToCard } from 'src/stores/order-product'
 import { useAuth } from 'src/hooks/useAuth'
 import NoData from 'src/components/no-data'
+import { current } from '@reduxjs/toolkit'
+import { useRouter } from 'next/router'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 type TProps = {}
 
@@ -22,6 +25,7 @@ const MyCardPage: NextPage<TProps> = () => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const { t } = useTranslation()
+  const router = useRouter()
   const theme = useTheme()
   const dispatch = useDispatch()
   const { orderItems } = useSelector((state: RootState) => state.orderProduct)
@@ -30,6 +34,29 @@ const MyCardPage: NextPage<TProps> = () => {
   const memoListAllProductId = useMemo(() => {
     return orderItems.map((item: TItemOrderProduct) => item.product)
   }, [orderItems])
+
+  //tong tien
+  const memoItemSelected = useMemo(() => {
+    return selectedRows.map(item => {
+      const findItem: any = orderItems.find((i: TItemOrderProduct) => i.product === item)
+      if (findItem) {
+        return {
+          ...findItem
+        }
+      }
+    })
+  }, [selectedRows, orderItems])
+
+  const memoTotal = useMemo(() => {
+    const total = memoItemSelected.reduce((res, item: TItemOrderProduct) => {
+      const currentPrice = item?.discount > 0 ? (item?.price * (100 - item?.discount)) / 100 : item?.price
+
+      return res + currentPrice * item?.amount
+    }, 0)
+
+    return memoItemSelected.length !== 0 ? total : 0
+  }, [memoItemSelected])
+
   const handleChangeAmountCart = (item: TItemOrderProduct, number: number) => {
     const productCart = getLocalProductCart()
     const parseData = productCart ? JSON.parse(productCart) : {}
@@ -50,6 +77,9 @@ const MyCardPage: NextPage<TProps> = () => {
       )
       setLocalProductToCart({ ...parseData, [user._id]: listOrderItem })
     }
+    if (item.amount + number === 0) {
+      setSelectedRows(selectedRows.filter((i: string) => i !== item.product))
+    }
   }
   const handleDeleteProductCart = (id: string) => {
     const productCart = getLocalProductCart()
@@ -64,6 +94,7 @@ const MyCardPage: NextPage<TProps> = () => {
       )
       setLocalProductToCart({ ...parseData, [user._id]: filteredItem })
     }
+    setSelectedRows(selectedRows.filter((i: string) => i !== id))
   }
   const handleDeleteMany = () => {
     const productCart = getLocalProductCart()
@@ -78,6 +109,7 @@ const MyCardPage: NextPage<TProps> = () => {
       )
       setLocalProductToCart({ ...parseData, [user._id]: filteredItem })
     }
+    setSelectedRows([])
   }
   const handleChangeCheckbox = (value: string) => {
     const isChecked = selectedRows.find((item: string) => item === value)
@@ -93,6 +125,19 @@ const MyCardPage: NextPage<TProps> = () => {
     } else {
       setSelectedRows(memoListAllProductId)
     }
+  }
+  const handleNavigateCheckout = () => {
+    const formatData = JSON.stringify(memoItemSelected)
+    router.push(
+      {
+        pathname: ROUTE_CONFIG.CHECKOUT_PRODUCT,
+        query: {
+          totalPrice: memoTotal,
+          product: formatData
+        }
+      },
+      'checkout-product'
+    )
   }
 
   return (
@@ -336,9 +381,23 @@ const MyCardPage: NextPage<TProps> = () => {
             <NoData />
           </Box>
         )}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            mt: 5,
+            gap: 3
+          }}
+        >
+          <Typography sx={{ fontSize: '20px', fontWeight: 600 }}>{t('Sum_money')} : </Typography>
+          <Typography sx={{ fontSize: '20px', fontWeight: 600, color: theme.palette.primary.main }}>
+            {formatNumberToLocal(memoTotal)} VND
+          </Typography>
+        </Box>
       </Box>
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
         <Button
+          onClick={handleNavigateCheckout}
           disabled={!selectedRows.length}
           variant='contained'
           sx={{
