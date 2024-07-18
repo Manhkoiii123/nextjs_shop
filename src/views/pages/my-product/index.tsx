@@ -2,7 +2,7 @@
 import { NextPage } from 'next'
 
 // ** React
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 // ** Mui
 import { Box, Grid, Tab, Tabs, TabsProps, styled, useTheme } from '@mui/material'
@@ -119,8 +119,6 @@ const MyProductPage: NextPage<TProps> = () => {
     }
   }
 
-  //teststststtststs
-
   useEffect(() => {
     if (isSuccessLike) {
       toast.success(t('Like_product_success'))
@@ -158,6 +156,10 @@ const MyProductPage: NextPage<TProps> = () => {
   useEffect(() => {
     handleGetListData()
   }, [searchBy, tabActive, page, pageSize])
+
+  const rowLength = useMemo(() => {
+    return tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total
+  }, [likedProducts.total, tabActive, viewedProducts.total])
 
   return (
     <>
@@ -245,21 +247,21 @@ const MyProductPage: NextPage<TProps> = () => {
             </Box>
           )}
         </Grid>
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 6 }}>
-          <CustomPagination
-            onChangePagination={handleOnchangePagination}
-            pageSizeOptions={PAGE_SIZE_OPTIONS}
-            rowLength={tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total}
-            pageSize={pageSize}
-            page={page}
-            setPage={setPage}
-            setPageSize={setPageSize}
-            totalPage={Math.ceil(
-              (tabActive === TYPE_VALUE.liked ? likedProducts.total : viewedProducts.total) / pageSize
-            )}
-            isHideShow
-          />
-        </Box>
+        {rowLength > 0 && (
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 6 }}>
+            <CustomPagination
+              onChangePagination={handleOnchangePagination}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+              rowLength={rowLength}
+              pageSize={pageSize}
+              page={page}
+              setPage={setPage}
+              setPageSize={setPageSize}
+              totalPage={Math.ceil(rowLength / pageSize)}
+              isHideShow
+            />
+          </Box>
+        )}
       </Box>
     </>
   )
