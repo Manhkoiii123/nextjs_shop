@@ -366,5 +366,12 @@
   "Count_in_stock_product": "Còn {{count}} sản phẩm trong kho",
   "Sold_product_count": "Đã bán {{count}} sản phẩm",
   "Hết hàng": "Hết hàng",
-  "Seach_name_product": "Tìm kiếm theo tên sản phẩm"
+  "Seach_name_product": "Tìm kiếm theo tên sản phẩm",
+  "Enter_your_city": "Chọn thành phố của bạn",
+  "Enter_your_full_name": "Nhập họ và tên",
+  "Enter_your_phone": "Nhập số điện thoại",
+  "Enter_your_address": "Nhập địa chỉ",
+  "Edit_address": "Thay đổi địa chỉ",
+  "Full_name": "Họ và tên",
+  "Phone_number": "Số điện thoại"
 }
