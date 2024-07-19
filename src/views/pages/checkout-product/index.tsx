@@ -37,24 +37,12 @@ import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 import ModalAddAddress from 'src/views/pages/checkout-product/components/ModalAddAddress'
 import { getAllCity } from 'src/services/city'
+import ModalWarning from 'src/views/pages/checkout-product/components/ModalWarning'
 
 type TProps = {}
 
 const CheckoutProductPage: NextPage<TProps> = () => {
   const router = useRouter()
-  const memoQueryProduct = useMemo(() => {
-    const res = {
-      totalPrice: 0,
-      product: []
-    }
-    const data: any = router.query
-    if (data) {
-      res.totalPrice = data.totalPrice || 0
-      res.product = data.product ? JSON.parse(data.product) : []
-    }
-
-    return res
-  }, [router.query])
 
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -67,9 +55,48 @@ const CheckoutProductPage: NextPage<TProps> = () => {
   const [deliverySelected, setDeliverySelected] = useState('')
   const [openAddress, setOpenAddress] = useState(false)
   const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
-  const { isLoading, isErrorCreate, isSuccessCreate, messageErrorCreate, orderItems } = useSelector(
+  const { orderItems, isErrorCreate, isSuccessCreate, messageErrorCreate } = useSelector(
     (state: RootState) => state.orderProduct
   )
+  const [openWarning, setOpenWarning] = useState(false)
+
+  const handleFormatDataProduct = (items: TItemOrderProduct[]) => {
+    const objMap: Record<string, TItemOrderProduct> = {}
+
+    orderItems.forEach((o: TItemOrderProduct) => {
+      objMap[o.product] = o
+    })
+
+    return items.map(item => {
+      return {
+        ...objMap[item.product],
+        amount: item.amount
+      }
+    })
+  }
+  const memoQueryProduct = useMemo(() => {
+    const res: {
+      totalPrice: number
+      product: TItemOrderProduct[]
+    } = {
+      totalPrice: 0,
+      product: []
+    }
+    const data: any = router.query
+    if (data) {
+      res.totalPrice = data.totalPrice || 0
+      res.product = data.product ? handleFormatDataProduct(JSON.parse(data.product)) : []
+    }
+
+    return res
+  }, [router.query, orderItems])
+  useEffect(() => {
+    const data: any = router.query
+    if (!data?.product) {
+      setOpenWarning(true)
+    }
+  }, [router.query])
+
   const handleGetAllPaymentType = async () => {
     await getAllPaymentTypes({ params: { limit: -1, page: -1 } }).then(res => {
       const data = res?.data?.paymentTypes
@@ -207,7 +234,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
     <>
       {loading || (loading && <Spinner />)}
       <ModalAddAddress open={openAddress} onClose={() => setOpenAddress(false)} />
-
+      <ModalWarning open={openWarning} onClose={() => setOpenAddress(false)} />
       <Box
         sx={{
           backgroundColor: theme.palette.background.paper,

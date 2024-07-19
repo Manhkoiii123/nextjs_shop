@@ -51,7 +51,6 @@ export const authSlice = createSlice({
       state.messageChangePassword = ''
     },
     updateUserredux: (state, action) => {
-      console.log(action)
       state.userData = action.payload
     }
   },
