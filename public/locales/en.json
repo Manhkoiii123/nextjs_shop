@@ -342,5 +342,12 @@
   "Count_in_stock_product": "Have {{count}} products in stock",
   "Sold_product_count": "Sold {{count}} product",
   "Hết hàng": "Out of stock",
-  "Seach_name_product": "Seach name product"
+  "Seach_name_product": "Seach name product",
+  "Enter_your_city": "Choose your city",
+  "Enter_your_full_name": "Enter your full name",
+  "Enter_your_phone": "Enter your phone number",
+  "Enter_your_address": "Enter your address",
+  "Edit_address": "Edit address",
+  "Full_name": "Fullname",
+  "Phone_number": "Phone number"
 }

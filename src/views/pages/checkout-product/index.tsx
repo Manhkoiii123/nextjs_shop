@@ -35,6 +35,8 @@ import { ROUTE_CONFIG } from 'src/configs/route'
 import { resetInitialState } from 'src/stores/order-product'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
+import ModalAddAddress from 'src/views/pages/checkout-product/components/ModalAddAddress'
+import { getAllCity } from 'src/services/city'
 
 type TProps = {}
 
@@ -63,6 +65,8 @@ const CheckoutProductPage: NextPage<TProps> = () => {
   const [optionsDelivery, setOptionsDelivery] = useState<{ label: string; value: string; price: number }[]>([])
   const [paymentSelected, setPaymentSelected] = useState('')
   const [deliverySelected, setDeliverySelected] = useState('')
+  const [openAddress, setOpenAddress] = useState(false)
+  const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
   const { isLoading, isErrorCreate, isSuccessCreate, messageErrorCreate, orderItems } = useSelector(
     (state: RootState) => state.orderProduct
   )
@@ -95,9 +99,24 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       }
     })
   }
+  const fetchAllCities = async () => {
+    setLoading(true)
+    await getAllCity({ params: { limit: -1, page: -1 } })
+      .then(res => {
+        const data = res?.data.cities
+        if (data) {
+          setOptionCities(data?.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
+        }
+        setLoading(false)
+      })
+      .catch(e => {
+        setLoading(false)
+      })
+  }
   useEffect(() => {
     handleGetAllPaymentType()
     handleGetAllDelivery()
+    fetchAllCities()
   }, [])
 
   const onChangePaymentType = (value: string) => {
@@ -106,22 +125,50 @@ const CheckoutProductPage: NextPage<TProps> = () => {
   const onChangeDeliveryType = (value: string) => {
     setDeliverySelected(value)
   }
+  const memoAddressDefault = useMemo(() => {
+    const findAddress = user?.addresses?.find(item => item.isDefault)
+
+    return findAddress
+  }, [user?.addresses])
+
+  const memoNameCity = useMemo(() => {
+    const findCity = optionCities.find(item => item.value === memoAddressDefault?.city)
+
+    return findCity?.label
+  }, [memoAddressDefault, optionCities])
+  const memoPriceShipping = useMemo(() => {
+    const findItemPrice = optionsDelivery?.find(item => item.value === deliverySelected)
+
+    return findItemPrice ? +findItemPrice?.price : 0
+  }, [deliverySelected])
 
   const handleOrderProduct = () => {
-    const shippingPrice = optionsDelivery.find(item => item.value === deliverySelected)?.price ?? 0
-    const totalPrice = shippingPrice + Number(memoQueryProduct.totalPrice)
+    if (!memoAddressDefault) {
+      setOpenAddress(true)
+
+      return
+    }
+    // const shippingPrice = optionsDelivery.find(item => item.value === deliverySelected)?.price ?? 0
+    const totalPrice = memoPriceShipping + Number(memoQueryProduct.totalPrice)
     const data = {
       orderItems: memoQueryProduct.product,
       itemsPrice: +memoQueryProduct.totalPrice,
       paymentMethod: paymentSelected,
       deliveryMethod: deliverySelected,
-      shippingPrice: shippingPrice,
+      shippingPrice: memoPriceShipping,
       totalPrice: totalPrice,
       user: user ? user?._id : '',
-      fullName: user ? toFullName(user?.lastName, user?.middleName, user?.firstName, i18n.language) : '',
-      address: user?.address ? user.address : '',
-      city: user?.city ? user.city : '',
-      phone: user?.phoneNumber ? user.phoneNumber : ''
+      fullName: user
+        ? toFullName(
+            memoAddressDefault?.lastName || '',
+            memoAddressDefault?.middleName || '',
+            memoAddressDefault?.firstName || '',
+            i18n.language
+          )
+        : '',
+      address: memoAddressDefault ? memoAddressDefault.address : '',
+      city: memoAddressDefault ? memoAddressDefault.city : '',
+      phone: memoAddressDefault ? memoAddressDefault.phoneNumber : ''
     }
     dispatch(createOrderProductAsync(data))
   }
@@ -159,6 +206,69 @@ const CheckoutProductPage: NextPage<TProps> = () => {
   return (
     <>
       {loading || (loading && <Spinner />)}
+      <ModalAddAddress open={openAddress} onClose={() => setOpenAddress(false)} />
+
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.paper,
+          padding: '40px',
+          width: '100%',
+          borderRadius: '15px',
+          mb: 6
+        }}
+      >
+        <Box sx={{}}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconifyIcon icon={'akar-icons:location'} style={{ color: theme.palette.primary.main }} />
+
+            <Typography
+              variant='h6'
+              sx={{
+                color: theme.palette.primary.main,
+                fontSize: '18px',
+                whiteSpace: 'nowrap',
+                fontWeight: 600
+              }}
+            >
+              {t('Address_shipping')}
+            </Typography>
+          </Box>
+          <Box sx={{ mt: 4 }}>
+            {user && user?.addresses?.length > 0 ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography
+                  sx={{
+                    color: `rgba(${theme.palette.customColors.main}, 0.78)`,
+                    fontSize: '18px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {memoAddressDefault?.phoneNumber}
+                  {' | '}
+                  {toFullName(
+                    memoAddressDefault?.lastName || '',
+                    memoAddressDefault?.middleName || '',
+                    memoAddressDefault?.firstName || '',
+                    i18n.language
+                  )}
+                  {' | '}
+                </Typography>
+                <Typography component='span' sx={{ fontSize: '18px' }}>
+                  {memoAddressDefault?.address} {' | '} {memoNameCity}
+                </Typography>
+
+                <Button sx={{ border: `1px solid ${theme.palette.primary.main}` }} onClick={() => setOpenAddress(true)}>
+                  {t('Change_address')}
+                </Button>
+              </Box>
+            ) : (
+              <Button sx={{ border: `1px solid ${theme.palette.primary.main}` }} onClick={() => setOpenAddress(true)}>
+                {t('Add_address')}
+              </Button>
+            )}
+          </Box>
+        </Box>
+      </Box>
       <Box
         sx={{
           backgroundColor: theme.palette.background.paper,
@@ -330,72 +440,94 @@ const CheckoutProductPage: NextPage<TProps> = () => {
           padding: '40px',
           width: '100%',
           borderRadius: '15px',
-          mt: 6
+          mt: 6,
+          display: 'flex'
         }}
       >
-        <Box>
-          <FormControl sx={{ flexDirection: 'row !important', gap: 10 }}>
-            <FormLabel sx={{ color: theme.palette.primary.main, fontWeight: 600, width: '260px' }} id='delivery-group'>
-              {t('Select_delivery_type')}
-            </FormLabel>
-            <RadioGroup
-              sx={{ position: 'relative', top: '-6px' }}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeDeliveryType(e.target.value)}
-              aria-labelledby='delivery-group'
-              name='radio-delivery-group'
-            >
-              {optionsDelivery.map(delivery => {
-                return (
-                  <FormControlLabel
-                    key={delivery.value}
-                    value={delivery.value}
-                    control={<Radio checked={deliverySelected === delivery.value} />}
-                    label={delivery.label}
-                  />
-                )
-              })}
-            </RadioGroup>
-          </FormControl>
-        </Box>
-        <Box sx={{ mt: 4 }}>
-          <FormControl sx={{ flexDirection: 'row !important', gap: 10 }}>
-            <FormLabel sx={{ color: theme.palette.primary.main, fontWeight: 600, width: '260px' }} id='payment-group'>
-              {t('Select_payment_type')}
-            </FormLabel>
-            <RadioGroup
-              sx={{ position: 'relative', top: '-6px' }}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangePaymentType(e.target.value)}
-              aria-labelledby='payment-group'
-              name='radio-payment-group'
-            >
-              {optionsPaymentType.map(payment => {
-                return (
-                  <FormControlLabel
-                    key={payment.value}
-                    value={payment.value}
-                    control={<Radio checked={paymentSelected === payment.value} />}
-                    label={payment.label}
-                  />
-                )
-              })}
-            </RadioGroup>
-          </FormControl>
-        </Box>
+        <Box sx={{ display: 'flex', gap: 5 }}>
+          <Box>
+            <FormControl sx={{ flexDirection: 'row !important', gap: 5 }}>
+              <FormLabel
+                sx={{ color: theme.palette.primary.main, fontWeight: 600, width: '250px' }}
+                id='delivery-group'
+              >
+                {t('Select_delivery_type')}
+              </FormLabel>
+              <RadioGroup
+                sx={{ position: 'relative', top: '-6px' }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeDeliveryType(e.target.value)}
+                aria-labelledby='delivery-group'
+                name='radio-delivery-group'
+              >
+                {optionsDelivery.map(delivery => {
+                  return (
+                    <FormControlLabel
+                      key={delivery.value}
+                      value={delivery.value}
+                      control={<Radio checked={deliverySelected === delivery.value} />}
+                      label={delivery.label}
+                    />
+                  )
+                })}
+              </RadioGroup>
+            </FormControl>
+            <Divider></Divider>
 
+            <FormControl sx={{ flexDirection: 'row !important', gap: 5, mt: 4 }}>
+              <FormLabel sx={{ color: theme.palette.primary.main, fontWeight: 600, width: '250px' }} id='payment-group'>
+                {t('Select_payment_type')}
+              </FormLabel>
+              <RadioGroup
+                sx={{ position: 'relative', top: '-6px' }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangePaymentType(e.target.value)}
+                aria-labelledby='payment-group'
+                name='radio-payment-group'
+              >
+                {optionsPaymentType.map(payment => {
+                  return (
+                    <FormControlLabel
+                      key={payment.value}
+                      value={payment.value}
+                      control={<Radio checked={paymentSelected === payment.value} />}
+                      label={payment.label}
+                    />
+                  )
+                })}
+              </RadioGroup>
+            </FormControl>
+          </Box>
+        </Box>
         <Box
           sx={{
+            flex: 1,
             display: 'flex',
+            alignItems: 'flex-end',
             justifyContent: 'flex-end',
-            mt: 5,
-            gap: 3
+            flexDirection: 'column',
+            gap: 2
           }}
         >
-          <Typography sx={{ fontSize: '20px', fontWeight: 600 }}>{t('Sum_money')} : </Typography>
-          <Typography sx={{ fontSize: '20px', fontWeight: 600, color: theme.palette.primary.main }}>
-            {formatNumberToLocal(memoQueryProduct.totalPrice)} VND
-          </Typography>
+          <Box sx={{ display: 'flex', gap: '2px' }}>
+            <Typography sx={{ fontSize: '20px', width: '200px' }}>{t('Price_item')}:</Typography>
+            <Typography sx={{ fontSize: '20px', width: '200px' }}>
+              {formatNumberToLocal(memoQueryProduct.totalPrice)} VND
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: '2px' }}>
+            <Typography sx={{ fontSize: '20px', width: '200px' }}>{t('Price_shipping')}:</Typography>
+            <Typography sx={{ fontSize: '20px', width: '200px' }}>
+              {formatNumberToLocal(memoPriceShipping)} VND
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: '2px' }}>
+            <Typography sx={{ fontSize: '20px', width: '200px', fontWeight: 600 }}>{t('Sum_money')}:</Typography>
+            <Typography sx={{ fontSize: '20px', width: '200px', fontWeight: 600, color: theme.palette.primary.main }}>
+              {formatNumberToLocal(+memoQueryProduct.totalPrice + +memoPriceShipping)} VND
+            </Typography>
+          </Box>
         </Box>
       </Box>
+
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
         <Button
           onClick={handleOrderProduct}
