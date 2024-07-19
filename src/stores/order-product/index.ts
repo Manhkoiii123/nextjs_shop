@@ -1,23 +1,72 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
-import { serviceName } from 'src/stores/order-product/actions'
+import { createOrderProductAsync, serviceName } from 'src/stores/order-product/actions'
 
 // ** Actions
 
 const initialState = {
-  orderItems: []
+  isSuccessCreate: false,
+  isErrorCreate: false,
+  messageErrorCreate: '',
+  isSuccessCancelMe: false,
+  isErrorCancelMe: false,
+  messageErrorCancelMe: '',
+  isSuccessEdit: false,
+  isErrorEdit: false,
+  messageErrorEdit: '',
+  isSuccessDelete: false,
+  isErrorDelete: false,
+  messageErrorDelete: '',
+  isLoading: false,
+  typeError: '',
+  orderItems: [],
+  orderProducts: {
+    data: [],
+    total: 0
+  },
+  ordersOfMe: {
+    data: [],
+    total: 0
+  }
 }
-
 export const orderProductSlice = createSlice({
   name: serviceName,
   initialState,
   reducers: {
     updateProductToCard: (state, action) => {
       state.orderItems = action.payload.orderItems
+    },
+    resetInitialState: state => {
+      state.isSuccessCreate = false
+      state.isErrorCreate = true
+      state.messageErrorCreate = ''
+      state.typeError = ''
+      state.isLoading = false
+      state.isSuccessCancelMe = false
+      state.isErrorCancelMe = true
+      state.messageErrorCancelMe = ''
+      state.isSuccessEdit = false
+      state.isErrorEdit = true
+      state.messageErrorEdit = ''
+      state.isSuccessDelete = false
+      state.isErrorDelete = true
+      state.messageErrorDelete = ''
     }
   },
-  extraReducers: builder => {}
+  extraReducers: builder => {
+    // ** create order product
+    builder.addCase(createOrderProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(createOrderProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessCreate = !!action.payload?.data?._id
+      state.isErrorCreate = !action.payload?.data?._id
+      state.messageErrorCreate = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+  }
 })
 
-export const { updateProductToCard } = orderProductSlice.actions
+export const { updateProductToCard, resetInitialState } = orderProductSlice.actions
 export default orderProductSlice.reducer

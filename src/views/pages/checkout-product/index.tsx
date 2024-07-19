@@ -19,7 +19,7 @@ import { NextPage } from 'next'
 import { ChangeEvent, Fragment, useEffect, useMemo, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import { useTranslation } from 'react-i18next'
-import { formatNumberToLocal } from 'src/utils'
+import { formatNumberToLocal, toFullName } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import Spinner from 'src/components/spinner'
 import { TItemOrderProduct } from 'src/types/order-product-type'
@@ -29,6 +29,12 @@ import NoData from 'src/components/no-data'
 import { useRouter } from 'next/router'
 import { getAllPaymentTypes } from 'src/services/payment-type'
 import { getAllDeliveryTypes } from 'src/services/delivery-type'
+import { createOrderProductAsync } from 'src/stores/order-product/actions'
+import { AppDispatch, RootState } from 'src/stores'
+import { ROUTE_CONFIG } from 'src/configs/route'
+import { resetInitialState } from 'src/stores/order-product'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 type TProps = {}
 
@@ -50,13 +56,16 @@ const CheckoutProductPage: NextPage<TProps> = () => {
 
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const theme = useTheme()
-  const dispatch = useDispatch()
+  const dispatch: AppDispatch = useDispatch()
   const [optionsPaymentType, setOptionPaymentType] = useState<{ label: string; value: string }[]>([])
-  const [optionsDelivery, setOptionsDelivery] = useState<{ label: string; value: string }[]>([])
+  const [optionsDelivery, setOptionsDelivery] = useState<{ label: string; value: string; price: number }[]>([])
   const [paymentSelected, setPaymentSelected] = useState('')
   const [deliverySelected, setDeliverySelected] = useState('')
+  const { isLoading, isErrorCreate, isSuccessCreate, messageErrorCreate, orderItems } = useSelector(
+    (state: RootState) => state.orderProduct
+  )
   const handleGetAllPaymentType = async () => {
     await getAllPaymentTypes({ params: { limit: -1, page: -1 } }).then(res => {
       const data = res?.data?.paymentTypes
@@ -76,9 +85,10 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       const data = res?.data?.deliveryTypes
       if (data) {
         setOptionsDelivery(
-          data.map((item: { name: string; _id: string }) => ({
+          data.map((item: { name: string; _id: string; price: number }) => ({
             label: item.name,
-            value: item._id
+            value: item._id,
+            price: item.price
           }))
         )
         setDeliverySelected(data[0]?._id)
@@ -96,6 +106,55 @@ const CheckoutProductPage: NextPage<TProps> = () => {
   const onChangeDeliveryType = (value: string) => {
     setDeliverySelected(value)
   }
+
+  const handleOrderProduct = () => {
+    const shippingPrice = optionsDelivery.find(item => item.value === deliverySelected)?.price ?? 0
+    const totalPrice = shippingPrice + Number(memoQueryProduct.totalPrice)
+    const data = {
+      orderItems: memoQueryProduct.product,
+      itemsPrice: +memoQueryProduct.totalPrice,
+      paymentMethod: paymentSelected,
+      deliveryMethod: deliverySelected,
+      shippingPrice: shippingPrice,
+      totalPrice: totalPrice,
+      user: user ? user?._id : '',
+      fullName: user ? toFullName(user?.lastName, user?.middleName, user?.firstName, i18n.language) : '',
+      address: user?.address ? user.address : '',
+      city: user?.city ? user.city : '',
+      phone: user?.phoneNumber ? user.phoneNumber : ''
+    }
+    dispatch(createOrderProductAsync(data))
+  }
+  useEffect(() => {
+    if (isSuccessCreate) {
+      Swal.fire({
+        title: t('Congraturation!'),
+        text: t('Order_product_success'),
+        icon: 'success',
+        confirmButtonText: t('Confirm'),
+        background: theme.palette.background.paper,
+        color: `rgba(${theme.palette.customColors.main}, 0.78)`
+      }).then(result => {
+        if (result.isConfirmed) {
+          // router.push(ROUTE_CONFIG.MY_ORDER)
+        }
+      })
+      // handleChangeAmountCart(memoQueryProduct.productsSelected)
+
+      dispatch(resetInitialState())
+    } else if (isErrorCreate && messageErrorCreate) {
+      toast.error(t('Warning_order_product'))
+      Swal.fire({
+        title: t('Opps!'),
+        text: t('Warning_order_product'),
+        icon: 'error',
+        confirmButtonText: t('Confirm'),
+        background: theme.palette.background.paper,
+        color: `rgba(${theme.palette.customColors.main}, 0.78)`
+      })
+      dispatch(resetInitialState())
+    }
+  }, [isSuccessCreate, isErrorCreate, messageErrorCreate])
 
   return (
     <>
@@ -339,6 +398,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       </Box>
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
         <Button
+          onClick={handleOrderProduct}
           variant='contained'
           sx={{
             height: 40,
@@ -347,8 +407,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
             gap: '8px'
           }}
         >
-          <IconifyIcon icon='icon-park-outline:buy' fontSize={20} style={{ position: 'relative', top: '-2px' }} />
-          {t('Buy_now')}
+          {t('Đặt hàng')}
         </Button>
       </Box>
     </>
