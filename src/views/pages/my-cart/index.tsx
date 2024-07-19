@@ -127,7 +127,12 @@ const MyCardPage: NextPage<TProps> = () => {
     }
   }
   const handleNavigateCheckout = () => {
-    const formatData = JSON.stringify(memoItemSelected)
+    const formatData = JSON.stringify(
+      memoItemSelected.map(item => ({
+        product: item.product,
+        amount: item.amount
+      }))
+    )
     router.push(
       {
         pathname: ROUTE_CONFIG.CHECKOUT_PRODUCT,
@@ -135,8 +140,8 @@ const MyCardPage: NextPage<TProps> = () => {
           totalPrice: memoTotal,
           product: formatData
         }
-      },
-      'checkout-product'
+      }
+      // 'checkout-product'
     )
   }
 
