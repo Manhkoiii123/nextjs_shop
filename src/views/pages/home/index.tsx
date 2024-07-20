@@ -73,11 +73,17 @@ const HomePage: NextPage<TProps> = () => {
     await getAllProductTypes({ params: { limit: -1, page: -1 } })
       .then(res => {
         const data = res.data.productTypes
+
         if (data) {
-          setOptionTypes(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
-          setProductTypeSelected(data[0]?._id)
+          const formatOption = [
+            { label: t('All'), value: '' },
+            ...data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id }))
+          ]
+          setOptionTypes(formatOption)
+          setProductTypeSelected(formatOption[0].value)
           firstRender.current = true
         }
+
         setLoading(false)
       })
       .catch(e => setLoading(false))
