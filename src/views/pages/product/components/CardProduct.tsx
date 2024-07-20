@@ -187,7 +187,8 @@ const CardProduct = (props: TCardProduct) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 marginBottom: '8px',
-                marginTop: '8px'
+                marginTop: '8px',
+                height: '40px'
               }}
             >
               {data.countInStock > 0 ? (
@@ -200,12 +201,13 @@ const CardProduct = (props: TCardProduct) => {
                 <Box
                   sx={{
                     backgroundColor: hexToRGBA(theme.palette.error.main, 0.42),
-                    width: '86px',
-                    height: '40px',
+                    width: '100%',
+                    padding: '8px 0',
+                    // height: '40px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: '2px',
+                    borderRadius: '8px',
                     my: 1
                   }}
                 >
@@ -223,9 +225,13 @@ const CardProduct = (props: TCardProduct) => {
               )}
             </Box>
             <Box>
-              {data.sold > 0 && (
-                <Typography variant='body2' color='text.secondary'>
+              {data.sold > 0 ? (
+                <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
                   {t('Sold_product_count', { count: data.sold })}
+                </Typography>
+              ) : (
+                <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
+                  {t('No_sell_product')}
                 </Typography>
               )}
               {data.location && (
@@ -281,6 +287,7 @@ const CardProduct = (props: TCardProduct) => {
           <Button
             type='button'
             fullWidth
+            disabled={data.countInStock === 0}
             variant='contained'
             onClick={() => handleAddToCard(data)}
             sx={{
@@ -298,6 +305,7 @@ const CardProduct = (props: TCardProduct) => {
             type='button'
             fullWidth
             variant='outlined'
+            disabled={data.countInStock === 0}
             sx={{
               height: '40px',
               display: 'flex',

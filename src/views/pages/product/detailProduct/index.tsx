@@ -156,6 +156,49 @@ const DetailProductPage = () => {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '8px',
+                      marginTop: '8px',
+                      height: '40px'
+                    }}
+                  >
+                    {dataProduct.countInStock > 0 ? (
+                      <>
+                        <Typography variant='body2' color='text.secondary'>
+                          {t('Count_in_stock_product', { count: dataProduct.countInStock })}
+                        </Typography>
+                      </>
+                    ) : (
+                      <Box
+                        sx={{
+                          backgroundColor: hexToRGBA(theme.palette.error.main, 0.42),
+                          width: '100px',
+                          padding: '8px 0',
+                          // height: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '8px',
+                          my: 1
+                        }}
+                      >
+                        <Typography
+                          variant='h6'
+                          sx={{
+                            color: theme.palette.error.main,
+                            fontSize: '14px',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {t('Hết hàng')}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 6
                     }}
                   >
@@ -197,6 +240,7 @@ const DetailProductPage = () => {
                         <span>{t('not_review')}</span>
                       )}
                     </Typography>
+                    {'  |  '}
                     {dataProduct.sold > 0 && (
                       <Typography variant='body2' color='text.secondary'>
                         {t('Sold_product_count', { count: dataProduct.sold })}
@@ -356,6 +400,7 @@ const DetailProductPage = () => {
                   }}
                 >
                   <Button
+                    disabled={dataProduct.countInStock === 0}
                     onClick={() => handleAddToCard(dataProduct)}
                     type='button'
                     variant='contained'
@@ -371,6 +416,7 @@ const DetailProductPage = () => {
                     {t('Add_to_cart')}
                   </Button>
                   <Button
+                    disabled={dataProduct.countInStock === 0}
                     type='button'
                     variant='outlined'
                     sx={{

@@ -19,7 +19,7 @@ import { NextPage } from 'next'
 import { ChangeEvent, Fragment, useEffect, useMemo, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import { useTranslation } from 'react-i18next'
-import { formatNumberToLocal, toFullName } from 'src/utils'
+import { cloneDeep, convertUpdateProductToCart, formatNumberToLocal, toFullName } from 'src/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import Spinner from 'src/components/spinner'
 import { TItemOrderProduct } from 'src/types/order-product-type'
@@ -32,12 +32,13 @@ import { getAllDeliveryTypes } from 'src/services/delivery-type'
 import { createOrderProductAsync } from 'src/stores/order-product/actions'
 import { AppDispatch, RootState } from 'src/stores'
 import { ROUTE_CONFIG } from 'src/configs/route'
-import { resetInitialState } from 'src/stores/order-product'
+import { resetInitialState, updateProductToCard } from 'src/stores/order-product'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 import ModalAddAddress from 'src/views/pages/checkout-product/components/ModalAddAddress'
 import { getAllCity } from 'src/services/city'
 import ModalWarning from 'src/views/pages/checkout-product/components/ModalWarning'
+import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 
 type TProps = {}
 
@@ -169,6 +170,38 @@ const CheckoutProductPage: NextPage<TProps> = () => {
     return findItemPrice ? +findItemPrice?.price : 0
   }, [deliverySelected])
 
+  const handleChangeAmountCart = (items: TItemOrderProduct[]) => {
+    const productCart = getLocalProductCart()
+    const parseData = productCart ? JSON.parse(productCart) : {}
+    const objectMap: Record<string, number> = {}
+
+    items.forEach(item => {
+      objectMap[item.product] = -item.amount
+    })
+    const listOrderItem: TItemOrderProduct[] = []
+    orderItems.forEach((o: TItemOrderProduct) => {
+      if (objectMap[o.product]) {
+        listOrderItem.push({
+          ...o,
+          amount: o.amount + objectMap[o.product]
+        })
+      } else {
+        listOrderItem.push(o)
+      }
+    })
+    if (user?._id) {
+      dispatch(
+        updateProductToCard({
+          orderItems: listOrderItem.filter((item: TItemOrderProduct) => item.amount > 0)
+        })
+      )
+      setLocalProductToCart({
+        ...parseData,
+        [user._id]: listOrderItem.filter((item: TItemOrderProduct) => item.amount > 0)
+      })
+    }
+  }
+
   const handleOrderProduct = () => {
     if (!memoAddressDefault) {
       setOpenAddress(true)
@@ -213,7 +246,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
           // router.push(ROUTE_CONFIG.MY_ORDER)
         }
       })
-      // handleChangeAmountCart(memoQueryProduct.productsSelected)
+      handleChangeAmountCart(memoQueryProduct.product)
 
       dispatch(resetInitialState())
     } else if (isErrorCreate && messageErrorCreate) {
