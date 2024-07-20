@@ -101,7 +101,8 @@ const DetailProductPage = () => {
       price: item.price,
       discount: discountItem,
       product: item._id,
-      slug: item.slug
+      slug: item.slug,
+      countInStock: item.countInStock
     })
 
     if (user?._id) {

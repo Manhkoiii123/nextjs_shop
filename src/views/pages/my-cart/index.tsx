@@ -29,6 +29,7 @@ const MyCardPage: NextPage<TProps> = () => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const { orderItems } = useSelector((state: RootState) => state.orderProduct)
+  console.log('🚀 ~ orderItems:', orderItems)
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [amountProduct, setAmountProduct] = useState<number>(0)
   const memoListAllProductId = useMemo(() => {
@@ -74,7 +75,8 @@ const MyCardPage: NextPage<TProps> = () => {
       price: item.price,
       discount: item.discount,
       product: item.product,
-      slug: item.slug
+      slug: item.slug,
+      countInStock: item.countInStock
     })
     if (user?._id) {
       dispatch(
@@ -323,8 +325,8 @@ const MyCardPage: NextPage<TProps> = () => {
                           value={amountProduct || item.amount}
                           inputProps={{
                             inputMode: 'numeric',
-                            min: 1
-                            // max: dataProduct.countInStock
+                            min: 1,
+                            max: item.countInStock
                           }}
                           // onChange={e => {
                           //   setAmountProduct(+e.target.value)
@@ -358,6 +360,7 @@ const MyCardPage: NextPage<TProps> = () => {
                           // }}
                         />
                         <IconButton
+                          disabled={item.amount + 1 > item.countInStock}
                           onClick={() => handleChangeAmountCart(item, 1)}
                           sx={{
                             backgroundColor: `${theme.palette.primary.main} !important`,
