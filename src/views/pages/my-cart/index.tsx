@@ -48,7 +48,7 @@ const MyCardPage: NextPage<TProps> = () => {
   }, [selectedRows, orderItems])
 
   const memoTotal = useMemo(() => {
-    const total = memoItemSelected.reduce((res, item: TItemOrderProduct) => {
+    const total = memoItemSelected?.reduce((res, item: TItemOrderProduct) => {
       const currentPrice = item?.discount > 0 ? (item?.price * (100 - item?.discount)) / 100 : item?.price
 
       return res + currentPrice * item?.amount
@@ -56,6 +56,13 @@ const MyCardPage: NextPage<TProps> = () => {
 
     return memoItemSelected.length !== 0 ? total : 0
   }, [memoItemSelected])
+
+  useEffect(() => {
+    const productSelect = router.query.selected as string
+    if (productSelect) {
+      setSelectedRows([productSelect])
+    }
+  }, [router.query])
 
   const handleChangeAmountCart = (item: TItemOrderProduct, number: number) => {
     const productCart = getLocalProductCart()
