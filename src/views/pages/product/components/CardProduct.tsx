@@ -94,6 +94,18 @@ const CardProduct = (props: TCardProduct) => {
       })
     }
   }
+  const handleBuyProduct = (item: TProduct) => {
+    handleAddToCard(item)
+    router.push(
+      {
+        pathname: ROUTE_CONFIG.MY_CART,
+        query: {
+          selected: item._id
+        }
+      },
+      ROUTE_CONFIG.MY_CART // custom cái url mặc dù truyền lên cái selectedId đấy nhưng mà nó ko hiện lên url
+    )
+  }
 
   return (
     <Styledcard sx={{ minHeight: 350 }}>
@@ -306,6 +318,7 @@ const CardProduct = (props: TCardProduct) => {
             fullWidth
             variant='outlined'
             disabled={data.countInStock === 0}
+            onClick={() => handleBuyProduct(data)}
             sx={{
               height: '40px',
               display: 'flex',

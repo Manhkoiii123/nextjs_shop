@@ -11,6 +11,7 @@ import IconifyIcon from 'src/components/Icon'
 import NoData from 'src/components/no-data'
 import Spinner from 'src/components/spinner'
 import CustomTextField from 'src/components/text-field'
+import { ROUTE_CONFIG } from 'src/configs/route'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
 import { getDetailsProductPublic, getListRelasedProductBySlug } from 'src/services/product'
@@ -71,6 +72,19 @@ const DetailProductPage = () => {
       fetchListRelasedProduct(productId)
     }
   }, [productId])
+
+  const handleBuyProduct = (item: TProduct) => {
+    handleAddToCard(item)
+    router.push(
+      {
+        pathname: ROUTE_CONFIG.MY_CART,
+        query: {
+          selected: item._id
+        }
+      },
+      ROUTE_CONFIG.MY_CART // custom cái url mặc dù truyền lên cái selectedId đấy nhưng mà nó ko hiện lên url
+    )
+  }
 
   const memo = useMemo(() => {
     return dataProduct && isExpiry(dataProduct.discountStartDate, dataProduct.discountEndDate)
@@ -416,6 +430,7 @@ const DetailProductPage = () => {
                     {t('Add_to_cart')}
                   </Button>
                   <Button
+                    onClick={() => handleBuyProduct(dataProduct)}
                     disabled={dataProduct.countInStock === 0}
                     type='button'
                     variant='outlined'
