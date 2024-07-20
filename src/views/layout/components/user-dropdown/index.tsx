@@ -90,6 +90,10 @@ const UserDropdown: NextPage = (props: TProps) => {
     router.push(ROUTE_CONFIG.MY_PRODUCT)
     handleClose()
   }
+  const handleNavigateMyOrder = () => {
+    router.push(ROUTE_CONFIG.MY_ORDER)
+    handleClose()
+  }
 
   return (
     <Fragment>
@@ -224,6 +228,12 @@ const UserDropdown: NextPage = (props: TProps) => {
             <IconifyIcon icon='fluent-mdl2:product-release' />
           </Avatar>{' '}
           {t('My_product')}
+        </MenuItem>
+        <MenuItem onClick={handleNavigateMyOrder}>
+          <Avatar sx={{ backgroundColor: 'transparent' }}>
+            <IconifyIcon icon='lets-icons:order-light' />
+          </Avatar>{' '}
+          {t('My_order')}
         </MenuItem>
         <MenuItem onClick={handleNavigateChangePassword}>
           <Avatar sx={{ backgroundColor: 'transparent' }}>
