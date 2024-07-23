@@ -16,15 +16,13 @@ import Icon from 'src/components/Icon'
 import { t } from 'i18next'
 
 // ** Utils
-// import { convertUpdateMultipleProductsCart, convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
-import { convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
+import { convertUpdateMultipleProductsCart, convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 
 // ** Redux
 import { cancelOrderProductOfMeAsync } from 'src/stores/order-product/actions'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
-// import { updateProductToCart } from 'src/stores/order-product'
 
 // ** Other
 import { TItemOrderProduct, TItemOrderProductMe, TItemProductMe } from 'src/types/order-product'
@@ -41,6 +39,7 @@ import { PAYMENT_TYPES } from 'src/configs/payment'
 // import { createURLpaymentVNPay } from 'src/services/payment'
 import Spinner from 'src/components/spinner'
 import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProducts'
+import { updateProductToCard } from 'src/stores/order-product'
 
 type TProps = {
   dataOrder: TItemOrderProductMe
@@ -85,40 +84,40 @@ const CardOrder: NextPage<TProps> = props => {
   const handleUpdateProductToCart = (items: TItemOrderProduct[]) => {
     const productCart = getLocalProductCart()
     const parseData = productCart ? JSON.parse(productCart) : {}
+    const listOrderItems = convertUpdateMultipleProductsCart(orderItems, items)
 
-    // const listOrderItems = convertUpdateMultipleProductsCart(orderItems, items)
-
-    // if (user) {
-    //   dispatch(
-    //     updateProductToCart({
-    //       orderItems: listOrderItems
-    //     })
-    //   )
-    //   setLocalProductToCart({ ...parseData, [user?._id]: listOrderItems })
-    // }
+    if (user) {
+      dispatch(
+        updateProductToCard({
+          orderItems: listOrderItems
+        })
+      )
+      setLocalProductToCart({ ...parseData, [user?._id]: listOrderItems })
+    }
   }
 
   const handleBuyAgain = () => {
-    // handleUpdateProductToCart(
-    //   dataOrder.orderItems.map(item => ({
-    //     name: item.name,
-    //     amount: item.amount,
-    //     image: item.image,
-    //     price: item.price,
-    //     discount: item.discount,
-    //     product: item?.product?._id,
-    //     slug: item?.product?.slug
-    //   }))
-    // )
-    // router.push(
-    //   {
-    //     pathname: ROUTE_CONFIG.MY_CART,
-    //     query: {
-    //       selected: dataOrder?.orderItems?.map((item: TItemProductMe) => item?.product?._id)
-    //     }
-    //   },
-    //   ROUTE_CONFIG.MY_CART
-    // )
+    handleUpdateProductToCart(
+      dataOrder.orderItems.map(item => ({
+        name: item.name,
+        amount: item.amount,
+        image: item.image,
+        price: item.price,
+        discount: item.discount,
+        product: item?.product?._id,
+        slug: item?.product?.slug,
+        countInStock: item?.product?.countInStock
+      }))
+    )
+    router.push(
+      {
+        pathname: ROUTE_CONFIG.MY_CART,
+        query: {
+          selected: dataOrder?.orderItems?.map((item: TItemProductMe) => item?.product?._id)
+        }
+      },
+      ROUTE_CONFIG.MY_CART
+    )
   }
 
   const handleNavigateDetailsOrder = () => {
