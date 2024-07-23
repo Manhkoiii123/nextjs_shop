@@ -6,6 +6,7 @@ export type TItemOrderProduct = {
   discount: number
   product: string
   slug: string
+  // countInStock: number
 }
 
 export type TItemProductMe = {

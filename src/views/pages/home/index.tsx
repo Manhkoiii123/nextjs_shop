@@ -55,7 +55,6 @@ const HomePage: NextPage<TProps> = () => {
   const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string | null>>({})
   const [productTypeSelected, setProductTypeSelected] = useState<string[] | string | null>(null)
-  console.log('🚀 ~ productTypeSelected:', productTypeSelected)
   const [productReviewSelected, setProductReviewSelected] = useState('')
   const [productLocationSelected, setProductLocationSelected] = useState('')
   const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
