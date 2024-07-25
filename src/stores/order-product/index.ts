@@ -3,8 +3,12 @@ import { createSlice } from '@reduxjs/toolkit'
 import {
   cancelOrderProductOfMeAsync,
   createOrderProductAsync,
+  deleteOrderProductAsync,
   getAllOrderByMeAsync,
-  serviceName
+  getAllOrderProductsAsync,
+  serviceName,
+  updateOrderProductAsync,
+  updateStatusOrderProductAsync
 } from 'src/stores/order-product/actions'
 
 // ** Actions
@@ -93,6 +97,56 @@ export const orderProductSlice = createSlice({
       state.isSuccessCancelMe = !!action.payload?.data?._id
       state.isErrorCancelMe = !action.payload?.data?._id
       state.messageErrorCancelMe = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    // ** get all order products
+    builder.addCase(getAllOrderProductsAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(getAllOrderProductsAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.orderProducts.data = action.payload?.data?.orders || []
+      state.orderProducts.total = action.payload?.data?.totalCount
+    })
+    builder.addCase(getAllOrderProductsAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.orderProducts.data = []
+      state.orderProducts.total = 0
+    })
+
+    // ** update order product
+    builder.addCase(updateOrderProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(updateOrderProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessEdit = !!action.payload?.data?._id
+      state.isErrorEdit = !action.payload?.data?._id
+      state.messageErrorEdit = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+
+    // ** update status order product
+    builder.addCase(updateStatusOrderProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(updateStatusOrderProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessEdit = !!action.payload?.data?._id
+      state.isErrorEdit = !action.payload?.data?._id
+      state.messageErrorEdit = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+
+    // ** delete orders product
+    builder.addCase(deleteOrderProductAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(deleteOrderProductAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessDelete = !!action.payload?.data?._id
+      state.isErrorDelete = !action.payload?.data?._id
+      state.messageErrorDelete = action.payload?.message
       state.typeError = action.payload?.typeError
     })
   }

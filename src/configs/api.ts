@@ -37,5 +37,8 @@ export const API_ENDPOINT = {
     ORDER: {
       INDEX: `${BASE_URL}/orders`
     }
+  },
+  REPORT: {
+    INDEX: `${BASE_URL}/report`
   }
 }
