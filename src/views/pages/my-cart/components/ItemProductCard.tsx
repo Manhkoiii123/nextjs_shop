@@ -6,7 +6,7 @@ import IconifyIcon from 'src/components/Icon'
 import CustomTextField from 'src/components/text-field'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
-import { getDetailsProduct, getDetailsProductPublicById } from 'src/services/product'
+import { getDetailsProductPublicById } from 'src/services/product'
 import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
 import { TItemOrderProduct } from 'src/types/order-product-type'
@@ -40,7 +40,7 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
   const [amountProduct, setAmountProduct] = useState<number>(0)
 
   const fetchDetailsProduct = async (id: string) => {
-    const res = await getDetailsProduct(id)
+    const res = await getDetailsProductPublicById(id)
     const data = res.data
     if (data) {
       const discountItem = isExpiry(data.discountStartDate, data.discountEndDate) ? data.discount : 0

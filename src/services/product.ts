@@ -75,6 +75,7 @@ export const getDetailsProduct = async (id: string) => {
     return error?.response?.data
   }
 }
+
 export const getDetailsProductPublic = async (slug: string) => {
   try {
     const data = {
