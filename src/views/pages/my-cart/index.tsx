@@ -162,7 +162,8 @@ const MyCardPage: NextPage<TProps> = () => {
                 flexDirection: 'column',
                 width: '100%',
                 gap: '8px',
-                mt: '10px'
+                mt: '10px',
+                mb: '10px'
               }}
             >
               {orderItems.map((item: TItemOrderProduct, index: number) => {

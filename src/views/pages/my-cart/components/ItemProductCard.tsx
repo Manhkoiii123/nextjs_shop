@@ -119,9 +119,10 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: 4 }}>
         <Box sx={{ width: 'calc(10% - 100px)' }}>
           <Checkbox
+            disabled={!itemState?.countInStock}
             checked={selectedRows.includes(itemState.product)}
             value={itemState.product}
             onChange={e => {
@@ -131,22 +132,24 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
         </Box>
 
         <Avatar variant='square' sx={{ width: '60px', height: '60px' }} src={itemState.image} />
-        <Link href={`/product/${itemState.slug}`}>
-          <Typography
-            sx={{
-              marginLeft: '20px',
-              fontSize: '16px',
-              flexBasis: '35%',
-              maxWidth: '100%',
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              overflow: 'hidden'
-            }}
-          >
+        {/*  */}
+        <Typography
+          sx={{
+            marginLeft: '20px',
+            fontSize: '16px',
+            flexBasis: '35%',
+            maxWidth: '100%',
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden'
+          }}
+        >
+          <Link href={`/product/${itemState.slug}`} style={{ color: theme.palette.customColors.dark }}>
             {itemState.name}
-          </Typography>
-        </Link>
+          </Link>
+        </Typography>
+        {/* </Link> */}
         <Box
           sx={{
             flexBasis: '20%',
@@ -220,6 +223,7 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
         </Box>
         <Box sx={{ flexBasis: '12%', display: 'flex', alignItems: 'center', gap: 2 }}>
           <IconButton
+            disabled={!itemState?.countInStock}
             onClick={() => handleChangeAmountCart(item, -1)}
             sx={{
               backgroundColor: `${theme.palette.primary.main} !important`,
@@ -230,8 +234,9 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
           </IconButton>
 
           <CustomTextField
+            disabled={!itemState?.countInStock}
             // type='number'
-            value={amountProduct || itemState.amount}
+            value={itemState.amount}
             inputProps={{
               inputMode: 'numeric',
               min: 1
@@ -269,6 +274,7 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
             // }}
           />
           <IconButton
+            disabled={!itemState?.countInStock}
             // disabled={itemState.amount + 1 > itemState.countInStock}
             onClick={() => handleChangeAmountCart(item, 1)}
             sx={{

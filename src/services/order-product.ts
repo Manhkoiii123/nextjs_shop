@@ -44,3 +44,12 @@ export const cancelOrderProductOfMe = async (id: string) => {
     return error?.response?.data
   }
 }
+export const getDetailsOrderProductByMe = async (id: string) => {
+  try {
+    const res = await instanceAxios.get(`${API_ENDPOINT.MANAGE_ORDER.ORDER.INDEX}/me/${id}`)
+
+    return res.data
+  } catch (error: any) {
+    return error?.response?.data
+  }
+}

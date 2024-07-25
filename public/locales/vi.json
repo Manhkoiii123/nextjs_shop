@@ -374,5 +374,8 @@
   "Edit_address": "Thay đổi địa chỉ",
   "Full_name": "Họ và tên",
   "Phone_number": "Số điện thoại",
-  "Số dòng hiển thị": "Số dòng hiển thị"
+  "Số dòng hiển thị": "Số dòng hiển thị",
+  "Item_price": "Giá sản phẩm",
+  "Shipping_price": "Phí vận chuyển",
+  "Order_name_user": "Thông tin người nhận"
 }
