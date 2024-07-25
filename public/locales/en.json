@@ -353,5 +353,12 @@
   "Số dòng hiển thị": "Display number of lines",
   "Item_price": "Item price",
   "Shipping_price": "Shipping price",
-  "Order_name_user": "Order name user"
+  "Order_name_user": "Order name user",
+  "Title_delete_order_product": "Delete order product ?",
+  "Confirm_delete_order_product": "Confirm delete order product",
+  "Update_order_product_success": "Update order product success",
+  "Update_order_product_error": "Update order product error",
+  "Delete_order_product_success": "Delete order product success",
+  "Delete_order_product_error": "Delete order product error",
+  "Product_items": "Product items"
 }

@@ -13,7 +13,6 @@ import ConfirmationDialog from 'src/components/confirmation-dialog'
 import Icon from 'src/components/Icon'
 
 // ** Translate
-import { t } from 'i18next'
 
 // ** Utils
 import { convertUpdateMultipleProductsCart, convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
@@ -33,10 +32,8 @@ import { useAuth } from 'src/hooks/useAuth'
 
 // ** Config
 import { ROUTE_CONFIG } from 'src/configs/route'
-// import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProduct'
 import { useTranslation } from 'react-i18next'
 import { PAYMENT_TYPES } from 'src/configs/payment'
-// import { createURLpaymentVNPay } from 'src/services/payment'
 import Spinner from 'src/components/spinner'
 import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProducts'
 import { updateProductToCard } from 'src/stores/order-product'
