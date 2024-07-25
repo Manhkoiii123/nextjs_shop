@@ -369,6 +369,7 @@ const CardOrder: NextPage<TProps> = props => {
             {t('Buy_again')}
           </Button>
           <Button
+            onClick={handleNavigateDetailsOrder}
             variant='outlined'
             sx={{
               height: 40,

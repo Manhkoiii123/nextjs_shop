@@ -350,5 +350,8 @@
   "Edit_address": "Edit address",
   "Full_name": "Fullname",
   "Phone_number": "Phone number",
-  "Số dòng hiển thị": "Display number of lines"
+  "Số dòng hiển thị": "Display number of lines",
+  "Item_price": "Item price",
+  "Shipping_price": "Shipping price",
+  "Order_name_user": "Order name user"
 }
