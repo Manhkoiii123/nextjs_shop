@@ -460,7 +460,7 @@ const OrderProductListPage: NextPage<TProps> = () => {
       label: t(item.label),
       value: item.value
     }))
-  }, [])
+  }, [t])
 
   const dataListOrderStatus = [
     {
