@@ -1,8 +1,13 @@
+
 import { NextPage } from 'next'
+
+
+import ReviewListPage from 'src/views/pages/manage-order/reviews/ReviewList'
 
 type TProps = {}
 
 const Index: NextPage<TProps> = () => {
-  return <h1>List review</h1>
+  return <ReviewListPage />
 }
+
 export default Index

@@ -29,7 +29,6 @@ import CustomTextField from 'src/components/text-field'
 import CustomSelect from 'src/components/custom-select'
 
 // ** Services
-import { getAllCity } from 'src/services/city'
 import { getDetailsOrderProduct } from 'src/services/order-product'
 
 // ** Redux
@@ -39,6 +38,7 @@ import { updateOrderProductAsync } from 'src/stores/order-product/actions'
 
 // ** Others
 import { stringToSlug } from 'src/utils'
+import { getAllCity } from 'src/services/city'
 
 interface TCreateEditProduct {
   open: boolean
