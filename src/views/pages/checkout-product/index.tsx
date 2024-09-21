@@ -243,7 +243,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
         color: `rgba(${theme.palette.customColors.main}, 0.78)`
       }).then(result => {
         if (result.isConfirmed) {
-          // router.push(ROUTE_CONFIG.MY_ORDER)
+          router.push(ROUTE_CONFIG.MY_ORDER)
         }
       })
       handleChangeAmountCart(memoQueryProduct.product)
