@@ -5,34 +5,51 @@ import { Box, Grid, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import IconifyIcon from 'src/components/Icon'
 import NoData from 'src/components/no-data'
 import Spinner from 'src/components/spinner'
 import CustomTextField from 'src/components/text-field'
+import { OBJECT_TYPE_ERROR_REVIEW } from 'src/configs/error'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
 import { getDetailsProductPublic, getListRelasedProductBySlug } from 'src/services/product'
+import { getAllReviews } from 'src/services/reviewProduct'
 import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
+import { resetInitialState } from 'src/stores/reviews'
 import { TProduct } from 'src/types/product'
-import { convertUpdateProductToCart, formatNumberToLocal, isExpiry } from 'src/utils'
+import { TReviewItem } from 'src/types/reviews'
+import { convertUpdateProductToCart, formatFilter, formatNumberToLocal, isExpiry } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import CardProduct from 'src/views/pages/product/components/CardProduct'
 import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedProduct'
+import CardReview from 'src/views/pages/product/components/CardReview'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
   const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
+  const [listReviews, setListReview] = useState<TReviewItem[]>([])
 
   const router = useRouter()
   const productId = router.query.productId as string
   const { user } = useAuth()
   const dispatch: AppDispatch = useDispatch()
   const { orderItems } = useSelector((state: RootState) => state.orderProduct)
+  const {
+    isSuccessEdit,
+    isErrorEdit,
+    isLoading,
+    messageErrorEdit,
+    isErrorDelete,
+    isSuccessDelete,
+    messageErrorDelete,
+    typeError
+  } = useSelector((state: RootState) => state.reviews)
 
   const [amountProduct, setAmountProduct] = useState(1)
 
@@ -72,6 +89,60 @@ const DetailProductPage = () => {
       fetchListRelasedProduct(productId)
     }
   }, [productId])
+
+  const fetchGetAllListReviewByProduct = async (id: string) => {
+    setLoading(true)
+    await getAllReviews({
+      params: {
+        limit: -1,
+        page: -1,
+        order: 'createdAt desc',
+        isPublic: true,
+        ...formatFilter({ productId: id })
+      }
+    })
+      .then(async response => {
+        setLoading(false)
+        const data = response?.data?.reviews
+        if (data) {
+          setListReview(data)
+        }
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }
+  useEffect(() => {
+    if (dataProduct?._id) {
+      fetchGetAllListReviewByProduct(dataProduct._id)
+    }
+  }, [dataProduct?._id])
+  useEffect(() => {
+    if (isSuccessEdit && dataProduct?._id) {
+      toast.success(t('Update_review_success'))
+      fetchGetAllListReviewByProduct(dataProduct._id)
+      dispatch(resetInitialState())
+    } else if (isErrorEdit && messageErrorEdit && typeError && dataProduct?._id) {
+      const errorConfig = OBJECT_TYPE_ERROR_REVIEW[typeError]
+      if (errorConfig) {
+        toast.error(t(errorConfig))
+      } else {
+        toast.error(t('Update_review_error'))
+      }
+      dispatch(resetInitialState())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessEdit, isErrorEdit, messageErrorEdit, typeError])
+  useEffect(() => {
+    if (isSuccessDelete && dataProduct?._id) {
+      toast.success(t('Delete_review_success'))
+      fetchGetAllListReviewByProduct(dataProduct._id)
+      dispatch(resetInitialState())
+    } else if (isErrorDelete && messageErrorDelete) {
+      toast.error(t('Delete_review_error'))
+      dispatch(resetInitialState())
+    }
+  }, [isSuccessDelete, isErrorDelete, messageErrorDelete, dataProduct?._id])
 
   const handleBuyProduct = (item: TProduct) => {
     handleAddToCard(item)
@@ -234,7 +305,7 @@ const DetailProductPage = () => {
                             textDecoration: 'underline'
                           }}
                         >
-                          {dataProduct.averageRating}
+                          {dataProduct.averageRating.toFixed(2)}
                         </Typography>
                         <Rating
                           name='read-only'
@@ -248,18 +319,20 @@ const DetailProductPage = () => {
                     <Typography sx={{ display: 'flex', alignItems: 'center' }}>
                       {!!dataProduct.totalReviews ? (
                         <span>
-                          {t('Review')}
-                          <b>{dataProduct.totalReviews}</b>
+                          <b>{dataProduct.totalReviews}</b> {t('reviews')}
                         </span>
                       ) : (
                         <span>{t('not_review')}</span>
                       )}
                     </Typography>
-                    {'  |  '}
+
                     {dataProduct.sold > 0 && (
-                      <Typography variant='body2' color='text.secondary'>
-                        {t('Sold_product_count', { count: dataProduct.sold })}
-                      </Typography>
+                      <>
+                        {'  |  '}
+                        <Typography variant='body2' color='text.secondary'>
+                          {t('Sold_product_count', { count: dataProduct.sold })}
+                        </Typography>
+                      </>
                     )}
                   </Box>
                   {dataProduct.location && (
@@ -452,61 +525,82 @@ const DetailProductPage = () => {
           </Box>
         </Grid>
         <Grid container mt={6}>
-          <Grid
-            container
-            item
-            md={8.5}
-            xs={12}
-            sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}
-          >
+          <Grid item md={8.5} xs={12}>
             <Box
               sx={{
-                width: '100%',
-                height: '100%'
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 2,
-                  marginBottom: '8px',
-                  mt: 4,
-                  padding: '8px',
-                  borderRadius: '8px',
-                  backgroundColor: theme.palette.customColors.bodyBg
-                }}
-              >
-                <Typography
-                  variant='h4'
+              {/* desc */}
+              <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}>
+                <Box
                   sx={{
-                    fontWeight: 'bold',
-                    fontSize: '18px',
-                    color: `rgba(${theme.palette.customColors.main}, 0.68)`
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    marginBottom: '8px',
+                    mt: 4,
+                    padding: '8px',
+                    borderRadius: '8px',
+                    backgroundColor: theme.palette.customColors.bodyBg
                   }}
                 >
-                  {t('Description_product')}
-                </Typography>
+                  <Typography
+                    variant='h4'
+                    sx={{
+                      fontWeight: 'bold',
+                      fontSize: '18px',
+                      color: `rgba(${theme.palette.customColors.main}, 0.68)`
+                    }}
+                  >
+                    {t('Description_product')}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    mt: 4,
+                    color: `rgba(${theme.palette.customColors.main}, 0.42)`,
+                    fontSize: '14px',
+                    backgroundColor: theme.palette.customColors.bodyBg,
+                    padding: 4,
+                    borderRadius: '10px'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: dataProduct.description }}
+                />
               </Box>
+              {/* reviews */}
               <Box
-                sx={{
-                  mt: 4,
-                  color: `rgba(${theme.palette.customColors.main}, 0.42)`,
-                  fontSize: '14px',
-                  backgroundColor: theme.palette.customColors.bodyBg,
-                  padding: 4,
-                  borderRadius: '10px'
-                }}
-                dangerouslySetInnerHTML={{ __html: dataProduct.description }}
-              />
+                display={{ md: 'block', xs: 'none' }}
+                sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}
+              >
+                <Typography
+                  variant='h6'
+                  sx={{
+                    color: `rgba(${theme.palette.customColors.main}, 0.68)`,
+                    fontWeight: 'bold',
+                    fontSize: '18px',
+                    marginBottom: '20px'
+                  }}
+                >
+                  {t('Review_product')} <b style={{ color: theme.palette.primary.main }}>{listReviews.length}</b>{' '}
+                  {t('ratings')}
+                </Typography>
+                <Grid container spacing={4}>
+                  {listReviews.map((review, index) => (
+                    <Grid item key={index} md={4} xs={12}>
+                      <CardReview item={review} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </Box>
           </Grid>
-          <Grid container item md={3.5} xs={12} mt={{ md: 0, xs: 5 }}>
+          <Grid item md={3.5} xs={12} mt={{ md: 0, xs: 5 }}>
             <Box
               sx={{
-                height: '100%',
-                width: '100%',
                 marginLeft: { md: 5, xs: 0 },
                 backgroundColor: theme.palette.background.paper,
                 borderRadius: '15px',
@@ -557,19 +651,32 @@ const DetailProductPage = () => {
               </Box>
             </Box>
           </Grid>
+          <Box
+            mt={{ md: 0, xs: 5 }}
+            display={{ md: 'none', xs: 'block' }}
+            sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}
+          >
+            <Typography
+              variant='h6'
+              sx={{
+                color: `rgba(${theme.palette.customColors.main}, 0.68)`,
+                fontWeight: 'bold',
+                fontSize: '18px',
+                marginBottom: '20px'
+              }}
+            >
+              {t('Review_product')} <b style={{ color: theme.palette.primary.main }}>{listReviews.length}</b>{' '}
+              {t('ratings')}
+            </Typography>
+            <Grid container spacing={4}>
+              {listReviews.map((review, index) => (
+                <Grid item key={index} md={4} xs={12}>
+                  <CardReview item={review} />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         </Grid>
-      </Grid>
-      <Grid container item md={12} xs={12} mt={6}>
-        <Box
-          sx={{
-            height: '100%',
-            width: '100%',
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: '15px',
-            py: 5,
-            px: 4
-          }}
-        ></Box>
       </Grid>
     </>
   )
