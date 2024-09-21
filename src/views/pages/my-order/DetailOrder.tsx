@@ -42,6 +42,8 @@ import { formatDate } from 'src/utils/date'
 import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProducts'
 import { updateProductToCard } from 'src/stores/order-product'
 import { getDetailsOrderProductByMe } from 'src/services/order-product'
+import ModalWriteReview from 'src/views/pages/my-order/components/ModalWriteReviews'
+import { resetInitialState as resetInitialReview } from 'src/stores/reviews'
 
 type TProps = {}
 
@@ -71,6 +73,12 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
   const { isSuccessCancelMe, orderItems, isErrorCancelMe, messageErrorCancelMe } = useSelector(
     (state: RootState) => state.orderProduct
   )
+  const {
+    isSuccessCreate,
+    isErrorCreate,
+    messageErrorCreate,
+    isLoading: loadingReview
+  } = useSelector((state: RootState) => state.reviews)
 
   // ** fetch API
   const handleConfirmCancel = () => {
@@ -145,11 +153,31 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
   const memoDisabledBuyAgain = useMemo(() => {
     return dataOrder?.orderItems?.some(item => !item.product.countInStock)
   }, [dataOrder.orderItems])
+  const handleCloseReview = () => {
+    setOpenReview({ open: false, userId: '', productId: '' })
+  }
+
+  useEffect(() => {
+    if (isSuccessCreate) {
+      handleGetDetailsOrdersOfMe()
+      toast.success(t('Write_review_success'))
+      dispatch(resetInitialReview())
+      handleCloseReview()
+    } else if (isErrorCreate && messageErrorCreate) {
+      toast.error(t('Write_review_error'))
+      dispatch(resetInitialReview())
+    }
+  }, [isSuccessCreate, isErrorCreate, messageErrorCreate])
 
   return (
     <>
       {isLoading && <Spinner />}
-
+      <ModalWriteReview
+        open={openReview.open}
+        onClose={handleCloseReview}
+        userId={openReview.userId}
+        productId={openReview.productId}
+      />
       <ConfirmationDialog
         open={openCancel}
         handleClose={handleCloseDialog}
@@ -345,10 +373,7 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
                     {t('Order_has_been_delivery')}
                   </span>
                   {dataOrder.deliveryAt && (
-                    <span style={{ fontSize: '16px' }}>
-                      {' '}
-                      ({formatDate(dataOrder?.deliveryAt, { dateStyle: 'short' })}){' '}
-                    </span>
+                    <span style={{ fontSize: '16px' }}> ({formatDate(dataOrder?.deliveryAt)}) </span>
                   )}
                 </>
               ) : (
@@ -366,10 +391,7 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
                   <span style={{ color: theme.palette.success.main, fontSize: '16px' }}>
                     {t('Order_has_been_paid')}
                   </span>
-                  <span style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                    {' '}
-                    {formatDate(dataOrder.paidAt, { dateStyle: 'short' })}
-                  </span>
+                  <span style={{ fontSize: '16px', fontWeight: 'bold' }}> {formatDate(dataOrder.paidAt)}</span>
                 </>
               ) : (
                 <span style={{ color: theme.palette.error.main, fontSize: '16px' }}>
