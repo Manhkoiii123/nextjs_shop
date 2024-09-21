@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 // ** Types
 import { buildAbilityFor, type ACLObj, AppAbility } from 'src/configs/acl'
@@ -9,6 +9,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { useRouter } from 'next/router'
 import { AbilityContext } from '../acl/Can'
 import { PERMISSIONS } from 'src/configs/permissions'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 interface AclGuardProps {
   children: ReactNode
@@ -29,7 +30,11 @@ const AclGuard = (props: AclGuardProps) => {
       ? [PERMISSIONS.DASHBOARD] // nếu có quyền basic thì phải thêm cái dash vào
       : auth.user?.role?.permissions //per của người dùng đang đăng nhập
     : [] //nếu ko có thì trả về mảng []
-
+  useEffect(() => {
+    if (router.route === '/') {
+      router.push(ROUTE_CONFIG.HOME)
+    }
+  }, [router])
   let ability: AppAbility
   if (auth.user && !ability) {
     ability = buildAbilityFor(permissionUser, permission)

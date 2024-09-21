@@ -18,6 +18,7 @@ import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { updateProductToCard } from 'src/stores/order-product'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -103,14 +104,18 @@ const AuthProvider = ({ children }: Props) => {
       // nếu mà ko phải các trang public thì logout sẽ đá ra các trang khác
       // nếu đang ở các trang public thì vẫn ở nguyên trang đó
       //ví dụ đang ở home logout ra thì vẫn phải ở home
+      // nếu check thế này thì cái list_page này phải đổi cái url của cái home page thành /home
+      // do all router đều bắt đầu bằng '/'
+
+      // ví dụ từ /my-order mà logout ra => as path sẽ là /my-order nó vẫn ăn cái startWith '/' => cái if đầu trả về true => loading mãi
       if (!LIST_PAGE_PUBLIC.some(item => router.asPath?.startsWith(item))) {
         if (router.asPath !== '/') {
           router.replace({
-            pathname: '/login',
+            pathname: ROUTE_CONFIG.LOGIN,
             query: { returnUrl: router.asPath }
           })
         } else {
-          router.replace('/login')
+          router.replace(ROUTE_CONFIG.LOGIN)
         }
       }
       // router.push(router.asPath)
