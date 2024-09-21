@@ -273,7 +273,7 @@ const CardProduct = (props: TCardProduct) => {
                       name='read-only'
                       sx={{ fontSize: '16px' }}
                       defaultValue={data?.averageRating}
-                      precision={0.5}
+                      precision={0.1}
                       readOnly
                     />
                   </Typography>
@@ -281,7 +281,20 @@ const CardProduct = (props: TCardProduct) => {
                   <Rating name='read-only' sx={{ fontSize: '16px' }} defaultValue={0} precision={0.5} readOnly />
                 )}
                 <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                  {!!data.totalReviews ? <b>{data.totalReviews}</b> : <span>{t('not_review')}</span>}
+                  {!!data.totalReviews ? (
+                    <>
+                      <b>{data.totalReviews}</b>
+                      <span
+                        style={{
+                          marginLeft: '4px'
+                        }}
+                      >
+                        {t('reviews')}
+                      </span>
+                    </>
+                  ) : (
+                    <span>{t('not_review')}</span>
+                  )}
                 </Typography>
               </Box>
               <IconButton

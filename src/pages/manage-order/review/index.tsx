@@ -1,6 +1,4 @@
-
 import { NextPage } from 'next'
-
 
 import ReviewListPage from 'src/views/pages/manage-order/reviews/ReviewList'
 
