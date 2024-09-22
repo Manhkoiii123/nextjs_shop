@@ -37,6 +37,7 @@ import { PAYMENT_TYPES } from 'src/configs/payment'
 import Spinner from 'src/components/spinner'
 import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProducts'
 import { updateProductToCard } from 'src/stores/order-product'
+import { createUrlPaymentVnpay } from 'src/services/payment'
 
 type TProps = {
   dataOrder: TItemOrderProductMe
@@ -133,17 +134,20 @@ const CardOrder: NextPage<TProps> = props => {
   }
 
   const handlePaymentVNPay = async () => {
-    // setLoading(true)
-    // await createURLpaymentVNPay({
-    //   totalPrice: dataOrder.totalPrice,
-    //   orderId: dataOrder?._id,
-    //   language: i18n.language === 'vi' ? 'vn' : i18n.language
-    // }).then(res => {
-    //   if (res?.data) {
-    //     window.open(res?.data, '_blank')
-    //   }
-    //   setLoading(false)
-    // })
+    setLoading(true)
+    // api này giúp tạo ra 1 url để điều hướng sang trang thanh toán của vnpay và trả về cái url đó
+    await createUrlPaymentVnpay({
+      totalPrice: dataOrder.totalPrice,
+      orderId: dataOrder._id,
+      language: i18n.language === 'vi' ? 'vn' : i18n.language
+    }).then(res => {
+      if (res.data) {
+        //động mở sang trang thanh toán đó
+        // đá về trang payment khi tt tnahf công là do be sử lí nó trả cho ta cái kết quả trên router => sang trang /payment/vnpay để xem cái router
+        window.open(res.data, '_blank')
+      }
+      setLoading(false)
+    })
   }
 
   const memoDisabledBuyAgain = useMemo(() => {
@@ -317,7 +321,7 @@ const CardOrder: NextPage<TProps> = props => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, mt: 6, justifyContent: 'flex-end' }}>
-          {/* đang đợi thanh toán  +  keieru khác trả sau  */}
+          {/* đang đợi thanh toán  +  keieru khác trả sau  => có nút thanh toán*/}
           {[0].includes(dataOrder.status) && dataOrder?.paymentMethod?.type !== PAYMENT_DATA.PAYMENT_LATER.value && (
             <Button
               variant='outlined'

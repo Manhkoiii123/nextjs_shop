@@ -39,18 +39,20 @@ import ModalAddAddress from 'src/views/pages/checkout-product/components/ModalAd
 import { getAllCity } from 'src/services/city'
 import ModalWarning from 'src/views/pages/checkout-product/components/ModalWarning'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
+import { createUrlPaymentVnpay } from 'src/services/payment'
+import { PAYMENT_TYPES } from 'src/configs/payment'
 
 type TProps = {}
 
 const CheckoutProductPage: NextPage<TProps> = () => {
   const router = useRouter()
-
+  const PAYMENT_DATA = PAYMENT_TYPES()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const { t, i18n } = useTranslation()
   const theme = useTheme()
   const dispatch: AppDispatch = useDispatch()
-  const [optionsPaymentType, setOptionPaymentType] = useState<{ label: string; value: string }[]>([])
+  const [optionsPaymentType, setOptionPaymentType] = useState<{ label: string; value: string; type: string }[]>([])
   const [optionsDelivery, setOptionsDelivery] = useState<{ label: string; value: string; price: number }[]>([])
   const [paymentSelected, setPaymentSelected] = useState('')
   const [deliverySelected, setDeliverySelected] = useState('')
@@ -103,9 +105,10 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       const data = res?.data?.paymentTypes
       if (data) {
         setOptionPaymentType(
-          data.map((item: { name: string; _id: string }) => ({
+          data.map((item: { name: string; _id: string; type: string }) => ({
             label: item.name,
-            value: item._id
+            value: item._id,
+            type: item.type
           }))
         )
         setPaymentSelected(data[0]?._id)
@@ -202,6 +205,31 @@ const CheckoutProductPage: NextPage<TProps> = () => {
     }
   }
 
+  const handlePaymentTypeOrder = (type: string, data: { orderId: string; totalPrice: number }) => {
+    switch (type) {
+      case PAYMENT_DATA.VN_PAYMENT.value: {
+        handlePaymentVNPay(data)
+        break
+      }
+      default:
+        break
+    }
+  }
+
+  const handlePaymentVNPay = async (data: { orderId: string; totalPrice: number }) => {
+    setLoading(true)
+    await createUrlPaymentVnpay({
+      totalPrice: data.totalPrice,
+      orderId: data?.orderId,
+      language: i18n.language === 'vi' ? 'vn' : i18n.language
+    }).then(res => {
+      if (res?.data) {
+        window.open(res?.data, '_blank')
+      }
+      setLoading(false)
+    })
+  }
+
   const handleOrderProduct = () => {
     if (!memoAddressDefault) {
       setOpenAddress(true)
@@ -230,7 +258,15 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       city: memoAddressDefault ? memoAddressDefault.city : '',
       phone: memoAddressDefault ? memoAddressDefault.phoneNumber : ''
     }
-    dispatch(createOrderProductAsync(data))
+    dispatch(createOrderProductAsync(data)).then(res => {
+      const idPaymentMethod = res?.payload.data.paymentMethod
+      const orderId = res?.payload?.data?._id
+      const totalPrice = res?.payload?.data?.totalPrice
+      const findPayment = optionsPaymentType.find(i => i.value === idPaymentMethod)
+      if (findPayment) {
+        handlePaymentTypeOrder(findPayment.type, { totalPrice, orderId })
+      }
+    })
   }
   useEffect(() => {
     if (isSuccessCreate) {

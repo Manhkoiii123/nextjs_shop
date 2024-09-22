@@ -47,10 +47,12 @@ const HomePage: NextPage<TProps> = () => {
     totalPage: 0,
     totalCount: 0
   })
+  console.log('productPublic', productPublic)
   const firstRender = useRef<boolean>(false)
   const [pageSize, setPageSize] = useState(3)
   const [page, setPage] = useState(1)
   const theme = useTheme()
+  const [loading, setLoading] = useState(false)
   const dispatch: AppDispatch = useDispatch()
   const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string | null>>({})
@@ -67,7 +69,6 @@ const HomePage: NextPage<TProps> = () => {
     messageErrorLike,
     messageErrorUnLike
   } = useSelector((state: RootState) => state.product)
-
   const fetchAllType = async () => {
     setLoading(true)
     await getAllProductTypes({ params: { limit: -1, page: -1 } })
@@ -149,8 +150,6 @@ const HomePage: NextPage<TProps> = () => {
     setProductLocationSelected('')
     setProductReviewSelected('')
   }
-
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (firstRender.current) {
