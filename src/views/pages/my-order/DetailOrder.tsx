@@ -44,6 +44,7 @@ import { updateProductToCard } from 'src/stores/order-product'
 import { getDetailsOrderProductByMe } from 'src/services/order-product'
 import ModalWriteReview from 'src/views/pages/my-order/components/ModalWriteReviews'
 import { resetInitialState as resetInitialReview } from 'src/stores/reviews'
+import { createUrlPaymentVnpay } from 'src/services/payment'
 
 type TProps = {}
 
@@ -51,6 +52,7 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
   // State
   const [isLoading, setIsLoading] = useState(false)
   const [dataOrder, setDataOrder] = useState<TItemOrderProductMe>({} as any)
+
   const [openCancel, setOpenCancel] = useState(false)
   const [openReview, setOpenReview] = useState({
     open: false,
@@ -150,6 +152,33 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
       ROUTE_CONFIG.MY_CART
     )
   }
+
+  const handlePaymentTypeOrder = (type: string) => {
+    switch (type) {
+      case PAYMENT_DATA.VN_PAYMENT.value: {
+        handlePaymentVNPay()
+        break
+      }
+      default:
+        break
+    }
+  }
+
+  const handlePaymentVNPay = async () => {
+    // api này giúp tạo ra 1 url để điều hướng sang trang thanh toán của vnpay và trả về cái url đó
+    await createUrlPaymentVnpay({
+      totalPrice: dataOrder.totalPrice,
+      orderId: dataOrder._id,
+      language: i18n.language === 'vi' ? 'vn' : i18n.language
+    }).then(res => {
+      if (res.data) {
+        //động mở sang trang thanh toán đó
+        // đá về trang payment khi tt tnahf công là do be sử lí nó trả cho ta cái kết quả trên router => sang trang /payment/vnpay để xem cái router
+        window.open(res.data, '_blank')
+      }
+    })
+  }
+
   const memoDisabledBuyAgain = useMemo(() => {
     return dataOrder?.orderItems?.some(item => !item.product.countInStock)
   }, [dataOrder.orderItems])
@@ -406,7 +435,7 @@ const MyOrderDetailPage: NextPage<TProps> = () => {
           {[0].includes(dataOrder?.status) && dataOrder.paymentMethod.type !== PAYMENT_DATA.PAYMENT_LATER.value && (
             <Button
               variant='outlined'
-              //   onClick={() => handlePaymentTypeOrder(dataOrder.paymentMethod.type)}
+              onClick={() => handlePaymentTypeOrder(dataOrder?.paymentMethod?.type)}
               sx={{
                 height: 40,
                 display: 'flex',
