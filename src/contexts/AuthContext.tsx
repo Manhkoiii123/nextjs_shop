@@ -8,8 +8,8 @@ import { useRouter } from 'next/router'
 import authConfig, { LIST_PAGE_PUBLIC } from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
-import { loginAuth, logoutAuth } from 'src/services/auth'
+import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType, LoginGoogleParams } from './types'
+import { loginAuth, loginAuthGoogle, logoutAuth } from 'src/services/auth'
 import { API_ENDPOINT } from 'src/configs/api'
 import { clearLocalUserData, setLocalUserData, setTemporaryToken } from 'src/helpers/storage'
 import instanceAxios from 'src/helpers/axios'
@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { updateProductToCard } from 'src/stores/order-product'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import { signOut } from 'next-auth/react'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -27,7 +28,8 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve()
+  logout: () => Promise.resolve(),
+  loginGoogle: () => Promise.resolve()
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -97,10 +99,33 @@ const AuthProvider = ({ children }: Props) => {
       })
   }
 
+  const handleLoginGoogle = (params: LoginGoogleParams, errorCallback?: ErrCallbackType) => {
+    loginAuthGoogle(params.idToken)
+      .then(async response => {
+        if (params.rememberMe) {
+          setLocalUserData(JSON.stringify(response.data.user), response.data.access_token, response.data.refresh_token)
+        } else {
+          setTemporaryToken(response.data.access_token)
+        }
+        toast.success(t('login_successfull'))
+        const returnUrl = router.query.returnUrl
+        setUser({ ...response.data.user })
+
+        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+
+        router.replace(redirectURL as string)
+      })
+
+      .catch(err => {
+        if (errorCallback) errorCallback(err)
+      })
+  }
+
   const handleLogout = () => {
     logoutAuth().then(res => {
       setUser(null)
       clearLocalUserData()
+      signOut()
       // nếu mà ko phải các trang public thì logout sẽ đá ra các trang khác
       // nếu đang ở các trang public thì vẫn ở nguyên trang đó
       //ví dụ đang ở home logout ra thì vẫn phải ở home
@@ -133,7 +158,8 @@ const AuthProvider = ({ children }: Props) => {
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout
+    logout: handleLogout,
+    loginGoogle: handleLoginGoogle
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
