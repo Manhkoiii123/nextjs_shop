@@ -17,7 +17,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import Image from 'next/image'
 import LoginDark from '/public/images/login-dark.png'
@@ -26,6 +26,14 @@ import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import { signIn, useSession } from 'next-auth/react'
+import {
+  clearLocalPreTokenAuthSocial,
+  getLocalDeviceToken,
+  getLocalPreTokenAuthSocial,
+  getLocalRememberLoginAuthSocial,
+  setLocalPreTokenAuthSocial
+} from 'src/helpers/storage'
 
 type TProps = {}
 type TDefaultValue = {
@@ -50,6 +58,7 @@ const LoginPage: NextPage<TProps> = () => {
     email: '',
     password: ''
   }
+  const prevTokenLocal = getLocalPreTokenAuthSocial()
   const [isShowPassword, setIsShowPassword] = useState(false)
   const [isRemember, setIsRemenber] = useState(true)
   const theme = useTheme()
@@ -63,18 +72,62 @@ const LoginPage: NextPage<TProps> = () => {
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
+  const { data: session } = useSession()
 
   //** context */
-  const { login } = useAuth()
+  const { login, loginGoogle } = useAuth()
 
   const onsubmit = (data: { email: string; password: string }) => {
     if (!Object.keys(errors).length) {
       login({ ...data, rememberMe: isRemember }, err => {
-        if (err?.response?.data?.typeError === 'INVALID')
-          toast.error(t('the_emmail_or_pass_wrong'))
+        if (err?.response?.data?.typeError === 'INVALID') toast.error(t('the_emmail_or_pass_wrong'))
       })
     }
   }
+  const handleLoginGoogle = () => {
+    signIn('google')
+    clearLocalPreTokenAuthSocial()
+  }
+  useEffect(() => {
+    if ((session as any)?.accessToken && (session as any)?.accessToken !== prevTokenLocal) {
+      const rememberLocal = getLocalRememberLoginAuthSocial()
+      const deviceToken = getLocalDeviceToken()
+      if ((session as any)?.provider === 'facebook') {
+        loginGoogle(
+          {
+            idToken: (session as any)?.accessToken,
+            rememberMe: rememberLocal ? rememberLocal === 'true' : true
+            // deviceToken: deviceToken ? deviceToken : ''
+          },
+          err => {
+            if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
+          }
+        )
+        // loginFacebook(
+        //   {
+        //     idToken: (session as any)?.accessToken,
+        //     rememberMe: rememberLocal ? rememberLocal === 'true' : true,
+        //     deviceToken: deviceToken ? deviceToken : ''
+        //   },
+        //   err => {
+        //     if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
+        //   }
+        // )
+      } else {
+        loginGoogle(
+          {
+            idToken: (session as any)?.accessToken,
+            rememberMe: rememberLocal ? rememberLocal === 'true' : true
+            // deviceToken: deviceToken ? deviceToken : ''
+          },
+          err => {
+            if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
+          }
+        )
+      }
+      setLocalPreTokenAuthSocial((session as any)?.accessToken)
+    }
+  }, [(session as any)?.accessToken])
 
   return (
     <Box
@@ -242,7 +295,7 @@ const LoginPage: NextPage<TProps> = () => {
                 gap: 5
               }}
             >
-              <IconButton sx={{ color: theme.palette.error.main }}>
+              <IconButton sx={{ color: theme.palette.error.main }} onClick={handleLoginGoogle}>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   role='img'

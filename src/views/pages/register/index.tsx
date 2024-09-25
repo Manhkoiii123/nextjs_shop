@@ -17,20 +17,26 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import IconifyIcon from 'src/components/Icon'
 import Image from 'next/image'
 import RegisterDark from '/public/images/register-dark.png'
 import RegisterLight from '/public/images/register-light.png'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerAuthAsync } from 'src/stores/auth/actions'
+import { registerAuthAsync, registerAuthGoogleAsync } from 'src/stores/auth/actions'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
 import FallbackSpinner from 'src/components/fall-back'
 import { resetInitialState } from 'src/stores/auth'
 import { useRouter } from 'next/navigation'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import { signIn, useSession } from 'next-auth/react'
+import {
+  clearLocalPreTokenAuthSocial,
+  getLocalPreTokenAuthSocial,
+  setLocalPreTokenAuthSocial
+} from 'src/helpers/storage'
 
 type TProps = {}
 type TDefaultValue = {
@@ -58,8 +64,10 @@ const RegisterPage: NextPage<TProps> = () => {
     password: '',
     confirmPassword: ''
   }
+  const refRegister = useRef<boolean>(false)
   const [isShowPassword, setIsShowPassword] = useState(false)
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
+  const prevTokenLocal = getLocalPreTokenAuthSocial()
   const [isRemember, setIsRemember] = useState(true)
   const theme = useTheme()
   const {
@@ -71,6 +79,7 @@ const RegisterPage: NextPage<TProps> = () => {
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
+  const { data: session } = useSession()
 
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
@@ -93,6 +102,21 @@ const RegisterPage: NextPage<TProps> = () => {
       dispatch(resetInitialState())
     }
   }, [isSuccess, isError, message])
+  const handleRegisterGoogle = () => {
+    signIn('google')
+    clearLocalPreTokenAuthSocial()
+  }
+  useEffect(() => {
+    if ((session as any)?.accessToken && (session as any)?.accessToken !== prevTokenLocal) {
+      if ((session as any)?.provider === 'facebook') {
+        // dispatch(registerAuthFacebookAsync((session as any)?.accessToken))
+        dispatch(registerAuthGoogleAsync((session as any)?.accessToken))
+      } else {
+        dispatch(registerAuthGoogleAsync((session as any)?.accessToken))
+      }
+      setLocalPreTokenAuthSocial((session as any)?.accessToken)
+    }
+  }, [(session as any)?.accessToken])
 
   return (
     <>
@@ -286,7 +310,7 @@ const RegisterPage: NextPage<TProps> = () => {
                   gap: 5
                 }}
               >
-                <IconButton sx={{ color: theme.palette.error.main }}>
+                <IconButton sx={{ color: theme.palette.error.main }} onClick={handleRegisterGoogle}>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     role='img'

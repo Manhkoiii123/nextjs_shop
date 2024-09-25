@@ -1,7 +1,12 @@
 // ** Redux Imports
 import { createSlice } from '@reduxjs/toolkit'
 import { UserDataType } from 'src/contexts/types'
-import { updateAuthMeAsync, registerAuthAsync, chagePasswordMeAsync } from 'src/stores/auth/actions'
+import {
+  updateAuthMeAsync,
+  registerAuthAsync,
+  chagePasswordMeAsync,
+  registerAuthGoogleAsync
+} from 'src/stores/auth/actions'
 
 type TInit = {
   isLoading: boolean
@@ -66,6 +71,23 @@ export const authSlice = createSlice({
       state.typeError = action.payload.typeError
     })
     builder.addCase(registerAuthAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.isError = false
+      state.isSuccess = false
+      state.message = ''
+      state.typeError = ''
+    })
+    builder.addCase(registerAuthGoogleAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(registerAuthGoogleAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isError = !action.payload.data?.email
+      state.isSuccess = !!action.payload.data?.email //có emial là thành công
+      state.message = action.payload.message
+      state.typeError = action.payload.typeError
+    })
+    builder.addCase(registerAuthGoogleAsync.rejected, (state, action) => {
       state.isLoading = false
       state.isError = false
       state.isSuccess = false

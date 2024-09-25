@@ -5,6 +5,10 @@ export type LoginParams = {
   password: string
   rememberMe?: boolean
 }
+export type LoginGoogleParams = {
+  idToken: string
+  rememberMe?: boolean
+}
 export type TUserAddresses = {
   address: string
   city: string
@@ -40,4 +44,5 @@ export type AuthValuesType = {
   setLoading: (value: boolean) => void
   setUser: (value: UserDataType | null) => void
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
+  loginGoogle: (params: LoginGoogleParams, errorCallback?: ErrCallbackType) => void
 }
