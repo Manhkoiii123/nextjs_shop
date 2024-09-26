@@ -59,7 +59,9 @@ const ProfilePage: NextPage<TProps> = () => {
     handleSubmit,
     reset,
     watch,
-    formState: { errors }
+    formState: { errors },
+    setValue,
+    getValues
   } = useForm({
     defaultValues: defaultValues,
     mode: 'onBlur',
@@ -77,9 +79,9 @@ const ProfilePage: NextPage<TProps> = () => {
           setAvatar(data?.avatar)
           setIsDisableRole(!data?.role?.permissions.length)
           reset({
-            role: data?.role._id,
-            fullName: toFullName(data?.lastName, data?.middleName, data?.firstName, language),
             email: data?.email,
+            role: data?.role?._id,
+            fullName: toFullName(data?.lastName, data?.middleName, data?.firstName, language),
             address: data?.address,
             city: data?.city,
             phoneNumber: data?.phoneNumber
@@ -90,6 +92,7 @@ const ProfilePage: NextPage<TProps> = () => {
         setLoading(false)
       })
   }
+
   const dispatch: AppDispatch = useDispatch()
   const { isLoading, isErrorUpdate, messageUpdate, isSuccessUpdate } = useSelector((state: RootState) => state.auth)
   const onsubmit = (data: any) => {
@@ -323,18 +326,20 @@ const ProfilePage: NextPage<TProps> = () => {
                 <Grid item md={6} xs={12}>
                   <Controller
                     control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <CustomTextField
-                        error={Boolean(errors.fullName)}
-                        margin='normal'
-                        fullWidth
-                        label={t('fullName')}
-                        placeholder={t('enter_fullname')}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        value={value}
-                      />
-                    )}
+                    render={({ field: { onChange, onBlur, value } }) => {
+                      return (
+                        <CustomTextField
+                          error={Boolean(errors.fullName)}
+                          margin='normal'
+                          fullWidth
+                          label={t('fullName')}
+                          placeholder={t('enter_fullname')}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
+                      )
+                    }}
                     name='fullName'
                   />
                 </Grid>

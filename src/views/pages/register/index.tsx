@@ -24,7 +24,7 @@ import RegisterDark from '/public/images/register-dark.png'
 import RegisterLight from '/public/images/register-light.png'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerAuthAsync, registerAuthGoogleAsync } from 'src/stores/auth/actions'
+import { registerAuthAsync, registerAuthFacebookAsync, registerAuthGoogleAsync } from 'src/stores/auth/actions'
 import { AppDispatch, RootState } from 'src/stores'
 import toast from 'react-hot-toast'
 import FallbackSpinner from 'src/components/fall-back'
@@ -80,6 +80,7 @@ const RegisterPage: NextPage<TProps> = () => {
     resolver: yupResolver(schema)
   })
   const { data: session } = useSession()
+  console.log('🚀 ~ session:', session)
 
   //dùng redux
   const dispatch: AppDispatch = useDispatch()
@@ -106,11 +107,14 @@ const RegisterPage: NextPage<TProps> = () => {
     signIn('google')
     clearLocalPreTokenAuthSocial()
   }
+  const handleRegisterFacebook = () => {
+    signIn('facebook')
+    clearLocalPreTokenAuthSocial()
+  }
   useEffect(() => {
     if ((session as any)?.accessToken && (session as any)?.accessToken !== prevTokenLocal) {
       if ((session as any)?.provider === 'facebook') {
-        // dispatch(registerAuthFacebookAsync((session as any)?.accessToken))
-        dispatch(registerAuthGoogleAsync((session as any)?.accessToken))
+        dispatch(registerAuthFacebookAsync((session as any)?.accessToken))
       } else {
         dispatch(registerAuthGoogleAsync((session as any)?.accessToken))
       }
@@ -326,7 +330,7 @@ const RegisterPage: NextPage<TProps> = () => {
                     ></path>
                   </svg>
                 </IconButton>
-                <IconButton sx={{ color: '#497ce2' }}>
+                <IconButton sx={{ color: '#497ce2' }} onClick={handleRegisterFacebook}>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     role='img'

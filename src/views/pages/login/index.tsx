@@ -75,7 +75,7 @@ const LoginPage: NextPage<TProps> = () => {
   const { data: session } = useSession()
 
   //** context */
-  const { login, loginGoogle } = useAuth()
+  const { login, loginGoogle, loginFacebook } = useAuth()
 
   const onsubmit = (data: { email: string; password: string }) => {
     if (!Object.keys(errors).length) {
@@ -88,12 +88,16 @@ const LoginPage: NextPage<TProps> = () => {
     signIn('google')
     clearLocalPreTokenAuthSocial()
   }
+  const handleLoginFacebook = () => {
+    signIn('facebook')
+    clearLocalPreTokenAuthSocial()
+  }
   useEffect(() => {
     if ((session as any)?.accessToken && (session as any)?.accessToken !== prevTokenLocal) {
       const rememberLocal = getLocalRememberLoginAuthSocial()
       const deviceToken = getLocalDeviceToken()
       if ((session as any)?.provider === 'facebook') {
-        loginGoogle(
+        loginFacebook(
           {
             idToken: (session as any)?.accessToken,
             rememberMe: rememberLocal ? rememberLocal === 'true' : true
@@ -103,16 +107,6 @@ const LoginPage: NextPage<TProps> = () => {
             if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
           }
         )
-        // loginFacebook(
-        //   {
-        //     idToken: (session as any)?.accessToken,
-        //     rememberMe: rememberLocal ? rememberLocal === 'true' : true,
-        //     deviceToken: deviceToken ? deviceToken : ''
-        //   },
-        //   err => {
-        //     if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
-        //   }
-        // )
       } else {
         loginGoogle(
           {
@@ -311,7 +305,7 @@ const LoginPage: NextPage<TProps> = () => {
                   ></path>
                 </svg>
               </IconButton>
-              <IconButton sx={{ color: '#497ce2' }}>
+              <IconButton sx={{ color: '#497ce2' }} onClick={handleLoginFacebook}>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   role='img'

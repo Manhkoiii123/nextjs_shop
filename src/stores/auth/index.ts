@@ -5,7 +5,8 @@ import {
   updateAuthMeAsync,
   registerAuthAsync,
   chagePasswordMeAsync,
-  registerAuthGoogleAsync
+  registerAuthGoogleAsync,
+  registerAuthFacebookAsync
 } from 'src/stores/auth/actions'
 
 type TInit = {
@@ -91,6 +92,25 @@ export const authSlice = createSlice({
       state.isLoading = false
       state.isError = false
       state.isSuccess = false
+      state.message = ''
+      state.typeError = ''
+    })
+
+    // ** register facebook
+    builder.addCase(registerAuthFacebookAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(registerAuthFacebookAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccess = !!action.payload?.data?.email
+      state.isError = !action.payload?.data?.email
+      state.message = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    builder.addCase(registerAuthFacebookAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.isSuccess = false
+      state.isError = true
       state.message = ''
       state.typeError = ''
     })

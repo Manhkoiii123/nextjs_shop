@@ -34,3 +34,9 @@ yarn add next auth
 làm theo docs đã => TẠO ENV => ok base setup
 
 ## Xử lý đăng nhập, đăng ký với Google (OAuth)
+
+## setup cho đăng nhập đăng kí fb
+
+vào fb dev (meta for dev) => ud của tôi => tạo ud => xác thực yêu cầu...=> OK => import trong nexxtauth.ts
+
+vào cái vừa tạo trên fb dev => chọn web vừa tạo => cài đặt ứng dụng => tt cơ bản => copi id
