@@ -18,6 +18,12 @@ const nextConfig = {
         hostname: '*platform-lookaside.fbsbx.com',
         port: '',
         pathname: '**'
+      },
+      {
+        protocol: 'https',
+        hostname: '*scontent.fhan14-2.fna.fbcdn.net',
+        port: '',
+        pathname: '**'
       }
     ]
   }

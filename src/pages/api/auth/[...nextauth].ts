@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
+import FacebookProvider from 'next-auth/providers/facebook'
 
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -13,11 +13,24 @@ export const authOptions = {
         }
       },
       name: 'google'
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_SECRET as string,
+      name: 'facebook',
+      authorization: {
+        params: {
+          scope: 'email' // Ensure that the email scope is included here
+        }
+      }
     })
-    // ...add more providers here
   ],
   callbacks: {
     async jwt({ token, account }: any) {
+      if (account && account.provider) {
+        token.provider = account.provider
+      }
+
       if (account) {
         token.accessToken = account.access_token
       }
@@ -26,6 +39,7 @@ export const authOptions = {
     },
     async session({ session, token, user }: any) {
       session.accessToken = token.accessToken
+      session.provider = token.provider
 
       return session
     }
