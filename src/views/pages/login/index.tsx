@@ -32,8 +32,10 @@ import {
   getLocalDeviceToken,
   getLocalPreTokenAuthSocial,
   getLocalRememberLoginAuthSocial,
-  setLocalPreTokenAuthSocial
+  setLocalPreTokenAuthSocial,
+  setLocalRememberLoginAuthSocial
 } from 'src/helpers/storage'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 type TProps = {}
 type TDefaultValue = {
@@ -249,12 +251,17 @@ const LoginPage: NextPage<TProps> = () => {
                     value='remember'
                     color='primary'
                     checked={isRemember}
-                    onChange={e => setIsRemenber(e.target.checked)}
+                    onChange={e => {
+                      setIsRemenber(e.target.checked)
+                      setLocalRememberLoginAuthSocial(JSON.stringify(e.target.checked))
+                    }}
                   />
                 }
                 label='Remember me'
               />
-              <Typography>Forgot password?</Typography>
+              <Typography variant='body2' component={Link} href={`${ROUTE_CONFIG.FORGOT_PASSWORD}`}>
+                {t('Forgot_password')}?
+              </Typography>
             </Box>
             <Button type='submit' fullWidth variant='contained' sx={{ mt: 3, mb: 2 }}>
               Sign In
