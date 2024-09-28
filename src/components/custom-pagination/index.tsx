@@ -15,6 +15,7 @@ type TProps = {
   onChangePagination: (page: number, pageSize: number) => void
   totalPage?: number
   isHideShow?: boolean
+  isDisplayLines?: boolean
 }
 
 const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
@@ -28,6 +29,7 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
     setPageSize,
     onChangePagination,
     isHideShow,
+    isDisplayLines = true,
     ...rests
   } = props
 
@@ -70,28 +72,30 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
         }}
         sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}
       >
-        <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-          <span>{t('Số dòng hiển thị')}</span>
-          <Select
-            size='small'
-            sx={{
-              width: '80px',
-              padding: 0,
-              '& .MuiSelect-select.MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall':
-                { minWidth: 'unset !important', padding: '8.5px 12px 8.5px 24px !important' }
-            }}
-            value={pageSize}
-            onChange={e => onChangePagination(1, +e.target.value)}
-          >
-            {pageSizeOptions.map(opt => {
-              return (
-                <MenuItem value={opt} key={opt}>
-                  {opt}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </Box>
+        {isDisplayLines && (
+          <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <span>{t('Số dòng hiển thị')}</span>
+            <Select
+              size='small'
+              sx={{
+                width: '80px',
+                padding: 0,
+                '& .MuiSelect-select.MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall':
+                  { minWidth: 'unset !important', padding: '8.5px 12px 8.5px 24px !important' }
+              }}
+              value={pageSize}
+              onChange={e => onChangePagination(1, +e.target.value)}
+            >
+              {pageSizeOptions.map(opt => {
+                return (
+                  <MenuItem value={opt} key={opt}>
+                    {opt}
+                  </MenuItem>
+                )
+              })}
+            </Select>
+          </Box>
+        )}
         <StylePagination color='primary' {...rests} count={totalPage} onChange={handleChange} page={page} />
       </Box>
     </Box>
