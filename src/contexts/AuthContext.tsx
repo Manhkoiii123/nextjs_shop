@@ -18,7 +18,12 @@ import {
 } from './types'
 import { loginAuth, loginAuthFacebook, loginAuthGoogle, logoutAuth } from 'src/services/auth'
 import { API_ENDPOINT } from 'src/configs/api'
-import { clearLocalUserData, setLocalUserData, setTemporaryToken } from 'src/helpers/storage'
+import {
+  clearLocalRememberLoginAuthSocial,
+  clearLocalUserData,
+  setLocalUserData,
+  setTemporaryToken
+} from 'src/helpers/storage'
 import instanceAxios from 'src/helpers/axios'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -155,6 +160,7 @@ const AuthProvider = ({ children }: Props) => {
     logoutAuth().then(res => {
       setUser(null)
       clearLocalUserData()
+      clearLocalRememberLoginAuthSocial()
       signOut()
       // nếu mà ko phải các trang public thì logout sẽ đá ra các trang khác
       // nếu đang ở các trang public thì vẫn ở nguyên trang đó

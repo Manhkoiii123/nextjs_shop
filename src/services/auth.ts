@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_ENDPOINT } from 'src/configs/api'
 import instanceAxios from 'src/helpers/axios'
-import { TLoginAuth, TRegisterAuth, TypeChangePassword } from 'src/types/auth'
+import { TForgotPasswordAuth, TLoginAuth, TRegisterAuth, TResetPasswordAuth, TypeChangePassword } from 'src/types/auth'
 
 export const loginAuth = async (data: TLoginAuth) => {
   const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/login`, data)
@@ -76,4 +76,23 @@ export const loginAuthFacebook = async (data: { idToken: string; deviceToken?: s
   const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/login-facebook`, data)
 
   return res.data
+}
+export const forgotPasswordAuth = async (data: TForgotPasswordAuth) => {
+  try {
+    const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/forgot-password`, data)
+
+    return res.data
+  } catch (error) {
+    return error
+  }
+}
+
+export const resetPasswordAuth = async (data: TResetPasswordAuth) => {
+  try {
+    const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/reset-password`, data)
+
+    return res.data
+  } catch (error) {
+    return error
+  }
 }

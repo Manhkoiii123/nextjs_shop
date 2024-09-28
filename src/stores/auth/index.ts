@@ -6,7 +6,9 @@ import {
   registerAuthAsync,
   chagePasswordMeAsync,
   registerAuthGoogleAsync,
-  registerAuthFacebookAsync
+  registerAuthFacebookAsync,
+  resetPasswordAuthAsync,
+  forgotPasswordAuthAsync
 } from 'src/stores/auth/actions'
 
 type TInit = {
@@ -22,6 +24,12 @@ type TInit = {
   isErrorChangePassword: boolean
   messageChangePassword: string
   userData: UserDataType | null
+  isSuccessResetPassword: boolean
+  isErrorResetPassword: boolean
+  messageResetPassword: string
+  isSuccessForgotPassword: boolean
+  isErrorForgotPassword: boolean
+  messageForgotPassword: string
 }
 
 const initialState: TInit = {
@@ -36,7 +44,13 @@ const initialState: TInit = {
   isSuccessChangePassword: true,
   isErrorChangePassword: false,
   messageChangePassword: '',
-  userData: null
+  userData: null,
+  isSuccessForgotPassword: true,
+  isErrorForgotPassword: false,
+  messageForgotPassword: '',
+  isSuccessResetPassword: true,
+  isErrorResetPassword: false,
+  messageResetPassword: ''
 }
 
 export const authSlice = createSlice({
@@ -55,6 +69,12 @@ export const authSlice = createSlice({
       state.isErrorChangePassword = false
       state.isSuccessChangePassword = true
       state.messageChangePassword = ''
+      state.isSuccessForgotPassword = false
+      state.isErrorForgotPassword = true
+      state.messageForgotPassword = ''
+      state.isSuccessResetPassword = false
+      state.isErrorResetPassword = true
+      state.messageResetPassword = ''
     },
     updateUserredux: (state, action) => {
       state.userData = action.payload
@@ -150,6 +170,42 @@ export const authSlice = createSlice({
       state.isSuccessChangePassword = false
       state.isLoading = false
       state.messageChangePassword = ''
+      state.typeError = ''
+    })
+    builder.addCase(resetPasswordAuthAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(resetPasswordAuthAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessResetPassword = !!action.payload?.data?.email
+      state.isErrorResetPassword = !action.payload?.data?.email
+      state.messageResetPassword = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    builder.addCase(resetPasswordAuthAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.isSuccessResetPassword = false
+      state.isErrorResetPassword = true
+      state.messageResetPassword = ''
+      state.typeError = ''
+    })
+
+    // ** forgot password
+    builder.addCase(forgotPasswordAuthAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(forgotPasswordAuthAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessForgotPassword = !!action.payload?.data?.email
+      state.isErrorForgotPassword = !action.payload?.data?.email
+      state.messageForgotPassword = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
+    builder.addCase(forgotPasswordAuthAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.isSuccessForgotPassword = false
+      state.isErrorForgotPassword = true
+      state.message = ''
       state.typeError = ''
     })
   }
