@@ -28,6 +28,7 @@ import { OBJECT_TYPE_ERROR_PRODUCT } from 'src/configs/error'
 import { resetInitialState } from 'src/stores/product'
 import toast from 'react-hot-toast'
 import CustomSelect from 'src/components/custom-select'
+import CardSkeleton from 'src/views/pages/product/components/CardSkeleton'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -73,7 +74,6 @@ const HomePage: NextPage<TProps> = () => {
     setLoading(true)
     await getAllProductTypes({ params: { limit: -1, page: -1 } })
       .then(res => {
-        console.log("🚀 ~ productPublic:", productPublic)
         const data = res.data.productTypes
 
         if (data) {
@@ -282,7 +282,18 @@ const HomePage: NextPage<TProps> = () => {
           </Grid>
           <Grid item md={9} xs={12}>
             <Grid container spacing={8}>
-              {productPublic?.data.length > 0 ? (
+              {loading && (
+                <>
+                  {Array.from({ length: 3 }).map((_, index) => {
+                    return (
+                      <Grid item key={index} md={4} sm={6} xs={12}>
+                        <CardSkeleton />
+                      </Grid>
+                    )
+                  })}
+                </>
+              )}
+              {!loading && productPublic?.data.length > 0 ? (
                 <>
                   {productPublic.data.map((item: TProduct, index) => {
                     return (
@@ -295,8 +306,8 @@ const HomePage: NextPage<TProps> = () => {
               ) : (
                 <Box
                   sx={{
-                    height: '100%',
-                    width: '100%'
+                    height: '100vh',
+                    width: '100vw'
                   }}
                 >
                   <NoData />
