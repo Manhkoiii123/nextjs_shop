@@ -180,6 +180,7 @@ const ProductTypeListPage: NextPage<TProps> = () => {
       headerName: t('product_type_Name'),
       flex: 1,
       minWidth: 200,
+      maxWidth: 500,
       renderCell: params => {
         const { row } = params
 
@@ -190,7 +191,7 @@ const ProductTypeListPage: NextPage<TProps> = () => {
       field: 'slug',
       headerName: t('Slug'),
       minWidth: 200,
-      maxWidth: 200,
+      maxWidth: 500,
       renderCell: params => {
         const { row } = params
 
@@ -205,13 +206,13 @@ const ProductTypeListPage: NextPage<TProps> = () => {
       renderCell: params => {
         const { row } = params
 
-        return <Typography>{formatDate(row?.createdAt, { dateStyle: 'short' })}</Typography>
+        return <Typography>{formatDate(row?.createdAt)}</Typography>
       }
     },
     {
       field: 'action',
       headerName: t('Actions'),
-      minWidth: 150,
+      maxWidth: 150,
       sortable: false,
       align: 'left',
       renderCell: params => {

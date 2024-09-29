@@ -13,6 +13,10 @@ export const PERMISSIONS: any = {
       CREATE: 'MANAGE_PRODUCT.PRODUCT_TYPE.CREATE',
       UPDATE: 'MANAGE_PRODUCT.PRODUCT_TYPE.UPDATE',
       DELETE: 'MANAGE_PRODUCT.PRODUCT_TYPE.DELETE'
+    },
+    COMMENT: {
+      UPDATE: 'MANAGE_PRODUCT.COMMENT.UPDATE',
+      DELETE: 'MANAGE_PRODUCT.COMMENT.DELETE'
     }
   },
   SYSTEM: {
@@ -68,7 +72,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isHideCreate: true,
     isHideUpdate: true,
     isHideDelete: true
-    // isHideCheckAll: true
   },
   {
     id: 1,
@@ -82,10 +85,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'PRODUCT',
     parentValue: 'MANAGE_PRODUCT'
-    // create: PERMISSIONS.MANAGE_PRODUCT.PRODUCT.CREATE,
-    // update: PERMISSIONS.MANAGE_PRODUCT.PRODUCT.UPDATE,
-    // delete: PERMISSIONS.MANAGE_PRODUCT.PRODUCT.DELETE,
-    // isHideView: true
   },
   {
     id: 3,
@@ -94,10 +93,15 @@ export const LIST_DATA_PERMISSIONS: any = [
     value: 'PRODUCT_TYPE',
     parentValue: 'MANAGE_PRODUCT',
     isHideView: true
-    // create: PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.CREATE,
-    // update: PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.UPDATE,
-    // delete: PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.DELETE,
-    // view: PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.VIEW
+  },
+  {
+    id: 20,
+    name: 'Comment',
+    isParent: false,
+    value: 'COMMENT',
+    parentValue: 'MANAGE_PRODUCT',
+    isHideCreate: true,
+    isHideView: true
   },
   {
     id: 4,
@@ -111,11 +115,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'USER',
     parentValue: 'SYSTEM'
-    // isHideView: true
-    // create: PERMISSIONS.SYSTEM.USER.CREATE,
-    // update: PERMISSIONS.SYSTEM.USER.UPDATE,
-    // delete: PERMISSIONS.SYSTEM.USER.DELETE,
-    // view: PERMISSIONS.SYSTEM.USER.VIEW
   },
   {
     id: 6,
@@ -123,10 +122,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'ROLE',
     parentValue: 'SYSTEM'
-    // create: PERMISSIONS..ROLE.CREATE,
-    // update: PERMISSIONS.SYSTEM.ROLE.UPDATE,
-    // delete: PERMISSIONS.SYSTEM.ROLE.DELETE,
-    // view: PERMISSIONS.SYSTEM.ROLE.VIEW
   },
   {
     id: 7,
@@ -140,8 +135,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'REVIEW',
     parentValue: 'MANAGE_ORDER',
-    // update: PERMISSIONS.MANAGE_ORDER.REVIEW.UPDATE,
-    // delete: PERMISSIONS.MANAGE_ORDER.REVIEW.DELETE,
     isHideView: true,
     isHideCreate: true
   },
@@ -151,10 +144,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'ORDER',
     parentValue: 'MANAGE_ORDER'
-    // create: PERMISSIONS.MANAGE_ORDER.ORDER.CREATE,
-    // update: PERMISSIONS.MANAGE_ORDER.ORDER.UPDATE,
-    // delete: PERMISSIONS.MANAGE_ORDER.ORDER.DELETE,
-    // view: PERMISSIONS.MANAGE_ORDER.ORDER.VIEW
   },
   {
     id: 10,
@@ -168,9 +157,6 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'CITY',
     parentValue: 'SETTING',
-    // create: PERMISSIONS.SETTING.CITY.CREATE,
-    // update: PERMISSIONS.SETTING.CITY.UPDATE,
-    // delete: PERMISSIONS.SETTING.CITY.DELETE,
     isHideView: true
   },
   {
@@ -179,18 +165,12 @@ export const LIST_DATA_PERMISSIONS: any = [
     isParent: false,
     value: 'DELIVERY_TYPE',
     parentValue: 'SETTING',
-    // create: PERMISSIONS.SETTING.DELIVERY_TYPE.CREATE,
-    // update: PERMISSIONS.SETTING.DELIVERY_TYPE.UPDATE,
-    // delete: PERMISSIONS.SETTING.DELIVERY_TYPE.DELETE,
     isHideView: true
   },
   {
     id: 13,
     name: 'Payment_type',
     isParent: false,
-    // create: PERMISSIONS.SETTING.PAYMENT_TYPE.CREATE,
-    // update: PERMISSIONS.SETTING.PAYMENT_TYPE.UPDATE,
-    // delete: PERMISSIONS.SETTING.PAYMENT_TYPE.DELETE,
     isHideView: true,
     value: 'PAYMENT_TYPE',
     parentValue: 'SETTING'

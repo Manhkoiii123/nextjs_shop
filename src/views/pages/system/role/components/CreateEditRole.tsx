@@ -13,6 +13,7 @@ import { createRolesAsync, updateRolesAsync } from 'src/stores/role/actions'
 import { useEffect, useState } from 'react'
 import { getDetailRoles, updateRoles } from 'src/services/role'
 import Spinner from 'src/components/spinner'
+import { PERMISSIONS } from 'src/configs/permissions'
 
 interface TCreateEditRole {
   open: boolean
@@ -51,7 +52,7 @@ const CreateEditRole = (props: TCreateEditRole) => {
         dispatch(updateRolesAsync({ name: data.name, id: idRole }))
       } else {
         // create
-        dispatch(createRolesAsync({ name: data.name }))
+        dispatch(createRolesAsync({ name: data.name, permissions: [PERMISSIONS.DASHBOARD] }))
       }
     }
   }
