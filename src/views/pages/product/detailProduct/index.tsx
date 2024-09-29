@@ -29,6 +29,7 @@ import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import CardProduct from 'src/views/pages/product/components/CardProduct'
 import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedProduct'
 import CardReview from 'src/views/pages/product/components/CardReview'
+import CommentInput from 'src/views/pages/product/components/CommentInput'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
@@ -191,6 +192,10 @@ const DetailProductPage = () => {
       })
     }
   }
+
+  const handleCancelComment = () => {}
+
+  const handleComment = (comment: string) => {}
 
   if (!dataProduct) return null
 
@@ -621,6 +626,23 @@ const DetailProductPage = () => {
                       )
                     })}
                   </CustomCarousel>
+                </Box>
+              </Box>
+              {/* comment */}
+              <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '15px', py: 5, px: 4 }}>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    color: `rgba(${theme.palette.customColors.main}, 0.68)`,
+                    fontWeight: 'bold',
+                    fontSize: '18px',
+                    marginBottom: '20px'
+                  }}
+                >
+                  {t('Comment')} <b style={{ color: theme.palette.primary.main }}>0</b>{' '}
+                </Typography>
+                <Box sx={{ width: '100%' }}>
+                  <CommentInput onCancel={handleCancelComment} onApply={handleComment} />
                 </Box>
               </Box>
             </Box>
