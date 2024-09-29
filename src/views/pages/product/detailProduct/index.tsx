@@ -17,11 +17,13 @@ import { OBJECT_TYPE_ERROR_REVIEW } from 'src/configs/error'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import { getLocalProductCart, setLocalProductToCart } from 'src/helpers/storage'
 import { useAuth } from 'src/hooks/useAuth'
+import { getAllCommentsPublic } from 'src/services/commentProduct'
 import { getDetailsProductPublic, getListRelasedProductBySlug } from 'src/services/product'
 import { getAllReviews } from 'src/services/reviewProduct'
 import { AppDispatch, RootState } from 'src/stores'
 import { updateProductToCard } from 'src/stores/order-product'
 import { resetInitialState } from 'src/stores/reviews'
+import { TCommentItemProduct } from 'src/types/comment'
 import { TProduct } from 'src/types/product'
 import { TReviewItem } from 'src/types/reviews'
 import { convertUpdateProductToCart, formatFilter, formatNumberToLocal, isExpiry } from 'src/utils'
@@ -30,13 +32,14 @@ import CardProduct from 'src/views/pages/product/components/CardProduct'
 import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedProduct'
 import CardReview from 'src/views/pages/product/components/CardReview'
 import CommentInput from 'src/views/pages/product/components/CommentInput'
+import CommentItem from 'src/views/pages/product/components/CommentItem'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
   const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
   const [listReviews, setListReview] = useState<TReviewItem[]>([])
-
+  const [listComment, setListComment] = useState<TCommentItemProduct[]>([])
   const router = useRouter()
   const productId = router.query.productId as string
   const { user } = useAuth()
@@ -85,10 +88,23 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
+  const fetchListCommentProduct = async () => {
+    setLoading(true)
+    await getAllCommentsPublic({ params: { limit: -1, page: -1, order: 'createdAt desc' } })
+      .then(res => {
+        setLoading(false)
+        const data = res.data
+        setListComment(data.comments)
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }
   useEffect(() => {
     if (productId) {
       fetchDetailProduct(productId)
       fetchListRelasedProduct(productId)
+      fetchListCommentProduct()
     }
   }, [productId])
 
@@ -114,6 +130,7 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
+
   useEffect(() => {
     if (dataProduct?._id) {
       fetchGetAllListReviewByProduct(dataProduct._id)
@@ -639,10 +656,22 @@ const DetailProductPage = () => {
                     marginBottom: '20px'
                   }}
                 >
-                  {t('Comment')} <b style={{ color: theme.palette.primary.main }}>0</b>{' '}
+                  {t('Comment')} <b style={{ color: theme.palette.primary.main }}>{listComment.length || 0}</b>{' '}
                 </Typography>
                 <Box sx={{ width: '100%' }}>
                   <CommentInput onCancel={handleCancelComment} onApply={handleComment} />
+                  <Box
+                    mt={8}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '20px'
+                    }}
+                  >
+                    {listComment.map(c => {
+                      return <CommentItem key={c._id} item={c} />
+                    })}
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -686,7 +715,7 @@ const DetailProductPage = () => {
                   mt: 4
                 }}
               >
-                {listRelatedProduct.length > 0 ? (
+                {listRelatedProduct?.length > 0 ? (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {listRelatedProduct.map(item => {
                       return <CardRelatedProduct key={item._id} item={item} />
