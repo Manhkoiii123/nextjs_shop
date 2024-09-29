@@ -11,6 +11,7 @@ import Icon from 'src/components/Icon'
 
 // ** Third party
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'
+import { useAuth } from 'src/hooks/useAuth'
 
 const StyleWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -53,6 +54,7 @@ const CommentInput = (props: TCommentInput) => {
   const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [isFocus, setIsFocus] = useState(false)
+  const { user } = useAuth()
 
   const onEmojiClick = (emojiObject: EmojiClickData) => {
     setInputComment(prevInput => prevInput + emojiObject.emoji)
@@ -74,7 +76,7 @@ const CommentInput = (props: TCommentInput) => {
 
   return (
     <StyleWrapper>
-      <Avatar src={'/'} sx={{ height: '40px !important', width: '40px !important' }} />
+      <Avatar src={user?.avatar || '/'} sx={{ height: '40px !important', width: '40px !important' }} />
       <Box sx={{ flex: 1 }}>
         <CustomTextField
           fullWidth
