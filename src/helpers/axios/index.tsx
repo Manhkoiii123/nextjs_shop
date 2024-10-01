@@ -104,7 +104,7 @@ const AxiosInterceptor: FC<TAxiosInterceptor> = ({ children }) => {
       }
     } else if (!isPublicApi) {
       //ko có acctoken
-      handleRedirectLogin(router, setUser)
+      // handleRedirectLogin(router, setUser)
     }
 
     return config
