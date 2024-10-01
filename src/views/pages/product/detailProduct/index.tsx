@@ -4,7 +4,7 @@ import { Button, IconButton, Rating } from '@mui/material'
 import { Box, Grid, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { Fragment, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -33,13 +33,18 @@ import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedPr
 import CardReview from 'src/views/pages/product/components/CardReview'
 import CommentInput from 'src/views/pages/product/components/CommentInput'
 import CommentItem from 'src/views/pages/product/components/CommentItem'
+import { resetInitialState as resetInitialStateComment } from 'src/stores/comments'
+import { createCommentAsync } from 'src/stores/comments/actions'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
   const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
   const [listReviews, setListReview] = useState<TReviewItem[]>([])
-  const [listComment, setListComment] = useState<TCommentItemProduct[]>([])
+  const [listComment, setListComment] = useState<{ data: TCommentItemProduct[]; total: number }>({
+    data: [],
+    total: 0
+  })
   const router = useRouter()
   const productId = router.query.productId as string
   const { user } = useAuth()
@@ -55,6 +60,22 @@ const DetailProductPage = () => {
     messageErrorDelete,
     typeError
   } = useSelector((state: RootState) => state.reviews)
+
+  const {
+    isSuccessCreate: isSuccessCreateComment,
+    isErrorCreate: isErrorCreateComment,
+    messageErrorCreate: messageErrorCreateComment,
+    isSuccessReply,
+    isErrorReply,
+    isLoading: isLoadingComment,
+    messageErrorReply,
+    isSuccessDelete: isSuccessDeleteComment,
+    isErrorDelete: isErrorDeleteComment,
+    messageErrorDelete: messageErrorDeleteComment,
+    isSuccessEdit: isSuccessEditComment,
+    isErrorEdit: isErrorEditComment,
+    messageErrorEdit: messageErrorEditComment
+  } = useSelector((state: RootState) => state.comments)
 
   const [amountProduct, setAmountProduct] = useState(1)
 
@@ -74,6 +95,23 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
+
+  const renderCommentItem = (item: TCommentItemProduct, level: number) => {
+    level += 1
+
+    return (
+      <Box sx={{ marginLeft: `${level * 60}px` }}>
+        <CommentItem item={item} />
+        {item.replies && item?.replies?.length > 0 && (
+          <>
+            {item.replies?.map(reply => {
+              return <>{renderCommentItem(reply, level)}</>
+            })}
+          </>
+        )}
+      </Box>
+    )
+  }
   const fetchListRelasedProduct = async (slug: string) => {
     setLoading(true)
     await getListRelasedProductBySlug({ params: { slug: slug } })
@@ -88,13 +126,18 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
-  const fetchListCommentProduct = async () => {
+  const fetchListCommentProduct = async (productId: string) => {
     setLoading(true)
-    await getAllCommentsPublic({ params: { limit: -1, page: -1, order: 'createdAt desc' } })
+    await getAllCommentsPublic({
+      params: { limit: -1, page: -1, order: 'createdAt desc', productId: productId }
+    })
       .then(res => {
         setLoading(false)
         const data = res.data
-        setListComment(data.comments)
+        setListComment({
+          data: data.comments,
+          total: data.totalCount
+        })
       })
       .catch(() => {
         setLoading(false)
@@ -104,9 +147,13 @@ const DetailProductPage = () => {
     if (productId) {
       fetchDetailProduct(productId)
       fetchListRelasedProduct(productId)
-      fetchListCommentProduct()
     }
   }, [productId])
+  useEffect(() => {
+    if (dataProduct?._id) {
+      fetchListCommentProduct(dataProduct?._id)
+    }
+  }, [dataProduct?._id])
 
   const fetchGetAllListReviewByProduct = async (id: string) => {
     setLoading(true)
@@ -163,6 +210,49 @@ const DetailProductPage = () => {
     }
   }, [isSuccessDelete, isErrorDelete, messageErrorDelete, dataProduct?._id])
 
+  useEffect(() => {
+    if (isSuccessDeleteComment && dataProduct?._id) {
+      toast.success(t('Delete_comment_success'))
+      fetchListCommentProduct(dataProduct._id)
+      dispatch(resetInitialStateComment())
+    } else if (isErrorDeleteComment && messageErrorDeleteComment) {
+      toast.error(t('Delete_comment_error'))
+      dispatch(resetInitialStateComment())
+    }
+  }, [isSuccessDeleteComment, isErrorDeleteComment, messageErrorDeleteComment])
+
+  useEffect(() => {
+    if (isSuccessCreateComment && dataProduct?._id) {
+      toast.success(t('Create_comment_success'))
+      fetchListCommentProduct(dataProduct._id)
+      dispatch(resetInitialStateComment())
+    } else if (isErrorCreateComment && messageErrorCreateComment) {
+      toast.error(t('Create_comment_error'))
+      dispatch(resetInitialStateComment())
+    }
+  }, [isSuccessCreateComment, isErrorCreateComment, messageErrorCreateComment])
+  useEffect(() => {
+    if (isSuccessEditComment&& dataProduct?._id) {
+      toast.success(t('Update_comment_success'))
+      fetchListCommentProduct(dataProduct._id)
+      dispatch(resetInitialStateComment())
+    } else if (isErrorEditComment && messageErrorEditComment) {
+      toast.error(t('Update_comment_error'))
+      dispatch(resetInitialStateComment())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessEditComment, isErrorEditComment, messageErrorEditComment, typeError])
+  useEffect(() => {
+    if (isSuccessReply && dataProduct?._id) {
+      toast.success(t('Create_reply_success'))
+      fetchListCommentProduct(dataProduct._id)
+      dispatch(resetInitialStateComment())
+    } else if (isErrorReply && messageErrorReply) {
+      toast.error(t('Create_reply_error'))
+      dispatch(resetInitialStateComment())
+    }
+  }, [isSuccessReply, isErrorReply, messageErrorReply])
+
   const handleBuyProduct = (item: TProduct) => {
     handleAddToCard(item)
     router.push(
@@ -210,9 +300,24 @@ const DetailProductPage = () => {
     }
   }
 
-  const handleCancelComment = () => {}
-
-  const handleComment = (comment: string) => {}
+  const handleComment = (comment: string) => {
+    if (comment) {
+      if (user) {
+        dispatch(
+          createCommentAsync({
+            product: (dataProduct as TProduct)._id,
+            user: user?._id,
+            content: comment
+          })
+        )
+      } else {
+        router.replace({
+          pathname: ROUTE_CONFIG.LOGIN,
+          query: { returnUrl: router.asPath }
+        })
+      }
+    }
+  }
 
   if (!dataProduct) return null
 
@@ -656,10 +761,10 @@ const DetailProductPage = () => {
                     marginBottom: '20px'
                   }}
                 >
-                  {t('Comment')} <b style={{ color: theme.palette.primary.main }}>{listComment.length || 0}</b>{' '}
+                  {t('Comment')} <b style={{ color: theme.palette.primary.main }}>{listComment.total || 0}</b>{' '}
                 </Typography>
                 <Box sx={{ width: '100%' }}>
-                  <CommentInput onCancel={handleCancelComment} onApply={handleComment} />
+                  <CommentInput onApply={handleComment} />
                   <Box
                     mt={8}
                     sx={{
@@ -668,8 +773,10 @@ const DetailProductPage = () => {
                       gap: '20px'
                     }}
                   >
-                    {listComment.map(c => {
-                      return <CommentItem key={c._id} item={c} />
+                    {listComment.data?.map((comment: TCommentItemProduct) => {
+                      const level: number = -1
+
+                      return <Fragment key={comment._id}>{renderCommentItem(comment, level)}</Fragment>
                     })}
                   </Box>
                 </Box>

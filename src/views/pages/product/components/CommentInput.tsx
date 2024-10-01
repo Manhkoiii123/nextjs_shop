@@ -1,6 +1,6 @@
 // ** React
 import { useTranslation } from 'react-i18next'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 // ** Mui
 import { Avatar, Box, Button, IconButton, styled } from '@mui/material'
@@ -11,6 +11,7 @@ import Icon from 'src/components/Icon'
 
 // ** Third party
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'
+import { TCommentItemProduct } from 'src/types/comment'
 import { useAuth } from 'src/hooks/useAuth'
 
 const StyleWrapper = styled(Box)(({ theme }) => ({
@@ -45,8 +46,11 @@ const StyleWrapper = styled(Box)(({ theme }) => ({
 }))
 
 interface TCommentInput {
-  onApply: (comment: string) => void
+  onApply: (comment: string, isEdit: boolean, item?: TCommentItemProduct) => void
   onCancel?: () => void
+  item?: TCommentItemProduct
+  isEdit?: boolean
+  isReply?: boolean
 }
 
 const CommentInput = (props: TCommentInput) => {
@@ -71,12 +75,28 @@ const CommentInput = (props: TCommentInput) => {
   }
 
   const handleApply = () => {
-    props.onApply(inputComment)
+    props.onApply(inputComment, !!props?.isEdit, props?.item)
+    setIsFocus(false)
+    setInputComment('')
   }
+
+  useEffect(() => {
+    if (props.isEdit && props.item) {
+      setInputComment(props?.item?.content)
+    }
+  }, [props.isEdit])
 
   return (
     <StyleWrapper>
-      <Avatar src={user?.avatar || '/'} sx={{ height: '40px !important', width: '40px !important' }} />
+      {!props.isEdit && (
+        <Avatar
+          src={user?.avatar || ''}
+          sx={{
+            height: props?.item ? '34px !important' : '40px !important',
+            width: props?.item ? '34px !important' : '40px !important'
+          }}
+        />
+      )}
       <Box sx={{ flex: 1 }}>
         <CustomTextField
           fullWidth
@@ -84,6 +104,7 @@ const CommentInput = (props: TCommentInput) => {
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setInputComment(e.target.value)
           }}
+          placeholder={t('Comment...')}
           onFocus={() => {
             setIsFocus(true)
           }}
@@ -97,7 +118,7 @@ const CommentInput = (props: TCommentInput) => {
             }
           }}
         />
-        {isFocus && (
+        {(isFocus || props.item) && (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Box sx={{ position: 'relative' }}>
               <IconButton onClick={() => setIsVisible(!isVisible)}>
@@ -116,7 +137,7 @@ const CommentInput = (props: TCommentInput) => {
                 {t('Cancel')}
               </Button>
               <Button variant='contained' onClick={handleApply}>
-                {t('Comment')}
+                {props.isEdit ? t('Edit_comment') : props?.isReply ? t('Reply') : t('Comment')}
               </Button>
             </Box>
           </Box>
