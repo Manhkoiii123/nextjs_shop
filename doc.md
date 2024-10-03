@@ -233,3 +233,23 @@ khi nào sử dụng
 `getStaticProps` thường dùng cho dữ liệu tĩnh, ít thay đổi và ko phụ thuộc vào context của mỗi request(ví dụ trang bài viêt, trang giới thiệu (landing page))
 
 `getServerSideProps` dùng tương tự như `getStaticProps` nhưng ko có cái revalidate
+
+# 245. Sử dụng socket io để bình luận real time
+
+cài đặt thư viện `yarn add socket.io-client`
+
+tạo file helper để custom cái socket (helper/socket/index.ts)
+
+```ts
+import { io } from 'socket.io-client'
+
+const connectSocketIO = () => {
+  const socket = io('https://api-shop-fnnd.onrender.com') // ko có /api đâu
+  //   const socket = io(process.env.NEXT_PUBLIC_API_HOST)
+
+  return socket
+}
+export default connectSocketIO
+```
+
+sang trang detail lắng nghe sự kiện socket => useEffect
