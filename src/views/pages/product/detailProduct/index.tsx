@@ -26,7 +26,7 @@ import { resetInitialState } from 'src/stores/reviews'
 import { TCommentItemProduct } from 'src/types/comment'
 import { TProduct } from 'src/types/product'
 import { TReviewItem } from 'src/types/reviews'
-import { convertUpdateProductToCart, formatFilter, formatNumberToLocal, isExpiry } from 'src/utils'
+import { cloneDeep, convertUpdateProductToCart, formatFilter, formatNumberToLocal, isExpiry } from 'src/utils'
 import { hexToRGBA } from 'src/utils/hex-to-rgba'
 import CardProduct from 'src/views/pages/product/components/CardProduct'
 import CardRelatedProduct from 'src/views/pages/product/components/CardRelatedProduct'
@@ -35,6 +35,8 @@ import CommentInput from 'src/views/pages/product/components/CommentInput'
 import CommentItem from 'src/views/pages/product/components/CommentItem'
 import { resetInitialState as resetInitialStateComment } from 'src/stores/comments'
 import { createCommentAsync } from 'src/stores/comments/actions'
+import connectSocketIO from 'src/helpers/socket'
+import { ACTION_SOCKET_COMMENT } from 'src/configs/socket'
 
 const DetailProductPage = () => {
   const [loading, setLoading] = useState(false)
@@ -178,6 +180,115 @@ const DetailProductPage = () => {
       })
   }
 
+  //tìm comment => tìm các thằng cha trước => ok
+  //nếu ko có trong thằng cha thì tìm vào thằng con bằng cách lặp qua thnawgf cha và kiểm trả replies
+  const findCommentByIdRecursive = (comments: TCommentItemProduct[], id: string): undefined | TCommentItemProduct => {
+    const findComment: undefined | TCommentItemProduct = comments.find(item => item._id === id)
+    if (findComment) return findComment
+
+    for (const comment of comments) {
+      if (comment.replies && comment.replies.length > 0) {
+        const findReply: undefined | TCommentItemProduct = findCommentByIdRecursive(comment.replies, id)
+        if (findReply) return findReply
+      }
+    }
+
+    return undefined
+  }
+  //tương tự xóa cmt
+  const deleteCommentByIdRecursive = (comments: TCommentItemProduct[], id: string): undefined | TCommentItemProduct => {
+    const index = comments.findIndex(item => item._id === id)
+    if (index !== -1) {
+      const item = comments[index]
+      comments.splice(index, 1)
+
+      return item // xem có bnh phần tử trong cái item đẻ tính lại số lượng
+    }
+
+    for (const comment of comments) {
+      if (comment.replies && comment.replies.length > 0) {
+        const findReply: undefined | TCommentItemProduct = deleteCommentByIdRecursive(comment.replies, id)
+        if (findReply) return findReply
+      }
+    }
+
+    return undefined
+  }
+
+  //xóa nhiều cmt
+  const deleteManyCommentRecursive = (comments: TCommentItemProduct[], ids: string[]) => {
+    let deletedCount: number = 0
+    // xóa lớp ngoài
+    ids.forEach(id => {
+      const index = comments.findIndex(item => item._id === id)
+      if (index !== -1) {
+        comments.splice(index, 1)
+        deletedCount += 1
+      }
+    })
+    //xóa replies
+    for (const comment of comments) {
+      if (comment.replies && comment.replies.length > 0) {
+        deleteManyCommentRecursive(comment.replies, ids)
+      }
+    }
+
+    return deletedCount
+  }
+
+  //socket
+  useEffect(() => {
+    const socket = connectSocketIO()
+    const cloneListComment = cloneDeep(listComment)
+    socket.on(ACTION_SOCKET_COMMENT.CREATE_COMMENT, data => {
+      const newListComment = cloneListComment.data
+      newListComment.unshift(data)
+      setListComment({
+        data: newListComment,
+        total: cloneListComment.total + 1
+      })
+    })
+    socket.on(ACTION_SOCKET_COMMENT.REPLY_COMMENT, data => {
+      const parentId = data.parent
+      const findParent = cloneListComment?.data?.find((item: TCommentItemProduct) => item?._id === parentId)
+      if (findParent) {
+        findParent?.replies?.push({ ...data })
+        setListComment({
+          data: cloneListComment.data,
+          total: cloneListComment.total + 1
+        })
+      }
+    })
+    socket.on(ACTION_SOCKET_COMMENT.UPDATE_COMMENT, data => {
+      const findComment = findCommentByIdRecursive(cloneListComment.data, data._id)
+      if (findComment) {
+        findComment.content = data.content
+        setListComment(cloneListComment)
+      }
+    })
+    socket.on(ACTION_SOCKET_COMMENT.DELETE_COMMENT, data => {
+      const deleteComment = deleteCommentByIdRecursive(cloneListComment.data, data._id)
+      if (deleteComment) {
+        const totalDelete = (deleteComment?.replies ? deleteComment?.replies?.length : 0) + 1
+        setListComment({
+          data: cloneListComment.data,
+          total: cloneListComment.total - totalDelete
+        })
+      }
+    })
+    socket.on(ACTION_SOCKET_COMMENT.DELETE_MULTIPLE_COMMENT, data => {
+      const deletedCount = deleteManyCommentRecursive(cloneListComment.data, data)
+      setListComment({
+        data: cloneListComment.data,
+        total: cloneListComment.total - deletedCount
+      })
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [listComment])
+
   useEffect(() => {
     if (dataProduct?._id) {
       fetchGetAllListReviewByProduct(dataProduct._id)
@@ -213,7 +324,6 @@ const DetailProductPage = () => {
   useEffect(() => {
     if (isSuccessDeleteComment && dataProduct?._id) {
       toast.success(t('Delete_comment_success'))
-      fetchListCommentProduct(dataProduct._id)
       dispatch(resetInitialStateComment())
     } else if (isErrorDeleteComment && messageErrorDeleteComment) {
       toast.error(t('Delete_comment_error'))
@@ -224,7 +334,6 @@ const DetailProductPage = () => {
   useEffect(() => {
     if (isSuccessCreateComment && dataProduct?._id) {
       toast.success(t('Create_comment_success'))
-      fetchListCommentProduct(dataProduct._id)
       dispatch(resetInitialStateComment())
     } else if (isErrorCreateComment && messageErrorCreateComment) {
       toast.error(t('Create_comment_error'))
@@ -232,9 +341,8 @@ const DetailProductPage = () => {
     }
   }, [isSuccessCreateComment, isErrorCreateComment, messageErrorCreateComment])
   useEffect(() => {
-    if (isSuccessEditComment&& dataProduct?._id) {
+    if (isSuccessEditComment && dataProduct?._id) {
       toast.success(t('Update_comment_success'))
-      fetchListCommentProduct(dataProduct._id)
       dispatch(resetInitialStateComment())
     } else if (isErrorEditComment && messageErrorEditComment) {
       toast.error(t('Update_comment_error'))
@@ -245,7 +353,6 @@ const DetailProductPage = () => {
   useEffect(() => {
     if (isSuccessReply && dataProduct?._id) {
       toast.success(t('Create_reply_success'))
-      fetchListCommentProduct(dataProduct._id)
       dispatch(resetInitialStateComment())
     } else if (isErrorReply && messageErrorReply) {
       toast.error(t('Create_reply_error'))
