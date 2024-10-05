@@ -20,7 +20,7 @@ export const authOptions = {
       name: 'facebook',
       authorization: {
         params: {
-          scope: 'email' // Ensure that the email scope is included here
+          scope: 'email,public_profile'
         }
       }
     })
