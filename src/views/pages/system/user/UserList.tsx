@@ -42,9 +42,12 @@ import TableHeader from 'src/components/table-header'
 import { PERMISSIONS } from 'src/configs/permissions'
 import CustomSelect from 'src/components/custom-select'
 import { getAllRoles } from 'src/services/role'
-import { OBJECT_STATUS_USER } from 'src/configs/user'
+import { CONFIG_USER_TYPE, OBJECT_STATUS_USER } from 'src/configs/user'
 import { resetInitialState } from 'src/stores/user'
 import { getAllCity } from 'src/services/city'
+import { getCountUserType } from 'src/services/report'
+import IconifyIcon from 'src/components/Icon'
+import CardCountUser from 'src/views/pages/system/user/components/CardCountUser'
 
 type TProps = {}
 type TSelectedRow = { id: string; role: { name: string; permissions: string[] } }
@@ -87,6 +90,10 @@ const UserListPage: NextPage<TProps> = () => {
   const CONSTANT_STATUS_USER = OBJECT_STATUS_USER()
   const [optionRoles, setOptionRoles] = useState<{ label: string; value: string }[]>([])
   const [optionCity, setOptionCity] = useState<{ label: string; value: string }[]>([])
+  const [countUserType, setCountUserType] = useState<{
+    data: Record<number, number>
+    totalUser: number
+  }>({} as any)
   const fetchRoles = async () => {
     setLoading(true)
     await getAllRoles({ params: { limit: -1, page: -1 } })
@@ -112,9 +119,26 @@ const UserListPage: NextPage<TProps> = () => {
       .catch(e => setLoading(false))
   }
 
+  const fetchAllCountUserType = async () => {
+    setLoading(true)
+    await getCountUserType()
+      .then(res => {
+        const data = res.data
+        setLoading(false)
+        setCountUserType({
+          data: data.data,
+          totalUser: data.total
+        })
+      })
+      .catch(e => {
+        setLoading(false)
+      })
+  }
+
   useEffect(() => {
     fetchRoles()
     fetchAllCity()
+    fetchAllCountUserType()
   }, [])
   //page Nào cần check chỉ cần dugnf thế này là ok
   const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.USER', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
@@ -175,6 +199,21 @@ const UserListPage: NextPage<TProps> = () => {
       />
     )
   }
+  const mapUserType = {
+    1: {
+      title: t('Facebook'),
+      icon: 'logos:facebook'
+    },
+    2: {
+      title: t('Google'),
+      icon: 'flat-color-icons:google'
+    },
+    3: {
+      title: t('Email'),
+      icon: 'logos:google-gmail',
+      iconSize: 18
+    }
+  }
 
   const columns: GridColDef[] = [
     {
@@ -182,6 +221,7 @@ const UserListPage: NextPage<TProps> = () => {
       headerName: t('FullName'),
       flex: 1,
       minWidth: 150,
+      maxWidth: 150,
       renderCell: params => {
         const { row } = params
         const fullname = toFullName(row?.lastName || '', row?.middleName || '', row?.firstName || '', i18n.language)
@@ -225,8 +265,8 @@ const UserListPage: NextPage<TProps> = () => {
     {
       field: 'city',
       headerName: t('city'),
-      maxWidth: 150,
-      minWidth: 150,
+      maxWidth: 100,
+      minWidth: 100,
       renderCell: params => {
         const { row } = params
 
@@ -268,6 +308,28 @@ const UserListPage: NextPage<TProps> = () => {
               <GridDelete disabled={!DELETE} onClick={() => setOpenDeleteUser({ open: true, id: String(params.id) })} />
             </>
           </Box>
+        )
+      }
+    },
+    {
+      field: 'userType',
+      headerName: t('User Type'),
+      minWidth: 120,
+      maxWidth: 120,
+      renderCell: params => {
+        const { row } = params
+
+        return (
+          <>
+            {row.userType && (
+              <Box>
+                <IconifyIcon
+                  icon={(mapUserType as any)[row.userType]?.icon}
+                  fontSize={(mapUserType as any)[row.userType]?.iconSize || 24}
+                />
+              </Box>
+            )}
+          </>
         )
       }
     }
@@ -362,6 +424,26 @@ const UserListPage: NextPage<TProps> = () => {
     return selectedRow.some(item => item?.role?.permissions?.includes(PERMISSIONS.ADMIN))
   }, [selectedRow])
 
+  const dataListUser = [
+    {
+      icon: 'tabler:user',
+      userType: 4
+    },
+    {
+      icon: 'logos:facebook',
+      userType: CONFIG_USER_TYPE.FACEBOOK
+    },
+    {
+      userType: CONFIG_USER_TYPE.GOOGLE,
+      icon: 'flat-color-icons:google'
+    },
+    {
+      icon: 'logos:google-gmail',
+      iconSize: '18',
+      userType: CONFIG_USER_TYPE.DEFAULT
+    }
+  ]
+
   return (
     <>
       {loading && <Spinner />}
@@ -389,6 +471,17 @@ const UserListPage: NextPage<TProps> = () => {
         setAvatar={setAvatar}
       />
       {isLoading && <Spinner />}
+      <Box sx={{ backgroundColor: 'inherit', width: '100%', mb: 4 }}>
+        <Grid container spacing={6} sx={{ height: '100%' }}>
+          {dataListUser?.map((item: any, index: number) => {
+            return (
+              <Grid item xs={12} md={3} sm={6} key={index}>
+                <CardCountUser {...item} countUserType={countUserType} />
+              </Grid>
+            )
+          })}
+        </Grid>
+      </Box>
       <Box
         sx={{
           backgroundColor: theme.palette.background.paper,
@@ -404,7 +497,7 @@ const UserListPage: NextPage<TProps> = () => {
             <Box
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 4, width: '100%', gap: 4 }}
             >
-              <Box sx={{ width: '300px' }}>
+              <Box sx={{ width: '200px' }}>
                 <CustomSelect
                   fullWidth
                   multiple
@@ -416,7 +509,7 @@ const UserListPage: NextPage<TProps> = () => {
                   placeholder={t('city')}
                 />
               </Box>
-              <Box sx={{ width: '300px' }}>
+              <Box sx={{ width: '200px' }}>
                 <CustomSelect
                   fullWidth
                   onChange={e => setStatusSelected(e.target.value as string)}
@@ -426,7 +519,7 @@ const UserListPage: NextPage<TProps> = () => {
                 />
               </Box>
 
-              <Box sx={{ width: '300px' }}>
+              <Box sx={{ width: '200px' }}>
                 <CustomSelect
                   fullWidth
                   onChange={e => setRoleSelected(e.target.value as string)}
@@ -435,7 +528,7 @@ const UserListPage: NextPage<TProps> = () => {
                   placeholder={t('Search_your_role')}
                 />
               </Box>
-              <Box sx={{ width: '300px' }}>
+              <Box sx={{ width: '200px' }}>
                 <InputSearch value={searchBy} onChange={(value: string) => setSearchBy(value)}></InputSearch>
               </Box>
               <GridCreate
