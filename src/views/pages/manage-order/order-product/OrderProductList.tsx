@@ -65,7 +65,6 @@ import { STATUS_ORDER_PRODUCT } from 'src/configs/orderProducts'
 import EditOrderProduct from 'src/views/pages/manage-order/order-product/components/EditOrderProduct'
 import CardCountStatusOrder from 'src/views/pages/manage-order/order-product/components/CardCountOrderStatus'
 import { getCountOrderStatus } from 'src/services/report'
-// import { getCountOrderStatus } from 'src/services/report'
 
 type TProps = {}
 
