@@ -29,6 +29,10 @@ khi đăng nahapaj bằng fb => client call 1 api đến fb => fb trả về nhi
 
 docs `https://next-auth.js.org/getting-started/example`
 
+khi deploy mà bị lỗi ko thể tải url thì cài đặt thêm cái +. vào cái app đó => truy cập
+
+`https://developers.facebook.com/apps/1950674085401135/use_cases/customize/settings/?product_route=fb-login` hoặc là `https://developers.facebook.com/apps/1950674085401135/fb-login/settings` => dán cái này vào cái phần `URI chuyển hướng OAuth hợp lệ` : `https://nextjs-shop-omega.vercel.app/api/auth/callback/facebook` là ok
+
 yarn add next auth
 
 làm theo docs đã => TẠO ENV => ok base setup
