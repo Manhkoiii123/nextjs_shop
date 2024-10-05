@@ -243,10 +243,22 @@ const ProductList: NextPage<TProps> = () => {
       headerName: t('product_Name'),
       flex: 1,
       minWidth: 200,
+      maxWidth: 200,
+      width: 200,
       renderCell: params => {
         const { row } = params
 
-        return <Typography>{row?.name}</Typography>
+        return (
+          <Typography
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '100%'
+            }}
+          >
+            {row?.name}
+          </Typography>
+        )
       }
     },
     {
@@ -265,10 +277,21 @@ const ProductList: NextPage<TProps> = () => {
       headerName: t('Slug'),
       minWidth: 200,
       maxWidth: 200,
+      width: 200,
       renderCell: params => {
         const { row } = params
 
-        return <Typography>{row?.slug}</Typography>
+        return (
+          <Typography
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '100%'
+            }}
+          >
+            {row?.slug}
+          </Typography>
+        )
       }
     },
     {
