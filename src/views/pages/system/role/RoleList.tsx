@@ -235,7 +235,8 @@ const RoleListPage: NextPage<TProps> = () => {
           alignItems: 'center',
           padding: '20px',
           height: '100%',
-          width: '100%'
+          width: '100%',
+          borderRadius: '15px'
         }}
       >
         <Grid container sx={{ height: '100%', width: '100%' }}>
@@ -272,11 +273,13 @@ const RoleListPage: NextPage<TProps> = () => {
                 sortingOrder={['desc', 'asc']}
                 sortingMode='server'
                 onSortModelChange={handleSort}
-                slots={{
-                  // cái này để cutom pagination nó là 1 hàm trả về cái comp này
-                  // viết hàm PaginationComponent trả về cái customPa của ta
-                  // pagination: PaginationComponent
-                }}
+                slots={
+                  {
+                    // cái này để cutom pagination nó là 1 hàm trả về cái comp này
+                    // viết hàm PaginationComponent trả về cái customPa của ta
+                    // pagination: PaginationComponent
+                  }
+                }
                 disableColumnFilter
                 getRowClassName={(row: GridRowClassNameParams) => {
                   //khi đó cái nào chọn thì có class này
