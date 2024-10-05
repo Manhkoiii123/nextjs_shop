@@ -239,6 +239,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
     // const shippingPrice = optionsDelivery.find(item => item.value === deliverySelected)?.price ?? 0
     const totalPrice = memoPriceShipping + Number(memoQueryProduct.totalPrice)
     const data = {
+      email: user?.email || '',
       orderItems: memoQueryProduct.product,
       itemsPrice: +memoQueryProduct.totalPrice,
       paymentMethod: paymentSelected,
@@ -259,7 +260,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
       phone: memoAddressDefault ? memoAddressDefault.phoneNumber : ''
     }
     dispatch(createOrderProductAsync(data)).then(res => {
-      const idPaymentMethod = res?.payload.data.paymentMethod
+      const idPaymentMethod = res?.payload.data?.paymentMethod
       const orderId = res?.payload?.data?._id
       const totalPrice = res?.payload?.data?.totalPrice
       const findPayment = optionsPaymentType.find(i => i.value === idPaymentMethod)

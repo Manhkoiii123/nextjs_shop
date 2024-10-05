@@ -34,6 +34,7 @@ export type TParamsCreateOrderProduct = {
   totalPrice: number
   user: string
   deliveryMethod: string
+  email: string
 }
 
 export type TParamsStatusOrderUpdate = {
