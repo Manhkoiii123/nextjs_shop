@@ -44,11 +44,11 @@ const UserLayout: NextPage<TProps> = ({ children }) => {
           sx={{
             m: 4,
             padding: '0 !important',
-            borderRadius: '15px',
+            // borderRadius: '15px',
             maxWidth: 'unset !important',
             width: `calc(100% - 32px)`,
-            maxHeight: `calc(100vh - ${theme.mixins.toolbar.minHeight}px - 32px)`,
-            height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px - 32px)`
+            // maxHeight: `calc(100vh - ${theme.mixins.toolbar.minHeight}px - 32px)`,
+            // height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px - 32px)`
           }}
         >
           {children}

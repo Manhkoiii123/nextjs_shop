@@ -42,7 +42,7 @@ import TableHeader from 'src/components/table-header'
 import { PERMISSIONS } from 'src/configs/permissions'
 import CustomSelect from 'src/components/custom-select'
 import { getAllRoles } from 'src/services/role'
-import { CONFIG_USER_TYPE, OBJECT_STATUS_USER } from 'src/configs/user'
+import { CONFIG_USER_TYPE, OBJECT_STATUS_USER, OBJECT_TYPE_USER } from 'src/configs/user'
 import { resetInitialState } from 'src/stores/user'
 import { getAllCity } from 'src/services/city'
 import { getCountUserType } from 'src/services/report'
@@ -147,6 +147,7 @@ const UserListPage: NextPage<TProps> = () => {
   const [selectedRow, setSelectedRow] = useState<TSelectedRow[]>([])
   const [roleSelected, setRoleSelected] = useState<string>('')
   const [statusSelected, setStatusSelected] = useState<string>('')
+  const [typeSelected, setTypeSelected] = useState<string[]>([])
   const [citySelected, setCitySelected] = useState<string[]>([])
   const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
   const [avatar, setAvatar] = useState('')
@@ -214,7 +215,7 @@ const UserListPage: NextPage<TProps> = () => {
       iconSize: 18
     }
   }
-
+  const CONSTANT_USER_TYPE = OBJECT_TYPE_USER()
   const columns: GridColDef[] = [
     {
       field: i18n.language === 'vi' ? 'lastName' : 'firstName',
@@ -393,10 +394,11 @@ const UserListPage: NextPage<TProps> = () => {
     setFilterBy({
       roleId: roleSelected,
       status: statusSelected,
-      cityId: citySelected
+      cityId: citySelected,
+      userType: typeSelected
       // cityId: ''
     })
-  }, [roleSelected, statusSelected, citySelected])
+  }, [roleSelected, statusSelected, citySelected, typeSelected])
   useEffect(() => {
     if (isSuccessDelete) {
       toast.success(t('delete-user-success'))
@@ -489,7 +491,8 @@ const UserListPage: NextPage<TProps> = () => {
           alignItems: 'center',
           padding: '20px',
           height: '100%',
-          width: '100%'
+          width: '100%',
+          borderRadius: '10px'
         }}
       >
         <Grid container sx={{ height: '100%', width: '100%' }}>
@@ -497,6 +500,18 @@ const UserListPage: NextPage<TProps> = () => {
             <Box
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 4, width: '100%', gap: 4 }}
             >
+              <Box sx={{ width: '200px' }}>
+                <CustomSelect
+                  fullWidth
+                  onChange={e => {
+                    setTypeSelected(e.target.value as string[])
+                  }}
+                  multiple
+                  options={Object.values(CONSTANT_USER_TYPE)}
+                  value={typeSelected}
+                  placeholder={t('User type')}
+                />
+              </Box>
               <Box sx={{ width: '200px' }}>
                 <CustomSelect
                   fullWidth
