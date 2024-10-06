@@ -257,3 +257,30 @@ export default connectSocketIO
 ```
 
 sang trang detail lắng nghe sự kiện socket => useEffect
+
+# Hướng dẫn setup firebase ở client và API
+
+lên firebase đăng kí project => ok => chọn `cloud messengeing` => chọn web => đặt tên => register => copy code
+
+ví dụ đây vào file `config/firebase.ts`
+
+```ts
+import { initializeApp } from 'firebase/app'
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyB3ORPRhiO7KdynHVBvfOtC1sT6ttWqkZ0',
+  authDomain: 'manh-shop-d116c.firebaseapp.com',
+  projectId: 'manh-shop-d116c',
+  storageBucket: 'manh-shop-d116c.appspot.com',
+  messagingSenderId: '669097405316',
+  appId: '1:669097405316:web:193079279467da8beb0bd1',
+  measurementId: 'G-MBL2S58W6E'
+}
+
+// Initialize Firebase
+const fireApp = initializeApp(firebaseConfig)
+
+export default fireApp
+```
+
+đây là bên client , bên BE thì vào service account
