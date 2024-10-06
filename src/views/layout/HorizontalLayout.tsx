@@ -19,6 +19,7 @@ import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
 import Link from 'next/link'
 import CardProduct from 'src/views/layout/components/card-product'
+import NotificationDropdown from 'src/views/layout/components/notification-dropdown'
 
 const drawerWidth: number = 240
 
@@ -104,7 +105,10 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
         <ModeToggle />
         <CardProduct />
         {user ? (
-          <UserDropdown />
+          <>
+            <NotificationDropdown />
+            <UserDropdown />
+          </>
         ) : (
           <Button onClick={handleNavigateLogin} type='submit' variant='contained' sx={{ width: 'auto', ml: 2 }}>
             {t('Sign_In')}
