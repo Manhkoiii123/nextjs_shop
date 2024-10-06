@@ -43,6 +43,7 @@ import { AxiosInterceptor } from 'src/helpers/axios'
 import NoGrard from 'src/components/auth/NoGuard'
 
 import { SessionProvider } from 'next-auth/react'
+import { useTheme } from '@mui/material'
 
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -83,6 +84,7 @@ export default function App(props: ExtendedAppProps) {
     Component,
     pageProps: { session, ...pageProps }
   } = props
+  const theme = useTheme()
 
   const { settings } = useSettings()
 
@@ -103,13 +105,15 @@ export default function App(props: ExtendedAppProps) {
     success: {
       className: 'react-hot-toast',
       style: {
-        background: '#DDF6E8'
+        background: '#DDF6E8',
+        color: theme.palette.text.primary
       }
     },
     error: {
       className: 'react-hot-toast',
       style: {
-        background: '#FDE4D5'
+        background: '#FDE4D5',
+        color: theme.palette.text.primary
       }
     }
   }
