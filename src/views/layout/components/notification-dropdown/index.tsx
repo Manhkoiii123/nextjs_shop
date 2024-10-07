@@ -1,7 +1,5 @@
-// ** React Imports
-import { useState, SyntheticEvent, Fragment, useEffect } from 'react'
+import { useState, SyntheticEvent, Fragment, useEffect, useRef } from 'react'
 
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
@@ -12,10 +10,8 @@ import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import { Chip } from '@mui/material'
 
-// ** Components
 import Icon from 'src/components/Icon'
 
-// ** Third party
 import { useTranslation } from 'react-i18next'
 import NotificationItem from 'src/views/layout/components/notification-dropdown/components/NotificationItem'
 import { useDispatch, useSelector } from 'react-redux'
@@ -40,7 +36,6 @@ export type NotificationsType = {
 
 interface Props {}
 
-// ** Styled Menu component
 const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
   '& .MuiMenu-paper': {
     width: 380,
@@ -63,7 +58,6 @@ const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
   }
 }))
 
-// ** Styled MenuItem component
 const MenuItem = styled(MuiMenuItem)<MenuItemProps>(({ theme }) => ({
   paddingTop: theme.spacing(3),
   paddingBottom: theme.spacing(3),
@@ -73,11 +67,10 @@ const MenuItem = styled(MuiMenuItem)<MenuItemProps>(({ theme }) => ({
 }))
 
 const NotificationDropdown = (props: Props) => {
-  // ** Hooks
   const theme = useTheme()
   const { t } = useTranslation()
+  const wrapperListNotiRef = useRef<HTMLDivElement>(null)
 
-  // ** States
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const {
     notifications,
@@ -91,16 +84,32 @@ const NotificationDropdown = (props: Props) => {
     isErrorReadAll,
     messageErrorReadAll
   } = useSelector((state: RootState) => state.notification)
+  const [limit, setLimit] = useState(10)
   const dispatch: AppDispatch = useDispatch()
   const handleGetListNotification = () => {
-    dispatch(getAllNotificationsAsync({ params: { limit: -1, page: -1 } }))
+    dispatch(getAllNotificationsAsync({ params: { limit: limit, page: 1 } }))
   }
-  console.log(notifications)
   useEffect(() => {
     handleGetListNotification()
-  }, [])
+  }, [limit])
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
+  }
+
+  const handleScrollListNoti = () => {
+    const wrapperContent = wrapperListNotiRef.current
+    if (!wrapperContent) {
+      return
+    }
+    const heightList = wrapperContent.clientHeight // chiều cao hiển thị
+    const scrollHeight = wrapperContent.scrollHeight // tất cả các phần tử nếu ko có scroll
+    const maxScroll = scrollHeight - heightList
+    const currentScroll = wrapperContent.scrollTop
+    if (currentScroll >= maxScroll) {
+      if (notifications.totalCount > limit) {
+        setLimit(prev => prev + 10)
+      }
+    }
   }
 
   const handleDropdownClose = () => {
@@ -183,6 +192,8 @@ const NotificationDropdown = (props: Props) => {
             overflowY: 'auto',
             overflowX: 'hidden'
           }}
+          ref={wrapperListNotiRef}
+          onScroll={handleScrollListNoti}
         >
           {notifications.data.map((notification: NotificationsType, index: number) => (
             <NotificationItem key={index} notification={notification} handleDropdownClose={handleDropdownClose} />
