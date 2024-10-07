@@ -3,7 +3,7 @@ import { MouseEvent, useState } from 'react'
 
 // Mui Imports
 import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
-import { Badge, Box, IconButton, Menu, Typography, TypographyProps, styled } from '@mui/material'
+import { Avatar, Badge, Box, IconButton, Menu, Typography, TypographyProps, styled } from '@mui/material'
 
 // ** Components
 import Icon from 'src/components/Icon'
@@ -11,6 +11,13 @@ import Icon from 'src/components/Icon'
 // ** Third party
 import { useTranslation } from 'react-i18next'
 import { NotificationsType } from 'src/views/layout/components/notification-dropdown'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/stores'
+import { deleteNotificationAsync, markReadNotificationAsync } from 'src/stores/notification/actions'
+import { formatDate } from 'src/utils/date'
+import { CONTEXT_NOTIFICATION } from 'src/configs/notification'
+import { useRouter } from 'next/navigation'
+import { ROUTE_CONFIG } from 'src/configs/route'
 
 // ** Styled component for the title in MenuItems
 const MenuItemTitle = styled(Typography)<TypographyProps>({
@@ -46,33 +53,76 @@ type TProps = {
 const NotificationItem = (props: TProps) => {
   // ** Props
   const { notification, handleDropdownClose } = props
+  const router = useRouter()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-
+  const dispatch: AppDispatch = useDispatch()
   const optionsOpen = Boolean(anchorEl)
 
   // ** Hooks
   const { t } = useTranslation()
+  const mapTitle = {
+    Cancel_order: `${t('Cancel_order')}`,
+    Create_order: `${t('Create_order')}`,
+    Wait_payment: `${t('Wait_payment_order')}`,
+    Wait_delivery: `${t('Wait_delivery_order')}`,
+    Done_order: `${t('Done_order')}`,
+    Is_delivered: `${t('Is_delivered')}`,
+    Is_paid: `${t('Is_paid')}`,
+    Payment_vn_pay_success: `${t('Payment_vn_pay_success')}`,
+    Payment_vn_pay_error: `${t('Payment_vn_pay_error')}`
+  }
 
   // ** Handles
   const handleOptionsClose = () => {
     setAnchorEl(null)
   }
+  const handleMarkRead = () => {
+    dispatch(markReadNotificationAsync(notification._id))
+    setAnchorEl(null)
+  }
+  const handleDeleteNoti = () => {
+    dispatch(deleteNotificationAsync(notification._id))
+    setAnchorEl(null)
+  }
+  const handleNavigateDetail = (type: string) => {
+    switch (type) {
+      case CONTEXT_NOTIFICATION.ORDER:
+        handleDropdownClose()
+        router.push(`${ROUTE_CONFIG.MY_ORDER}/${notification.referenceId}`)
+        break
+
+      default:
+        break
+    }
+  }
 
   return (
     <MenuItem disableRipple disableTouchRipple>
       <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
-        <Box sx={{ mr: 4, ml: 2.5, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-          <MenuItemTitle onClick={handleDropdownClose}>{notification.title}</MenuItemTitle>
-          <MenuItemSubtitle variant='body2'>{notification.subtitle}</MenuItemSubtitle>
+        <Box
+          onClick={() => handleNavigateDetail(notification.context)}
+          sx={{ mr: 4, ml: 2.5, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}
+        >
+          <MenuItemTitle>{(mapTitle as any)[notification.title]}</MenuItemTitle>
+          <MenuItemSubtitle variant='body2'>{notification.body}</MenuItemSubtitle>
           <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-            {notification.meta}
+            {formatDate(notification.createdAt)}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-          <Badge sx={{}} color='error' overlap='circular' variant='dot' />
-          <Typography>Unread</Typography>
+          {!notification.isRead ? (
+            <>
+              <Badge sx={{}} color='error' overlap='circular' variant='dot' />
+              <Typography>Unread</Typography>
+            </>
+          ) : (
+            <>
+              <Badge sx={{}} color='success' overlap='circular' variant='dot' />
+            </>
+          )}
+
           <>
             <IconButton onClick={(event: MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget)}>
               <Icon icon='pepicons-pencil:dots-y'></Icon>
@@ -91,11 +141,11 @@ const NotificationItem = (props: TProps) => {
                 horizontal: 'right'
               }}
             >
-              <MenuItem sx={{ '& svg': { mr: 2 }, border: 'none !important' }}>
+              <MenuItem onClick={handleMarkRead} sx={{ '& svg': { mr: 2 }, border: 'none !important' }}>
                 <Icon icon='gg:read' fontSize={20} />
                 {t('Mark read')}
               </MenuItem>
-              <MenuItem sx={{ '& svg': { mr: 2 } }}>
+              <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handleDeleteNoti}>
                 <Icon icon='mdi:delete-outline' fontSize={20} />
                 {t('Delete')}
               </MenuItem>

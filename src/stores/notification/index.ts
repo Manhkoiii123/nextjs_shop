@@ -4,6 +4,7 @@ import { createSlice } from '@reduxjs/toolkit'
 // ** Actions
 
 import {
+  deleteNotificationAsync,
   getAllNotificationsAsync,
   markReadAllNotificationAsync,
   markReadNotificationAsync,
@@ -24,11 +25,13 @@ const initialState = {
   messageErrorReadAll: '',
   notifications: {
     data: [],
-    total: 0
+    totalCount: 0,
+    totalNew: 0,
+    totalPage: 0
   }
 }
 
-export const deliveryTypeSlice = createSlice({
+export const notificationSlice = createSlice({
   name: serviceName,
   initialState,
   reducers: {
@@ -53,12 +56,16 @@ export const deliveryTypeSlice = createSlice({
     builder.addCase(getAllNotificationsAsync.fulfilled, (state, action) => {
       state.isLoading = false
       state.notifications.data = action.payload?.data?.notifications || []
-      state.notifications.total = action.payload?.data?.totalCount
+      state.notifications.totalCount = action.payload?.data?.totalCount
+      state.notifications.totalNew = action.payload?.data?.totalNew
+      state.notifications.totalPage = action.payload?.data?.totalPage
     })
     builder.addCase(getAllNotificationsAsync.rejected, (state, action) => {
       state.isLoading = false
       state.notifications.data = []
-      state.notifications.total = 0
+      state.notifications.totalCount = 0
+      state.notifications.totalNew = 0
+      state.notifications.totalPage = 0
     })
 
     // ** read notification
@@ -72,6 +79,17 @@ export const deliveryTypeSlice = createSlice({
       state.messageErrorRead = action.payload?.message
       state.typeError = action.payload?.typeError
     })
+    // ** delete notification
+    builder.addCase(deleteNotificationAsync.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(deleteNotificationAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.isSuccessDelete = !!action.payload?.data?._id
+      state.isErrorDelete = !action.payload?.data?._id
+      state.messageErrorDelete = action.payload?.message
+      state.typeError = action.payload?.typeError
+    })
 
     // ** read all notification
     builder.addCase(markReadAllNotificationAsync.pending, (state, action) => {
@@ -79,13 +97,13 @@ export const deliveryTypeSlice = createSlice({
     })
     builder.addCase(markReadAllNotificationAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.isSuccessReadAll = !!action.payload?.data?._id
-      state.isErrorReadAll = !action.payload?.data?._id
+      state.isSuccessReadAll = action.payload?.status === 'Success'
+      state.isErrorReadAll = action.payload?.status !== 'Success'
       state.messageErrorReadAll = action.payload?.message
       state.typeError = action.payload?.typeError
     })
   }
 })
 
-export const { resetInitialState } = deliveryTypeSlice.actions
-export default deliveryTypeSlice.reducer
+export const { resetInitialState } = notificationSlice.actions
+export default notificationSlice.reducer
