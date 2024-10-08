@@ -1,41 +1,10 @@
-'use client'
-import { Box, Typography } from '@mui/material'
-import { getMessaging, onMessage } from 'firebase/messaging'
 import Head from 'next/head'
-import { ReactNode, useEffect } from 'react'
-import CustomDataGrid from 'src/components/custom-data-grid'
-import firebaseApp from 'src/configs/firebase'
-import useFcmToken from 'src/hooks/useFcmToken'
+import { ReactNode } from 'react'
 
 import LayoutNotApp from 'src/views/layout/LayoutNotApp'
 import HomePage from 'src/views/pages/home'
 
 export default function Home() {
-  const { fcmToken } = useFcmToken()
-
-  console.log('fcmToken', fcmToken)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/firebase-messaging-sw.js')
-        .then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope)
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error)
-        })
-      const messaging = getMessaging(firebaseApp)
-      const unsubcribe = onMessage(messaging, payload => {
-        console.log('payload', payload)
-      })
-
-      return () => {
-        unsubcribe()
-      }
-    }
-  }, [])
-
   return (
     <>
       <Head>
