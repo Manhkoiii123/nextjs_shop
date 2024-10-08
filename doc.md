@@ -416,3 +416,11 @@ Home.authGuard = false
 ```
 
 vào filebase => messaging trên thanh công cụ => create your first campain
+
+# 267. Integrate luồng push notification với firebase
+
+khi muốn nhận noti thì cần có cái `devicetoken` ở mỗi thiết bị => gắn nó ở đâu cho hợp lí ?
+
+khi đăng nhập vào thiết bị (bắt buộc phỉa `login`) => update tại trang `login`. khi đăng nhập ở thiết bị khác thì phải `login` mới vào được web để nhận thông báo => cần chạy qua luồng `login`
+
+tại thiết bị khác ch đăng nhập mà vào `home` thì ch cần update devide token cho nó

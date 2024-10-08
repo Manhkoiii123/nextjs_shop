@@ -36,6 +36,7 @@ import {
   setLocalRememberLoginAuthSocial
 } from 'src/helpers/storage'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import useFcmToken from 'src/hooks/useFcmToken'
 
 type TProps = {}
 type TDefaultValue = {
@@ -55,6 +56,8 @@ const schema = yup
   .required()
 
 const LoginPage: NextPage<TProps> = () => {
+  const { fcmToken } = useFcmToken()
+
   const { t } = useTranslation()
   const defaultValues: TDefaultValue = {
     email: '',
@@ -81,7 +84,7 @@ const LoginPage: NextPage<TProps> = () => {
 
   const onsubmit = (data: { email: string; password: string }) => {
     if (!Object.keys(errors).length) {
-      login({ ...data, rememberMe: isRemember }, err => {
+      login({ ...data, rememberMe: isRemember, deviceToken: fcmToken }, err => {
         if (err?.response?.data?.typeError === 'INVALID') toast.error(t('the_emmail_or_pass_wrong'))
       })
     }
@@ -102,8 +105,8 @@ const LoginPage: NextPage<TProps> = () => {
         loginFacebook(
           {
             idToken: (session as any)?.accessToken,
-            rememberMe: rememberLocal ? rememberLocal === 'true' : true
-            // deviceToken: deviceToken ? deviceToken : ''
+            rememberMe: rememberLocal ? rememberLocal === 'true' : true,
+            deviceToken: deviceToken ? deviceToken : ''
           },
           err => {
             if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))
@@ -113,8 +116,8 @@ const LoginPage: NextPage<TProps> = () => {
         loginGoogle(
           {
             idToken: (session as any)?.accessToken,
-            rememberMe: rememberLocal ? rememberLocal === 'true' : true
-            // deviceToken: deviceToken ? deviceToken : ''
+            rememberMe: rememberLocal ? rememberLocal === 'true' : true,
+            deviceToken: deviceToken ? deviceToken : ''
           },
           err => {
             if (err?.response?.data?.typeError === 'INVALID') toast.error(t('The_email_or_password_wrong'))

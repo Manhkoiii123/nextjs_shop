@@ -19,6 +19,8 @@ import { AppDispatch, RootState } from 'src/stores'
 import { getAllNotificationsAsync, markReadAllNotificationAsync } from 'src/stores/notification/actions'
 import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/notification'
+import { getMessaging, onMessage } from 'firebase/messaging'
+import firebaseApp from 'src/configs/firebase'
 
 export type NotificationsType = {
   _id: string
@@ -87,7 +89,7 @@ const NotificationDropdown = (props: Props) => {
   const [limit, setLimit] = useState(10)
   const dispatch: AppDispatch = useDispatch()
   const handleGetListNotification = () => {
-    dispatch(getAllNotificationsAsync({ params: { limit: limit, page: 1 } }))
+    dispatch(getAllNotificationsAsync({ params: { limit: limit, page: 1, order: 'createdAt desc' } }))
   }
   useEffect(() => {
     handleGetListNotification()
@@ -111,6 +113,19 @@ const NotificationDropdown = (props: Props) => {
       }
     }
   }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const messaging = getMessaging(firebaseApp)
+      const unsubcribe = onMessage(messaging, payload => {
+        handleGetListNotification()
+      })
+
+      return () => {
+        unsubcribe()
+      }
+    }
+  }, [])
 
   const handleDropdownClose = () => {
     setAnchorEl(null)

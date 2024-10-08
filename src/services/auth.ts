@@ -53,8 +53,8 @@ export const changePasswordMe = async (data: TypeChangePassword) => {
     return error
   }
 }
-export const loginAuthGoogle = async (idToken: string) => {
-  const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/login-google`, { idToken })
+export const loginAuthGoogle = async (data: { idToken: string; deviceToken?: string }) => {
+  const res = await axios.post(`${API_ENDPOINT.AUTH.INDEX}/login-google`, data)
 
   return res.data
 }
