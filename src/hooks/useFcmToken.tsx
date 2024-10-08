@@ -5,7 +5,6 @@ import { clearLocalDeviceToken, getLocalDeviceToken, setLocalDeviceToken } from 
 
 const useFcmToken = () => {
   const [token, setToken] = useState('')
-  console.log('🚀 ~ useFcmToken ~ token:', token)
 
   useEffect(() => {
     const retrieveToken = async () => {

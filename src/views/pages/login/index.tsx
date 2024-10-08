@@ -57,7 +57,6 @@ const schema = yup
 
 const LoginPage: NextPage<TProps> = () => {
   const { fcmToken } = useFcmToken()
-  console.log('🚀 ~ fcmToken:', fcmToken)
 
   const { t } = useTranslation()
   const defaultValues: TDefaultValue = {
