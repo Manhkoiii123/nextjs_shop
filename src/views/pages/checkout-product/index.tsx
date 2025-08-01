@@ -257,7 +257,7 @@ const CheckoutProductPage: NextPage<TProps> = () => {
         : '',
       address: memoAddressDefault ? memoAddressDefault.address : '',
       city: memoAddressDefault ? memoAddressDefault.city : '',
-      phone: memoAddressDefault ? memoAddressDefault.phoneNumber : ''
+      phone: memoAddressDefault ? memoAddressDefault.phoneNumber : '',
     }
     dispatch(createOrderProductAsync(data)).then(res => {
       const idPaymentMethod = res?.payload.data?.paymentMethod

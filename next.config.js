@@ -27,6 +27,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'scontent-sin6-3.xx.fbcdn.net',
+        port: '',
+        pathname: '**'
+      },
+      {
+        protocol: 'https',
         hostname: '*scontent-xsp1-1.xx.fbcdn.net',
         port: '',
         pathname: '**'

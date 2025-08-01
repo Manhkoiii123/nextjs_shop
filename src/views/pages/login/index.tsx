@@ -93,6 +93,7 @@ const LoginPage: NextPage<TProps> = () => {
     signIn('google')
     clearLocalPreTokenAuthSocial()
   }
+  // khi ấn vào handleLoginFacebook thì nó sẽ đi vào đây => session thay đổi chạy cái useEffect dưới => chạy hàm gọi đến phía be
   const handleLoginFacebook = () => {
     signIn('facebook')
     clearLocalPreTokenAuthSocial()

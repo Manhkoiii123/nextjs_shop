@@ -237,33 +237,76 @@ const CardProduct = (props: TCardProduct) => {
                 </Box>
               )}
             </Box>
-            <Box>
-              {data.sold > 0 ? (
-                <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
-                  {t('Sold_product_count', { count: data.sold })}
-                </Typography>
-              ) : (
-                <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
-                  {t('No_sell_product')}
-                </Typography>
-              )}
-              {data.location && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconifyIcon icon={'akar-icons:location'} />
+            {data.sold > 0 ? (
+              <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
+                {t('Sold_product_count', { count: data.sold })}
+              </Typography>
+            ) : (
+              <Typography sx={{ mb: 2 }} variant='body2' color='text.secondary'>
+                {t('No_sell_product')}
+              </Typography>
+            )}
+            {(data?.location?.name || data.views) && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', mt: 2 }}>
+                {data?.location?.name && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    <IconifyIcon icon={'akar-icons:location'} />
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {data?.location?.name}
+                    </Typography>
+                  </Box>
+                )}
+                {data?.views && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    <IconifyIcon icon='lets-icons:view-light' />
 
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      color: theme.palette.primary.main,
-                      fontSize: '14px',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    {data.location.name}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {data?.views}
+                    </Typography>
+                  </Box>
+                )}
+                {!!data?.uniqueViews?.length && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    <IconifyIcon icon='mdi:account-view-outline' height={20} style={{ marginBottom: '2px' }} />
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {data?.uniqueViews?.length}
+                    </Typography>
+                  </Box>
+                )}
+                {!!data?.likedBy?.length && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    <IconifyIcon icon='icon-park-outline:like' height={20} style={{ marginBottom: '2px' }} />
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {data?.likedBy?.length}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
 
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

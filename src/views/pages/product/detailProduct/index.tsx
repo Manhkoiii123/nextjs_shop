@@ -83,9 +83,9 @@ const DetailProductPage = () => {
 
   const { t } = useTranslation()
   const theme = useTheme()
-  const fetchDetailProduct = async (slug: string) => {
+  const fetchDetailProduct = async (slug: string, isViewed?: boolean) => {
     setLoading(true)
-    await getDetailsProductPublic(slug)
+    await getDetailsProductPublic(slug, isViewed)
       .then(res => {
         setLoading(false)
         const data = res.data
@@ -147,7 +147,7 @@ const DetailProductPage = () => {
   }
   useEffect(() => {
     if (productId) {
-      fetchDetailProduct(productId)
+      fetchDetailProduct(productId, true)
       fetchListRelasedProduct(productId)
     }
   }, [productId])

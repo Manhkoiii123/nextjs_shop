@@ -239,8 +239,8 @@ const ItemProductCard = ({ item, index, selectedRows, handleSetSelectedRows }: T
             value={itemState.amount}
             inputProps={{
               inputMode: 'numeric',
-              min: 1
-              //   max: itemState.countInStock
+              min: 1,
+              max: itemState.countInStock
             }}
             // onChange={e => {
             //   setAmountProduct(+e.target.value)
