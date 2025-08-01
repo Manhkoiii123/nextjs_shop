@@ -29,6 +29,7 @@ import { resetInitialState } from 'src/stores/product'
 import toast from 'react-hot-toast'
 import CustomSelect from 'src/components/custom-select'
 import CardSkeleton from 'src/views/pages/product/components/CardSkeleton'
+import ChatBotAI from '../../../components/chat-bot-ai'
 
 type TProps = {}
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -40,7 +41,7 @@ const HomePage: NextPage<TProps> = () => {
   // ** Translate
   const { t } = useTranslation()
 
-  // State
+  // Statea
 
   const [sortBy, setSortBy] = useState('createdAt desc')
   const [searchBy, setSearchBy] = useState('')
@@ -206,6 +207,7 @@ const HomePage: NextPage<TProps> = () => {
   return (
     <>
       {loading && <Spinner />}
+      <ChatBotAI />
       <Box
         sx={{
           display: 'flex',
