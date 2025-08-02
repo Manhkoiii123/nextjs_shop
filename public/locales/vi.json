@@ -379,5 +379,8 @@
   "Shipping_price": "Phí vận chuyển",
   "Order_name_user": "Thông tin người nhận",
   "reviews": "Đánh giá",
-  "Forgot_password": "Quên mật khẩu"
+  "Forgot_password": "Quên mật khẩu",
+  "Public Products": "Sản phẩm công khai",
+  "Total Product": "Tổng sản phẩm",
+  "Private Products": "Sản phẩm không công khai"
 }

@@ -315,24 +315,25 @@ const HomePage: NextPage<TProps> = () => {
                   <NoData />
                 </Box>
               )}
+              <Box mt={6} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                {productPublic?.data.length > 0 && (
+                  <CustomPagination
+                    onChangePagination={handleOnChangePagination}
+                    pageSizeOptions={PAGE_SIZE_OPTIONS}
+                    rowLength={productPublic?.totalCount}
+                    pageSize={pageSize}
+                    page={page}
+                    setPage={setPage}
+                    setPageSize={setPageSize}
+                    totalPage={productPublic?.totalPage}
+                    isHideShow={true}
+                    isDisplayLines={false}
+                  />
+                )}
+              </Box>
             </Grid>
           </Grid>
         </Grid>
-
-        {productPublic?.data.length > 0 && (
-          <CustomPagination
-            onChangePagination={handleOnChangePagination}
-            pageSizeOptions={PAGE_SIZE_OPTIONS}
-            rowLength={productPublic?.totalCount}
-            pageSize={pageSize}
-            page={page}
-            setPage={setPage}
-            setPageSize={setPageSize}
-            totalPage={productPublic?.totalPage}
-            isHideShow={true}
-            isDisplayLines={false}
-          />
-        )}
       </Box>
     </>
   )

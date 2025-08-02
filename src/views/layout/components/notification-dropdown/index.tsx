@@ -21,6 +21,9 @@ import toast from 'react-hot-toast'
 import { resetInitialState } from 'src/stores/notification'
 import { getMessaging, onMessage } from 'firebase/messaging'
 import firebaseApp from 'src/configs/firebase'
+import useFcmToken from '../../../../hooks/useFcmToken'
+import { updateDeviceToken } from '../../../../services/auth'
+import { clearLocalDeviceToken, getLocalDeviceToken, setLocalDeviceToken } from '../../../../helpers/storage'
 
 export type NotificationsType = {
   _id: string
@@ -72,6 +75,8 @@ const NotificationDropdown = (props: Props) => {
   const theme = useTheme()
   const { t } = useTranslation()
   const wrapperListNotiRef = useRef<HTMLDivElement>(null)
+  const { fcmToken } = useFcmToken()
+  const localDeviceToken = getLocalDeviceToken()
 
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
   const {
@@ -94,6 +99,16 @@ const NotificationDropdown = (props: Props) => {
   useEffect(() => {
     handleGetListNotification()
   }, [limit])
+  const handleUpdateDeviceToken = async (token: string) => {
+    clearLocalDeviceToken()
+    setLocalDeviceToken(token)
+    await updateDeviceToken({ deviceToken: token })
+  }
+  useEffect(() => {
+    if (fcmToken && fcmToken !== localDeviceToken) {
+      handleUpdateDeviceToken(fcmToken)
+    }
+  }, [fcmToken])
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
   }

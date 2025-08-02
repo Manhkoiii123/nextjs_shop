@@ -26,6 +26,12 @@ export const registerAuth = async (data: TRegisterAuth) => {
     return error
   }
 }
+export const updateDeviceToken = async (data: { deviceToken: string }) => {
+  const res = await instanceAxios.post(`${API_ENDPOINT.AUTH.INDEX}/update-device`, data)
+
+  return res.data
+}
+
 export const updateAuthMe = async (data: any) => {
   try {
     const res = await instanceAxios.put(`${API_ENDPOINT.AUTH.INDEX}/me`, data)

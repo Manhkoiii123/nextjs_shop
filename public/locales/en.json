@@ -362,5 +362,8 @@
   "Delete_order_product_error": "Delete order product error",
   "Product_items": "Product items",
   "reviews": "Reviews",
-  "Forgot_password": "Forgot password"
+  "Forgot_password": "Forgot password",
+  "Public Products": "Public Products",
+  "Total Product": "Total Product",
+  "Private Products": "Private Products"
 }

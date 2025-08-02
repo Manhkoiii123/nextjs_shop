@@ -47,7 +47,13 @@ const CustomPagination = React.forwardRef((props: TProps, ref: Ref<any>) => {
         xs: 'center',
         md: 'space-between'
       }}
-      sx={{ display: 'flex', alignItems: 'center', width: '100%', paddingLeft: '4px' }}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: isHideShow ? 'center' : 'space-between',
+        width: '100%',
+        paddingLeft: '4px'
+      }}
     >
       {!isHideShow ? (
         <Box>

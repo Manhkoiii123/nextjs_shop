@@ -56,7 +56,7 @@ export const usePermission = (key: string, actions: TActions[]) => {
     actions.forEach(mode => {
       if (userPermission?.includes(PERMISSIONS.ADMIN)) {
         defaultValue[mode] = true //admin thì bật hết mode crud lên thành true
-      } else if (userPermission?.includes(mapPermission[mode])) {
+      } else if (mapPermission[mode] && userPermission?.includes(mapPermission[mode])) {
         //truy cập vào cái view | edit... của cái mapP
         // nếu mà cái userPer có chứa cái
         defaultValue[mode] = true
