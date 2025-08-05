@@ -37,11 +37,18 @@ import { resetInitialState as resetInitialStateComment } from 'src/stores/commen
 import { createCommentAsync } from 'src/stores/comments/actions'
 import connectSocketIO from 'src/helpers/socket'
 import { ACTION_SOCKET_COMMENT } from 'src/configs/socket'
+import { NextPage } from 'next'
 
-const DetailProductPage = () => {
+type TProps = {
+  productData: TProduct
+  productsRelated: TProduct[]
+}
+const DetailProductPage: NextPage<TProps> = ({ productData, productsRelated }) => {
+  console.log('🚀 ~ DetailProductPage ~ productsRelated:', productsRelated)
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
   const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
+  console.log('🚀 ~ DetailProductPage ~ listRelatedProduct:', listRelatedProduct)
   const [listReviews, setListReview] = useState<TReviewItem[]>([])
   const [listComment, setListComment] = useState<{ data: TCommentItemProduct[]; total: number }>({
     data: [],
@@ -83,20 +90,20 @@ const DetailProductPage = () => {
 
   const { t } = useTranslation()
   const theme = useTheme()
-  const fetchDetailProduct = async (slug: string, isViewed?: boolean) => {
-    setLoading(true)
-    await getDetailsProductPublic(slug, isViewed)
-      .then(res => {
-        setLoading(false)
-        const data = res.data
-        if (data) {
-          setDataProduct(data)
-        }
-      })
-      .catch(() => {
-        setLoading(false)
-      })
-  }
+  // const fetchDetailProduct = async (slug: string, isViewed?: boolean) => {
+  //   setLoading(true)
+  //   await getDetailsProductPublic(slug, isViewed)
+  //     .then(res => {
+  //       setLoading(false)
+  //       const data = res.data
+  //       if (data) {
+  //         setDataProduct(data)
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setLoading(false)
+  //     })
+  // }
 
   const renderCommentItem = (item: TCommentItemProduct, level: number) => {
     level += 1
@@ -114,20 +121,20 @@ const DetailProductPage = () => {
       </Box>
     )
   }
-  const fetchListRelasedProduct = async (slug: string) => {
-    setLoading(true)
-    await getListRelasedProductBySlug({ params: { slug: slug } })
-      .then(res => {
-        setLoading(false)
-        const data = res.data
-        if (data) {
-          setListRelatedProduct(data.products)
-        }
-      })
-      .catch(() => {
-        setLoading(false)
-      })
-  }
+  // const fetchListRelasedProduct = async (slug: string) => {
+  //   setLoading(true)
+  //   await getListRelasedProductBySlug({ params: { slug: slug } })
+  //     .then(res => {
+  //       setLoading(false)
+  //       const data = res.data
+  //       if (data) {
+  //         setListRelatedProduct(data.products)
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setLoading(false)
+  //     })
+  // }
   const fetchListCommentProduct = async (productId: string) => {
     setLoading(true)
     await getAllCommentsPublic({
@@ -145,12 +152,24 @@ const DetailProductPage = () => {
         setLoading(false)
       })
   }
+  // useEffect(() => {
+  //   if (productId) {
+  //     fetchDetailProduct(productId, true)
+  //     fetchListRelasedProduct(productId)
+  //   }
+  // }, [productId])
+
   useEffect(() => {
-    if (productId) {
-      fetchDetailProduct(productId, true)
-      fetchListRelasedProduct(productId)
+    if (productData?._id) {
+      setDataProduct(productData)
     }
-  }, [productId])
+  }, [productData])
+
+  useEffect(() => {
+    if (productsRelated.length > 0) {
+      setListRelatedProduct(productsRelated)
+    }
+  }, [productsRelated])
   useEffect(() => {
     if (dataProduct?._id) {
       fetchListCommentProduct(dataProduct?._id)
