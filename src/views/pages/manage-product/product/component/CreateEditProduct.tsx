@@ -53,6 +53,10 @@ interface TCreateEditUser {
   idProduct?: string
   imageProduct: string
   setImageProduct: Dispatch<SetStateAction<string>>
+  optionTypes: {
+    label: string
+    value: string
+  }[]
 }
 type TDefaultValue = {
   name: string
@@ -71,9 +75,8 @@ const CreateEditProduct = (props: TCreateEditUser) => {
   const { t, i18n } = useTranslation()
   const [loading, setLoading] = useState(false)
   // const [imageProduct, setImageProduct] = useState('')
-  const [optionTypes, setOptionTypes] = useState<{ label: string; value: string }[]>([])
   const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
-  const { open, onClose, idProduct, imageProduct, setImageProduct } = props
+  const { open, onClose, idProduct, imageProduct, setImageProduct, optionTypes } = props
   const theme = useTheme()
   const defaultValues: TDefaultValue = {
     name: '',
@@ -216,18 +219,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
     }
   }
 
-  const fetchAllType = async () => {
-    setLoading(true)
-    await getAllProductTypes({ params: { limit: -1, page: -1 } })
-      .then(res => {
-        const data = res.data.productTypes
-        if (data) {
-          setOptionTypes(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
-        }
-        setLoading(false)
-      })
-      .catch(e => setLoading(false))
-  }
   const fetchAllCities = async () => {
     setLoading(true)
     await getAllCity({ params: { limit: -1, page: -1 } })
@@ -244,7 +235,6 @@ const CreateEditProduct = (props: TCreateEditUser) => {
   }
 
   useEffect(() => {
-    fetchAllType()
     fetchAllCities()
   }, [])
   const handleUploadImage = async (file: File) => {

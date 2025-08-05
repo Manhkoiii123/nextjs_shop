@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import { DataGrid, DataGridProps, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import { styled } from '@mui/material'
-import { Ref, forwardRef } from 'react'
+import { Ref, forwardRef, memo } from 'react'
 
 const StyleCustomGrid = styled(DataGrid)<DataGridProps>(({ theme }) => ({
   '& .MuiDataGrid-withBorderColor': {
@@ -23,4 +23,4 @@ const CustomDataGrid = forwardRef((props: DataGridProps, ref: Ref<any>) => {
     </Box>
   )
 })
-export default CustomDataGrid
+export default memo(CustomDataGrid)

@@ -2,7 +2,7 @@
 import { NextPage } from 'next'
 
 // ** React
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ** Mui
@@ -67,7 +67,7 @@ const ProductList: NextPage<TProps> = () => {
   const [openDeleteMultipleProduct, setOpenDeleteMultipleProduct] = useState(false)
   const [sortBy, setSortBy] = useState('createdAt desc')
   const [searchBy, setSearchBy] = useState('')
-
+  const isRendered = useRef<boolean>(false)
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
   const [page, setPage] = useState(1)
   const [selectedRow, setSelectedRow] = useState<string[]>([])
@@ -229,13 +229,15 @@ const ProductList: NextPage<TProps> = () => {
   }
 
   useEffect(() => {
+    if (isRendered.current) {
+      setFilterBy({ productType: typeSelected, status: statusSelected })
+    }
+  }, [typeSelected, statusSelected])
+  useEffect(() => {
     fetchAllType()
     fetchAllCountProductStatus()
+    isRendered.current = true
   }, [])
-
-  useEffect(() => {
-    setFilterBy({ productType: typeSelected, status: statusSelected })
-  }, [statusSelected, typeSelected])
 
   const columns: GridColDef[] = [
     {
@@ -365,7 +367,9 @@ const ProductList: NextPage<TProps> = () => {
   ]
 
   useEffect(() => {
-    handleGetListProducts()
+    if (isRendered.current) {
+      handleGetListProducts()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, searchBy, page, pageSize, filterBy])
 
@@ -459,6 +463,7 @@ const ProductList: NextPage<TProps> = () => {
         open={openCreateEdit.open}
         onClose={handleCloseCreateEdit}
         idProduct={openCreateEdit.id}
+        optionTypes={optionTypes}
       />
       {isLoading && <Spinner />}
       <Box sx={{ backgroundColor: 'inherit', width: '100%', mb: 4 }}>

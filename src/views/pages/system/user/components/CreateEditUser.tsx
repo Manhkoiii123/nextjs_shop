@@ -25,7 +25,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/stores'
 import { createUserAsync, updateUserAsync } from 'src/stores/user/actions'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, memo, SetStateAction, useEffect, useState } from 'react'
 import { getDetailUser, updateUser } from 'src/services/user'
 import Spinner from 'src/components/spinner'
 import { EMAIL_REG, PASSWORD_REG } from 'src/configs/regex'
@@ -42,6 +42,8 @@ interface TCreateEditUser {
   idUser?: string
   avatar: string
   setAvatar: Dispatch<SetStateAction<string>>
+  optionRoles: { label: string; value: string }[]
+  optionCities: { label: string; value: string }[]
 }
 type TDefaultValue = {
   password?: string
@@ -56,11 +58,8 @@ type TDefaultValue = {
 const CreateEditUser = (props: TCreateEditUser) => {
   const { t, i18n } = useTranslation()
   const [loading, setLoading] = useState(false)
-
-  const [optionRoles, setOptionRoles] = useState<{ label: string; value: string }[]>([])
   const [showPassword, setShowPassword] = useState(false)
-  const [optionCities, setOptionCities] = useState<{ label: string; value: string }[]>([])
-  const { open, onClose, idUser, avatar, setAvatar } = props
+  const { open, onClose, idUser, avatar, setAvatar, optionCities, optionRoles } = props
   const theme = useTheme()
   const defaultValues: TDefaultValue = {
     password: '',
@@ -135,35 +134,7 @@ const CreateEditUser = (props: TCreateEditUser) => {
       }
     }
   }
-  const fetchRoles = async () => {
-    setLoading(true)
-    await getAllRoles({ params: { limit: -1, page: -1 } })
-      .then(res => {
-        const data = res.data.roles
-        if (data) {
-          setOptionRoles(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
-        }
-        setLoading(false)
-      })
-      .catch(e => setLoading(false))
-  }
-  const fetchAllCity = async () => {
-    setLoading(true)
-    await getAllCity({ params: { limit: -1, page: -1 } })
-      .then(res => {
-        const data = res.data.cities
-        if (data) {
-          setOptionCities(data.map((item: { name: string; _id: string }) => ({ label: item.name, value: item._id })))
-        }
-        setLoading(false)
-      })
-      .catch(e => setLoading(false))
-  }
 
-  useEffect(() => {
-    fetchRoles()
-    fetchAllCity()
-  }, [])
   const handleUploadAvatar = async (file: File) => {
     const base64 = await convertBase64(file)
     setAvatar(base64 as string)
@@ -556,4 +527,4 @@ const CreateEditUser = (props: TCreateEditUser) => {
     </>
   )
 }
-export default CreateEditUser
+export default memo(CreateEditUser)

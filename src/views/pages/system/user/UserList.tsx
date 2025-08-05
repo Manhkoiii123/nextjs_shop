@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/stores'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GridColDef, GridRowClassNameParams, GridRowId, GridSortModel } from '@mui/x-data-grid'
 import CustomDataGrid from 'src/components/custom-data-grid'
 import CustomPagination from 'src/components/custom-pagination'
@@ -67,6 +67,27 @@ const UnactiveUserStyled = styled(Chip)<ChipProps>(({ theme }) => ({
 
 const UserListPage: NextPage<TProps> = () => {
   const { i18n } = useTranslation()
+  const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.USER', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
+  const isFirstRender = useRef<boolean>(false)
+  const [loading, setLoading] = useState(false)
+  const [selectedRow, setSelectedRow] = useState<TSelectedRow[]>([])
+  const [roleSelected, setRoleSelected] = useState<string>('')
+  const [statusSelected, setStatusSelected] = useState<string>('')
+  const [typeSelected, setTypeSelected] = useState<string[]>([])
+  const [citySelected, setCitySelected] = useState<string[]>([])
+  const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
+  const [avatar, setAvatar] = useState('')
+  const { t } = useTranslation()
+  const theme = useTheme()
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
+  const [openDeleteUser, setOpenDeleteUser] = useState({
+    open: false,
+    id: ''
+  })
+  const [openDeleteUserMultiple, setOpenDeleteUserMultiple] = useState(false)
+  //dùng redux
+  const dispatch: AppDispatch = useDispatch()
   const {
     users,
     isSuccessCreateEdit,
@@ -134,36 +155,20 @@ const UserListPage: NextPage<TProps> = () => {
         setLoading(false)
       })
   }
-
+  useEffect(() => {
+    if (isFirstRender.current) {
+      handleGetListUser()
+    }
+  }, [sortBy, searchBy, i18n.language, page, pageSize, filterBy])
   useEffect(() => {
     fetchRoles()
     fetchAllCity()
     fetchAllCountUserType()
+    isFirstRender.current = true
   }, [])
   //page Nào cần check chỉ cần dugnf thế này là ok
-  const { CREATE, UPDATE, DELETE, VIEW } = usePermission('SYSTEM.USER', ['CREATE', 'VIEW', 'UPDATE', 'DELETE'])
 
-  const [loading, setLoading] = useState(false)
-  const [selectedRow, setSelectedRow] = useState<TSelectedRow[]>([])
-  const [roleSelected, setRoleSelected] = useState<string>('')
-  const [statusSelected, setStatusSelected] = useState<string>('')
-  const [typeSelected, setTypeSelected] = useState<string[]>([])
-  const [citySelected, setCitySelected] = useState<string[]>([])
-  const [filterBy, setFilterBy] = useState<Record<string, string[] | string>>({})
-  const [avatar, setAvatar] = useState('')
-  const { t } = useTranslation()
-  const theme = useTheme()
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0])
-  const [openDeleteUser, setOpenDeleteUser] = useState({
-    open: false,
-    id: ''
-  })
-  const [openDeleteUserMultiple, setOpenDeleteUserMultiple] = useState(false)
-  //dùng redux
-  const dispatch: AppDispatch = useDispatch()
-
-  const handleAction = (action: string) => {
+  const handleAction = useCallback((action: string) => {
     switch (action) {
       case 'delete':
         setOpenDeleteUserMultiple(true)
@@ -172,7 +177,7 @@ const UserListPage: NextPage<TProps> = () => {
       default:
         break
     }
-  }
+  }, [])
   const handleGetListUser = () => {
     const query = {
       params: { limit: pageSize, page: page, search: searchBy, order: sortBy, ...formatFilter(filterBy) }
@@ -335,13 +340,13 @@ const UserListPage: NextPage<TProps> = () => {
       }
     }
   ]
-  const handleCloseCreateEdit = () => {
+  const handleCloseCreateEdit = useCallback(() => {
     setOpenCreateEdit({
       open: false,
       id: ''
     })
     setAvatar('')
-  }
+  }, [])
 
   const handleSort = (sort: GridSortModel) => {
     const sortOption = sort[0]
@@ -354,17 +359,14 @@ const UserListPage: NextPage<TProps> = () => {
   const handleDeleteUser = () => {
     dispatch(deleteUserAsync(openDeleteUser.id))
   }
-  const handleDeleteUserMultiple = () => {
+  const handleDeleteUserMultiple = useCallback(() => {
     dispatch(
       deleteMultipleUserAsync({
         userIds: selectedRow.map(item => item.id)
       })
     )
-  }
+  }, [selectedRow])
 
-  useEffect(() => {
-    handleGetListUser()
-  }, [sortBy, searchBy, i18n.language, page, pageSize, filterBy])
   useEffect(() => {
     if (isSuccessCreateEdit) {
       if (!openCreateEdit.id) {
@@ -391,13 +393,9 @@ const UserListPage: NextPage<TProps> = () => {
   }, [isErrorCreateEdit, isSuccessCreateEdit, messageErrorCreateEdit])
 
   useEffect(() => {
-    setFilterBy({
-      roleId: roleSelected,
-      status: statusSelected,
-      cityId: citySelected,
-      userType: typeSelected
-      // cityId: ''
-    })
+    if (isFirstRender.current) {
+      setFilterBy({ roleId: roleSelected, status: statusSelected, cityId: citySelected, userType: typeSelected })
+    }
   }, [roleSelected, statusSelected, citySelected, typeSelected])
   useEffect(() => {
     if (isSuccessDelete) {
@@ -471,6 +469,8 @@ const UserListPage: NextPage<TProps> = () => {
         onClose={handleCloseCreateEdit}
         avatar={avatar}
         setAvatar={setAvatar}
+        optionCities={optionCity}
+        optionRoles={optionRoles}
       />
       {isLoading && <Spinner />}
       <Box sx={{ backgroundColor: 'inherit', width: '100%', mb: 4 }}>

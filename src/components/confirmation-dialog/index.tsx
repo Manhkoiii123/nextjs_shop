@@ -10,6 +10,7 @@ import {
   useTheme
 } from '@mui/material'
 import { DialogTitle } from '@mui/material'
+import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconifyIcon from 'src/components/Icon'
 
@@ -68,4 +69,4 @@ const ConfirmationDialog = (props: TConfirmationDialog) => {
     </Dialog>
   )
 }
-export default ConfirmationDialog
+export default memo(ConfirmationDialog)
