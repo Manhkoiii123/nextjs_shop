@@ -44,11 +44,9 @@ type TProps = {
   productsRelated: TProduct[]
 }
 const DetailProductPage: NextPage<TProps> = ({ productData, productsRelated }) => {
-  console.log('🚀 ~ DetailProductPage ~ productsRelated:', productsRelated)
   const [loading, setLoading] = useState(false)
   const [dataProduct, setDataProduct] = useState<TProduct>()
   const [listRelatedProduct, setListRelatedProduct] = useState<TProduct[]>([])
-  console.log('🚀 ~ DetailProductPage ~ listRelatedProduct:', listRelatedProduct)
   const [listReviews, setListReview] = useState<TReviewItem[]>([])
   const [listComment, setListComment] = useState<{ data: TCommentItemProduct[]; total: number }>({
     data: [],
